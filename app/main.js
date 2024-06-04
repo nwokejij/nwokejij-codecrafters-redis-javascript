@@ -9,7 +9,7 @@ const server = net.createServer((connection) => {
         // connection.write("+PONG\r\n");
 
         const command = data.toString().trim();
-        // console.log("Command: " + command);
+        console.log(command);
         const message = parseRedisResponse(command.substring(5));
         console.log("Message: "+ message);
     })
