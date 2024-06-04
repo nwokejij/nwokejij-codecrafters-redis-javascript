@@ -19,6 +19,7 @@ const server = net.createServer((connection) => {
 
 function parseRedisResponse(data) {
     const type = data.charAt(0);
+    console.log("Type:" + type);
     const content = data.slice(1).trim();
   
     switch (type) {
