@@ -35,9 +35,8 @@ function parseRedisResponse(data) {
         //how to parse this
 
             const elements = parseInt(content, 10);
-            console.log("Elements: " + elements);
             const arrayData = [];
-            let index = data.indexOf('\r\n');
+            let index = data.indexOf('\r'); // 2
             console.log("Index: " + index);
             for (let i = 0; i < elements; i++) {
                 const subResponse = parseRedisResponse(data.slice(index));
