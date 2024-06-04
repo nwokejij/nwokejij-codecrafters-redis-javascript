@@ -31,7 +31,11 @@ function parseRedisResponse(data) {
             const length = parseInt(content, 10);
             return data.slice(data.indexOf('\r\n') + 2, data.indexOf('\r\n') + 2 + length);
         case '*': // Array
+        //*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n
+        //how to parse this
+
             const elements = parseInt(content, 10);
+            console.log("Elements: " + elements);
             const arrayData = [];
             let index = data.indexOf('\r\n');
             console.log("Index: " + index);
