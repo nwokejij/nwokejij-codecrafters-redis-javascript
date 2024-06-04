@@ -10,7 +10,7 @@ const server = net.createServer((connection) => {
 
         const command = data.toString().trim();
         console.log(command);
-        const message = parseRedisResponse(command.substring(5));
+        const message = parseRedisResponse(command);
         console.log("Message: "+ message);
     })
 
