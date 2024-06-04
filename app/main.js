@@ -8,8 +8,7 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
         // connection.write("+PONG\r\n");
 
-        const command = data.toString().trim();
-        console.log(command);
+        const command = data.toString();
         const message = parseRedisResponse(command);
         console.log("Message: "+ message);
     })
@@ -19,7 +18,6 @@ const server = net.createServer((connection) => {
 
 function parseRedisResponse(data) {
     const type = data.charAt(0);
-    console.log("Type:" + type);
     const content = data.slice(1).trim();
   
     switch (type) {
@@ -36,6 +34,7 @@ function parseRedisResponse(data) {
             const elements = parseInt(content, 10);
             const arrayData = [];
             let index = data.indexOf('\r\n');
+            console.log("Index: " + index);
             for (let i = 0; i < elements; i++) {
                 const subResponse = parseRedisResponse(data.slice(index));
                 arrayData.push(subResponse);
