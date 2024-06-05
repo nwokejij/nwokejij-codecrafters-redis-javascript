@@ -30,7 +30,7 @@ function parseRedisResponse(data) {
             return parseInt(content, 10);
         case '$': // Bulk string
             const length = parseInt(content, 10);
-            console.log("Length: " + length);
+            // console.log("Length: " + length);
             return data.slice(data.indexOf('\r\n') + 2, data.indexOf('\r\n') + 2 + length);
         case '*': // Array
         //*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n$11\r\n<11char>\r\n
@@ -44,13 +44,9 @@ function parseRedisResponse(data) {
             // let index = data.indexOf('\r\n'); // 3
             let bulkStrings = data.split('\r\nECHO\r\n')[1];
             // console.log("BulkStrings: " + bulkStrings + ".");
-            for (let i = 0; i < elements - 1; i++) {
-                console.log("String:" + bulkStrings[i]);
-                const subResponse = parseRedisResponse(bulkStrings[i]);
-                arrayData.push(subResponse);
-            }
+            const subResponse = parseRedisResponse(bulkStrings);
             response = arrayData.join("");
-            return bulkStrings;
+            return subResponse;
         default:
             throw new Error('Invalid Redis response');
     }
