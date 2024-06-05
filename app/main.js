@@ -44,12 +44,12 @@ function parseRedisResponse(data) {
             // let index = data.indexOf('\r\n'); // 3
             let bulkStrings = data.split('\r\n');
             console.log("First Element: " + bulkStrings[0]);
-            for (let i = 0; i < elements; i++) {
-                const subResponse = parseRedisResponse(data.slice(index));
+            for (let i = 2; i < elements + 1; i++) {
+                const subResponse = parseRedisResponse(bulkStrings[i]);
                 arrayData.push(subResponse);
-                index += subResponse.length + 4; // +4 for "$\r\n" or "*\r\n"
             }
-            return arrayData;
+            response = arrayData.join("");
+            return response;
         default:
             throw new Error('Invalid Redis response');
     }
