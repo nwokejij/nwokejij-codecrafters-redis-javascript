@@ -11,6 +11,7 @@ const server = net.createServer((connection) => {
 
         const command = data.toString();
         const message = parseRedisResponse(command);
+        console.log("have we gotten to this part");
         connection.write(message);
     })
 
