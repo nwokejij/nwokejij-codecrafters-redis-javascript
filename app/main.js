@@ -1,3 +1,4 @@
+const { Console } = require("console");
 const net = require("net");
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -29,15 +30,20 @@ function parseRedisResponse(data) {
             return parseInt(content, 10);
         case '$': // Bulk string
             const length = parseInt(content, 10);
+            console.log("Length: " + length);
             return data.slice(data.indexOf('\r\n') + 2, data.indexOf('\r\n') + 2 + length);
         case '*': // Array
         //*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n
         //how to parse this
+        // *2 $4 ECHO $3 hey $X <word>
+        // 2, 4, 6
+        // $4\r\nECHO
 
             const elements = parseInt(content, 10);
             const arrayData = [];
-            let index = data.indexOf('\n'); // 2
-            console.log("Index: " + index);
+            // let index = data.indexOf('\r\n'); // 3
+            let bulkStrings = data.split('\r\n');
+            console.log("First Element: " + bulkStrings[0]);
             for (let i = 0; i < elements; i++) {
                 const subResponse = parseRedisResponse(data.slice(index));
                 arrayData.push(subResponse);
