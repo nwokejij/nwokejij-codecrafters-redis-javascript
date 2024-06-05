@@ -43,6 +43,7 @@ function parseRedisResponse(data) {
             const arrayData = [];
             // let index = data.indexOf('\r\n'); // 3
             let bulkStrings = data.split('\r\nECHO\r\n')[1];
+            console.log("BulkStrings: " + bulkStrings + ".");
             console.log("First Element: " + bulkStrings);
             for (let i = 0; i < elements - 1; i++) {
                 console.log("String:" + bulkStrings[i]);
