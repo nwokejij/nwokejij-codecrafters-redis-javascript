@@ -43,7 +43,7 @@ function parseRedisResponse(data) {
             // let index = data.indexOf('\r\n'); // 3
             let bulkStrings = data.split('\r\nECHO\r\n')[1];
             // console.log("BulkStrings: " + bulkStrings + ".");
-            const subResponse = parseRedisResponse(bulkStrings);
+            // const subResponse = parseRedisResponse(bulkStrings);
             return bulkStrings;
         default:
             throw new Error('Invalid Redis response');
