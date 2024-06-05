@@ -11,7 +11,7 @@ const server = net.createServer((connection) => {
 
         const command = data.toString();
         const message = parseRedisResponse(command);
-        console.log("Message: "+ message);
+        connection.write(message);
     })
 
 
@@ -40,13 +40,11 @@ function parseRedisResponse(data) {
         // $4\r\nECHO
 
             const elements = parseInt(content, 10);
-            const arrayData = [];
             // let index = data.indexOf('\r\n'); // 3
             let bulkStrings = data.split('\r\nECHO\r\n')[1];
             // console.log("BulkStrings: " + bulkStrings + ".");
             const subResponse = parseRedisResponse(bulkStrings);
-            response = arrayData.join("");
-            return subResponse;
+            return bulkStrings;
         default:
             throw new Error('Invalid Redis response');
     }
