@@ -46,6 +46,7 @@ function parseRedisResponse(data) {
             console.log("First Element: " + bulkStrings[0]);
             for (let i = 2; i < elements + 1; i++) {
                 const subResponse = parseRedisResponse(bulkStrings[i]);
+                console.log(bulkStrings[i]);
                 arrayData.push(subResponse);
             }
             response = arrayData.join("");
