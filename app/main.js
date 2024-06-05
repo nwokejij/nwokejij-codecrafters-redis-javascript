@@ -33,7 +33,7 @@ function parseRedisResponse(data) {
             console.log("Length: " + length);
             return data.slice(data.indexOf('\r\n') + 2, data.indexOf('\r\n') + 2 + length);
         case '*': // Array
-        //*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n
+        //*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n$11\r\n<11char>\r\n
         //how to parse this
         // *2 $4 ECHO $3 hey $X <word>
         // 2, 4, 6
@@ -42,9 +42,9 @@ function parseRedisResponse(data) {
             const elements = parseInt(content, 10);
             const arrayData = [];
             // let index = data.indexOf('\r\n'); // 3
-            let bulkStrings = data.split('\r\n');
+            let bulkStrings = data.split('ECHO\r\n')[1];
             console.log("First Element: " + bulkStrings[0]);
-            for (let i = 2; i < elements + 1; i++) {
+            for (let i = 0; i < elements - 1; i++) {
                 console.log("String:" + bulkStrings[i]);
                 const subResponse = parseRedisResponse(bulkStrings[i]);
                 arrayData.push(subResponse);
