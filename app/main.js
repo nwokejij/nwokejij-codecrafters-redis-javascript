@@ -45,7 +45,15 @@ function parseRedisResponse(data) {
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
                     return "+OK\r\n";
-                } else if (stringArray[i] == "GET"){
+                } else if (stringArray[i] == "px"){
+                    setTimeout(() => {
+                    delete dictionary[string[i - 4]];
+                    }, dictionary[parseInt(string[i+2])]
+                )
+                }
+                    
+                    
+                else if (stringArray[i] == "GET"){
                     if (!(stringArray[i+2] in dictionary)) {
                         return getBulkString(null);
                     }
@@ -63,7 +71,7 @@ function parseRedisResponse(data) {
 }
 function getBulkString(string){
     if (string == null){
-        return "\$$-1\r\n"
+        return "$-1\r\n"
     }
 
     return `\$${string.length}\r\n${string}\r\n`
