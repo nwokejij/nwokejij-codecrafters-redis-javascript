@@ -58,7 +58,6 @@ function parseRedisResponse(data) {
             }
             strings = noNewLine.join("\r\n");
             console.log(strings);
-            strings += "\r\n";
             // let index = data.indexOf('\r\n'); // 3
             
             // console.log("BulkStrings: " + bulkStrings + ".");
