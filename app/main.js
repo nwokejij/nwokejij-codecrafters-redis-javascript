@@ -47,7 +47,7 @@ function parseRedisResponse(data) {
             stringArray = bulkStrings.split('\r\n');
             stringArrayLen = stringArray.length;
             noNewLine = [];
-            console.log(stringArray[0]);
+            // console.log(stringArray[0]);
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "ECHO"){
                     noNewLine.pop();
