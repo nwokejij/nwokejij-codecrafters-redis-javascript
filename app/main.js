@@ -42,7 +42,7 @@ function parseRedisResponse(data) {
         // *1 $4 PING
             words = data.split('\r\n');
             const elements = parseInt(content, 10);
-            console.log(data.indexOf('\r'));
+            console.log(data.indexOf('\r\n'));
             stringArray = [];
             for (let i = 2; i < words.length; i+=2){
                 if (words[i] == "ECHO" || words[i][0] == '*' || words[i][0] == '$'){
