@@ -45,11 +45,11 @@ function parseRedisResponse(data) {
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
-                    if (i + 6 < stringArrayLen){
+                    if (i + 6 < stringArrayLen && i + 8 < stringArrayLen){
                         if (dictionary[i+6] == "px"){
                             setTimeout(() => {
-                                delete dictionary[string[i - 4]];
-                                }, dictionary[parseInt(string[i+2])]
+                                delete dictionary[string[i + 2]];
+                                }, dictionary[parseInt(string[i + 8])]
                             )
                         }
                     }
