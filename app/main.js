@@ -44,6 +44,7 @@ function parseRedisResponse(data) {
             // const elements = parseInt(content, 10);
             console.log("Data:" + data);
             delimiter = data.indexOf('\r\n');
+            console.log("Index: " + delimiter);
             bulkStrings = data.slice(delimiter+1);
             stringArray = bulkStrings.split('\r\n');
             stringArrayLen = stringArray.length;
