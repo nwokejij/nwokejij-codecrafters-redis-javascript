@@ -41,20 +41,22 @@ function parseRedisResponse(data) {
         // *1\r\n$4\r\nPING\r\n
         // *1 $4 PING
             words = data.split('\r\n');
-            const elements = parseInt(content, 10);
+            // const elements = parseInt(content, 10);
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+1);
+            stringArray = bulkStrings.split('\r\n');
+            stringArrayLen = bulkStrings.length;
+            noNewLine = [];
             console.log(bulkStrings);
-            stringArray = [];
-            for (let i = 2; i < words.length; i+=2){
-                if (words[i] == "ECHO" || words[i][0] == '*' || words[i][0] == '$'){
+            for (let i = 0; i < stringArrayLen; i++){
+                if (stringArray[i] == "ECHO"){
+                    noNewLine.pop();
                     continue;
                 } else {
-                    stringArray.push(words[i]);
+                    noNewLine.push(stringArray[i]);
                 }
             }
-            strings = "\r\n";
-            strings += stringArray.join("\r\n");
+            strings = stringArray.join("\r\n");
             strings += "\r\n";
             // let index = data.indexOf('\r\n'); // 3
             
