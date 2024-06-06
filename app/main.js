@@ -17,6 +17,7 @@ const dictionary = {};
 function parseRedisResponse(data) {
     const type = data.charAt(0);
     const content = data.slice(1).trim();
+
     switch (type) {
         case '+': // Simple string
             return content;
@@ -44,16 +45,16 @@ function parseRedisResponse(data) {
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
+                    if (i + 6 < stringArrayLen){
+                        if (dictionary[i+6] == "px"){
+                            setTimeout(() => {
+                                delete dictionary[string[i - 4]];
+                                }, dictionary[parseInt(string[i+2])]
+                            )
+                        }
+                    }
                     return "+OK\r\n";
-                } else if (stringArray[i] == "px"){
-                    setTimeout(() => {
-                    delete dictionary[string[i - 4]];
-                    }, dictionary[parseInt(string[i+2])]
-                )
-                }
-                    
-                    
-                else if (stringArray[i] == "GET"){
+                }else if (stringArray[i] == "GET"){
                     if (!(stringArray[i+2] in dictionary)) {
                         return getBulkString(null);
                     }
