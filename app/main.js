@@ -6,7 +6,6 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
-        dictionary = {};
         const command = data.toString();
         const message = parseRedisResponse(command);
         connection.write(message);
@@ -14,7 +13,7 @@ const server = net.createServer((connection) => {
 
 
 });
-
+const dictionary = {};
 function parseRedisResponse(data) {
     const type = data.charAt(0);
     const content = data.slice(1).trim();
