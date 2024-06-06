@@ -55,6 +55,8 @@ function parseRedisResponse(data) {
                 if (stringArray[i] == "ECHO"){
                     noNewLine.pop();
                     continue;
+                } else if (stringArray[i] == "PING"){
+                    return "+PONG\r\n";
                 } else {
                     noNewLine.push(stringArray[i]);
                 }
