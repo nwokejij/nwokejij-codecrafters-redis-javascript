@@ -44,14 +44,9 @@ function parseRedisResponse(data) {
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
-                    // Iterate over dictionary entries
-                    for (let key in dictionary) {
-                        console.log(key + ": " + dictionary[key]);
-                    }
                     return "+OK\r\n";
                 } else if (stringArray[i] == "GET"){
                     if (!(stringArray[i+2] in dictionary)) {
-                        console.log("Should not see this");
                         return getBulkString(null);
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
