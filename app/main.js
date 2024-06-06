@@ -51,8 +51,8 @@ function parseRedisResponse(data) {
                     }
                     return "+OK\r\n";
                 } else if (stringArray[i] == "GET"){
-                    console.log("Grape: " + stringArray[i+2]);
                     if (!(stringArray[i+2] in dictionary)) {
+                        console.log("Should not see this");
                         return getBulkString(null);
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
