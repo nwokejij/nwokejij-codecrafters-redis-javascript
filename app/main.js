@@ -43,8 +43,8 @@ function parseRedisResponse(data) {
             words = data.split('\r\n');
             const elements = parseInt(content, 10);
             delimiter = data.indexOf('\r\n');
-            content = data.slice(delimiter+1);
-            console.log(content);
+            bulkStrings = data.slice(delimiter+1);
+            console.log(bulkStrings);
             stringArray = [];
             for (let i = 2; i < words.length; i+=2){
                 if (words[i] == "ECHO" || words[i][0] == '*' || words[i][0] == '$'){
