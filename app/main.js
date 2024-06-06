@@ -42,6 +42,7 @@ function parseRedisResponse(data) {
         // *1 $4 PING
             words = data.split('\r\n');
             // const elements = parseInt(content, 10);
+            console.log("Data:" + data);
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+1);
             stringArray = bulkStrings.split('\r\n');
