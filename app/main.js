@@ -56,7 +56,7 @@ function parseRedisResponse(data) {
                     noNewLine.push(stringArray[i]);
                 }
             }
-            strings = stringArray.join("\r\n");
+            strings = noNewLine.join("\r\n");
             console.log(strings);
             strings += "\r\n";
             // let index = data.indexOf('\r\n'); // 3
