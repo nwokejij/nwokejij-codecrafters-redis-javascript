@@ -47,6 +47,7 @@ function parseRedisResponse(data) {
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
                     if (i + 6 < stringArrayLen && i + 8 < stringArrayLen){
                         if (dictionary[i+6] == "px"){
+                            console.log("Have we gotten here");
                             setTimeout(() => {
                                 delete dictionary[string[i + 2]];
                                 }, dictionary[parseInt(string[i + 8])]
