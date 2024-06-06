@@ -38,8 +38,9 @@ function parseRedisResponse(data) {
         // *2 $4 ECHO $3 hey $X <word>
         // 2, 4, 6
         // $4\r\nECHO
-            console.log(data);
+        // *1\r\n$4\r\nPING\r\n
             const elements = parseInt(content, 10);
+            console.log(elements);
             // let index = data.indexOf('\r\n'); // 3
             let bulkStrings = data.split('\r\nECHO\r\n')[1];
             // console.log("BulkStrings: " + bulkStrings + ".");
