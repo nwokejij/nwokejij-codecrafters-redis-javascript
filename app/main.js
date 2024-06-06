@@ -6,6 +6,7 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
+        dictionary = {};
         const command = data.toString();
         const message = parseRedisResponse(command);
         connection.write(message);
@@ -30,7 +31,7 @@ function parseRedisResponse(data) {
             // console.log("Length: " + length);
             return data.slice(data.indexOf('\r\n') + 2, data.indexOf('\r\n') + 2 + length);
         case '*': // Array
-            words = data.split('\r\n');
+            console.log("Data: "+ data);
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+2);
             stringArray = bulkStrings.split('\r\n');
