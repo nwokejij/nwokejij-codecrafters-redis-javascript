@@ -48,7 +48,7 @@ function parseRedisResponse(data) {
                 if (words[i] == "ECHO" || words[i][0] == '*' || words[i][0] == '$'){
                     continue;
                 } else {
-                    stringArray.append(words[i]);
+                    stringArray.push(words[i]);
                 }
             }
             strings = "\r\n";
