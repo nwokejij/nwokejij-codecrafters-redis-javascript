@@ -71,6 +71,6 @@ function getBulkString(string){
         return "\$$-1\r\n"
     }
 
-    return f`\$$${string.length}\r\n${string}\r\n`
+    return `\$$${string.length}\r\n${string}\r\n`
 }
 server.listen(6379, "127.0.0.1");
