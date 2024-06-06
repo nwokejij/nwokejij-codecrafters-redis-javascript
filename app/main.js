@@ -39,13 +39,26 @@ function parseRedisResponse(data) {
         // 2, 4, 6
         // $4\r\nECHO
         // *1\r\n$4\r\nPING\r\n
+        // *1 $4 PING
+            words = data.split('\r\n');
             const elements = parseInt(content, 10);
             console.log(elements);
+            stringArray = [];
+            for (let i = 2; i < words.length; i+=2){
+                if (words[i] == "ECHO" || words[i][0] == '*' || words[i][0] == '$'){
+                    continue;
+                } else {
+                    stringArray.append(words[i]);
+                }
+            }
+            strings = "\r\n";
+            strings += stringArray.join("\r\n");
+            strings += "\r\n";
             // let index = data.indexOf('\r\n'); // 3
-            let bulkStrings = data.split('\r\nECHO\r\n')[1];
+            
             // console.log("BulkStrings: " + bulkStrings + ".");
             // const subResponse = parseRedisResponse(bulkStrings);
-            return bulkStrings;
+            return strings;
         default:
             throw new Error('Invalid Redis response');
     }
