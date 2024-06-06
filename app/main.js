@@ -11,7 +11,6 @@ const server = net.createServer((connection) => {
 
         const command = data.toString();
         const message = parseRedisResponse(command);
-        console.log(message);
         connection.write(message);
     })
 
@@ -39,7 +38,7 @@ function parseRedisResponse(data) {
         // *2 $4 ECHO $3 hey $X <word>
         // 2, 4, 6
         // $4\r\nECHO
-
+            console.log(data);
             const elements = parseInt(content, 10);
             // let index = data.indexOf('\r\n'); // 3
             let bulkStrings = data.split('\r\nECHO\r\n')[1];
