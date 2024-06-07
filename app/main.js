@@ -49,7 +49,7 @@ function parseRedisResponse(data) {
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
                                 delete dictionary[stringArray[i + 2]];
-                                }, dictionary[parseInt(stringArray[i + 8])]
+                                }, parseInt(stringArray[i + 8])
                             )
                         }
                     }
