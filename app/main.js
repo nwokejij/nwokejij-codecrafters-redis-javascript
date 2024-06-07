@@ -47,11 +47,11 @@ function parseRedisResponse(data) {
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
-                            console.log("Have we gotten here");
                             setTimeout(() => {
                                 delete dictionary[stringArray[i + 2]];
                                 }, dictionary[parseInt(stringArray[i + 8])]
                             )
+                            console.log(parseInt(stringArray[i + 8]));
                         }
                     }
                     return "+OK\r\n";
