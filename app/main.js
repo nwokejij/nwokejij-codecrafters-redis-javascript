@@ -30,7 +30,6 @@ function parseRedisResponse(data) {
             // console.log("Length: " + length);
             return data.slice(data.indexOf('\r\n') + 2, data.indexOf('\r\n') + 2 + length);
         case '*': // Array
-            console.log("Data: "+ data);
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+2);
             stringArray = bulkStrings.split('\r\n');
@@ -51,12 +50,12 @@ function parseRedisResponse(data) {
                                 delete dictionary[stringArray[i + 2]];
                                 }, dictionary[parseInt(stringArray[i + 8])]
                             )
-                            console.log(parseInt(stringArray[i + 8]));
                         }
                     }
                     return "+OK\r\n";
                 }else if (stringArray[i] == "GET"){
                     if (!(stringArray[i+2] in dictionary)) {
+                        console.log("Should not see this");
                         return getBulkString(null);
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
@@ -65,7 +64,7 @@ function parseRedisResponse(data) {
                 }
                 }
             strings = noNewLine.join("\r\n");
-            console.log(strings);
+            // console.log(strings);
             return strings;
         default:
             throw new Error('Invalid Redis response');
