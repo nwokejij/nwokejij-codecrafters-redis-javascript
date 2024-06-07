@@ -1,5 +1,6 @@
 const net = require("net");
-
+const portIndex = process.argv.indexOf("--port");
+const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
@@ -10,8 +11,8 @@ const server = net.createServer((connection) => {
         const message = parseRedisResponse(command);
         connection.write(message);
     })
-
 });
+
 const dictionary = {};
 function parseRedisResponse(data) {
     const type = data.charAt(0);
@@ -77,4 +78,4 @@ function getBulkString(string){
 
     return `\$${string.length}\r\n${string}\r\n`
 }
-server.listen(6379, "127.0.0.1");
+server.listen(PORT, "127.0.0.1");
