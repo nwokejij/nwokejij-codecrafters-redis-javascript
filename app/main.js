@@ -40,7 +40,7 @@ function parseRedisResponse(data) {
             noNewLine = [];
             
             for (let i = 0; i < stringArrayLen; i++){
-                if (stringArray[i] == "info"){
+                if (stringArray[i] == "INFO"){
                     return getBulkString("role:master");
                 }
                 else if (stringArray[i] == "ECHO"){
