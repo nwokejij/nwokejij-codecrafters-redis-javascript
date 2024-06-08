@@ -45,8 +45,7 @@ function parseRedisResponse(data) {
                 if (stringArray[i] == "INFO"){
                     if (isSlave != -1){
                         masterPort = process.argv[isSlave + 2];
-                        return getBulkString("role:slave");
-
+                        return "*1\r\n$4\r\nPING\r\n";
                     }
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
                 }
@@ -57,7 +56,6 @@ function parseRedisResponse(data) {
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
-                    console.log(dictionary[stringArray[i+2]]);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
