@@ -48,7 +48,7 @@ function parseRedisResponse(data) {
                         return getBulkString("role:slave");
 
                     }
-                    s = "*3/r/n";
+                    s = "*3\r\n";
                     s += getBulkString("role:master") + getBulkString("master_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb") + getBulkString("master_repl_offset:0");
                     return s
                 }
