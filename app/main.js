@@ -1,7 +1,6 @@
 const { defaultMaxListeners } = require("events");
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
-const redis = require('redis');
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
