@@ -1,5 +1,7 @@
+const { defaultMaxListeners } = require("events");
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
+const redis = require('redis');
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
@@ -12,6 +14,8 @@ const server = net.createServer((connection) => {
         connection.write(message);
     })
 });
+
+
 
 const dictionary = {};
 function parseRedisResponse(data) {
@@ -37,7 +41,10 @@ function parseRedisResponse(data) {
             noNewLine = [];
             
             for (let i = 0; i < stringArrayLen; i++){
-                if (stringArray[i] == "ECHO"){
+                if (stringArray[i] == "info"){
+                    return getBulkString("role:master");
+                }
+                else if (stringArray[i] == "ECHO"){
                     noNewLine.pop();
                     continue;
                 } else if (stringArray[i] == "PING"){
@@ -79,3 +86,4 @@ function getBulkString(string){
     return `\$${string.length}\r\n${string}\r\n`
 }
 server.listen(PORT, "127.0.0.1");
+
