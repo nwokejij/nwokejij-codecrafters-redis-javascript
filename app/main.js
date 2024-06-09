@@ -1,4 +1,5 @@
 const net = require("net");
+const { resolve } = require("path");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
@@ -12,7 +13,12 @@ if (isSlave != -1){
 }
 
 async function firstPing(){
+    return new Promise((resolve) => {
     client.write(getBulkString("PING"));
+    resolve();
+    }
+    )
+    
 }
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
