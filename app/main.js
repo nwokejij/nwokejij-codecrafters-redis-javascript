@@ -11,7 +11,13 @@ if (isSlave != -1){
     client.on('data', (data) => {
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
-    })
+    });
+
+    client.on('end', (end) => {
+        client.end();
+    }
+    )
+
     })
 }
 
