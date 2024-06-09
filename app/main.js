@@ -11,7 +11,9 @@ if (isSlave != -1){
     client.on('data', (data) => {
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
+        
     });
+    client.end();
 }
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
