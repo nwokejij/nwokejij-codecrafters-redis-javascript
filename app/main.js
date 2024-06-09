@@ -6,9 +6,8 @@ const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
-    console.log("masterPort:" + masterPort);
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-    client.write("*1\r\n$4\r\nPING\r\n" + "\n*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT) + "\n*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
+    client.write(getBulkString(`PING\nREPLCONF\nlistening-port\n${PORT}\nREPLCONF\ncapa\npsync2`));
     })
 }
 
