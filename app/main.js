@@ -12,7 +12,7 @@ if (isSlave != -1){
 
 function firstPing(client){
     return new Promise((resolve) => {
-    client.write(getBulkString("PING"));
+    client.write("*1\r\n" + getBulkString("PING"));
     resolve();
     }
     )
