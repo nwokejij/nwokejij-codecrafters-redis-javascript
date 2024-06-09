@@ -1,5 +1,4 @@
 const net = require("net");
-const { resolve } = require("path");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
@@ -7,18 +6,34 @@ if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-    await firstPing();
-    client.write("*3\r\n"+getBulkString("listening-port")+getBulkString(PORT));
+    slaveToMaster(client, PORT);
     })
 }
 
-async function firstPing(){
+function firstPing(client){
     return new Promise((resolve) => {
     client.write(getBulkString("PING"));
     resolve();
     }
     )
-    
+}
+function firstREPLCONF(client, port){
+    return new Promise((resolve) => {
+        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(port));
+        resolve();
+    })
+
+}
+function secondREPLCONF(client){
+    return new Promise((resolve) => {
+        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
+        resolve();
+    })
+}
+async function slaveToMaster(client, port){
+    await firstPing(client);
+    await firstREPLCONF(client, port);
+    await secondREPLCONF(client);
 }
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
