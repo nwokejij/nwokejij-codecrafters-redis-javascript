@@ -6,34 +6,14 @@ if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-    slaveToMaster(client, PORT);
-    })
-}
-
-function firstPing(client){
-    return new Promise((resolve) => {
     client.write("*1\r\n" + getBulkString("PING"));
-    resolve();
-    }
-    )
-}
-function firstREPLCONF(client, port){
-    return new Promise((resolve) => {
-        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(port));
-        resolve();
-    })
 
-}
-function secondREPLCONF(client){
-    return new Promise((resolve) => {
+    client.on('data', (data) => {
+        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(port));
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
-        resolve();
+        client.end();
     })
-}
-async function slaveToMaster(client, port){
-    await firstPing(client);
-    await firstREPLCONF(client, port);
-    await secondREPLCONF(client);
+    })
 }
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
