@@ -5,7 +5,7 @@ const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
-    masterPort = masterPort.split("localhost ")[0];
+    masterPort = masterPort.split("localhost ")[1];
     console.log("masterPort:" + masterPort);
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
     client.write("*1\r\n$4\r\nPING\r\n");
