@@ -7,8 +7,7 @@ if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-    client.write("*3\r\n"+getBulkString("listening-port")+getBulkString(PORT));
-    client.write("*1\r\n$4\r\nPING\r\n");
+    client.write("*1\r\n$4\r\nPING\r\n\n"+"*3\r\n"+getBulkString("listening-port")+getBulkString(PORT));
     })
 }
 
