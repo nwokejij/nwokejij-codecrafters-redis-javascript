@@ -11,7 +11,7 @@ if (isSlave != -1){
     })
 }
 
-function firstPing(){
+async function firstPing(){
     client.write(getBulkString("PING"));
 }
 
