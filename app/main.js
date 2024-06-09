@@ -1,9 +1,15 @@
 
 const net = require("net");
-const { join } = require("path");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
+if (isSlave != -1){
+    masterPort = process.argv[isSlave + 2];
+    console.log("masterPort:" + masterPort);
+    const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
+    client.write("*1\r\n$4\r\nPING\r\n");
+    })
+}
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
@@ -45,11 +51,6 @@ function parseRedisResponse(data) {
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "INFO"){
                     if (isSlave != -1){
-                        masterPort = process.argv[isSlave + 2];
-                        console.log("masterPort:" + masterPort);
-                        const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-                        client.write("*1\r\n$4\r\nPING\r\n");
-                        })
                         return getBulkString("role:slave");
                     }
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
