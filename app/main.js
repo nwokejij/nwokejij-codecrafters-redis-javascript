@@ -1,4 +1,3 @@
-
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
@@ -7,9 +6,13 @@ if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-    client.write("*1\r\n$4\r\nPING\r\n");
+    await firstPing();
     client.write("*3\r\n"+getBulkString("listening-port")+getBulkString(PORT));
     })
+}
+
+function firstPing(){
+    client.write(getBulkString("PING"));
 }
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
