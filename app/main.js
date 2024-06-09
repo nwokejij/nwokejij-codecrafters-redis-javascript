@@ -9,6 +9,9 @@ if (isSlave != -1){
     console.log("masterPort:" + masterPort);
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
     client.write("*1\r\n$4\r\nPING\r\n");
+    client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+    client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
+
     })
 }
 
@@ -55,6 +58,8 @@ function parseRedisResponse(data) {
                         return getBulkString("role:slave");
                     }
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
+                } else if (stringArray[i] == "REPL"){
+                    return "+0K\r\n";
                 }
                 else if (stringArray[i] == "ECHO"){
                     noNewLine.pop();
