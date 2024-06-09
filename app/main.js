@@ -7,9 +7,9 @@ if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-    })
-    client.on('data', (data) => {
         client.write("*1\r\n" + getBulkString("PING"));
+    });
+    client.on('data', (data) => {
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
         
@@ -27,7 +27,12 @@ const server = net.createServer((connection) => {
         const message = parseRedisResponse(command);
         connection.write(message);
     })
+
 });
+server.on('error', (err) => {
+    console.error("Already Used Port");
+    server.listen(PORT + 1, "127.0.0.1");
+})
 
 
 
