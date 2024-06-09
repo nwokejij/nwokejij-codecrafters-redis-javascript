@@ -1,4 +1,4 @@
-const { defaultMaxListeners } = require("events");
+
 const net = require("net");
 const { join } = require("path");
 const portIndex = process.argv.indexOf("--port");
@@ -46,6 +46,7 @@ function parseRedisResponse(data) {
                 if (stringArray[i] == "INFO"){
                     if (isSlave != -1){
                         masterPort = process.argv[isSlave + 2];
+                        console.log("masterPort:" + masterPort);
                         const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
                         client.write("*1\r\n$4\r\nPING\r\n");
                         })
