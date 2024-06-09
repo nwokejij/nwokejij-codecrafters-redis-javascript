@@ -7,14 +7,11 @@ if (isSlave != -1){
     masterPort = masterPort.split("localhost ")[1];
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
     client.write("*1\r\n" + getBulkString("PING"));
-
+    })
     client.on('data', (data) => {
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
     });
-
-
-    })
 }
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
