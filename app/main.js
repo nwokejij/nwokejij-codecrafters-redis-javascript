@@ -4,6 +4,7 @@ const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 console.log("port:" + PORT);
 if (isSlave != -1){
+    console.log("Called: once");
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
