@@ -10,7 +10,11 @@ if (isSlave != -1){
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT) + "*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
+            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+            console.log("Error here");
+            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
+            console.log("have we reached here");
+            
         });
     });
     // client.end();
