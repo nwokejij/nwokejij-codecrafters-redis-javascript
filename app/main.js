@@ -11,11 +11,19 @@ if (isSlave != -1){
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
             client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
-            console.log("Error here");
             client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
-            console.log("have we reached here");
-            
         });
+    });
+    client.on('end', () => {
+        console.log('Disconnected from master');
+    });
+
+    client.on('error', (err) => {
+        if (err.code === 'EPIPE') {
+            console.error('EPIPE error: attempting to write to a closed stream');
+        } else {
+            console.error('Connection error:', err);
+        }
     });
     // client.end();
 }
