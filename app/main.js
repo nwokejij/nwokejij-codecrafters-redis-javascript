@@ -13,11 +13,12 @@ if (isSlave != -1){
             client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
             client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
         });
-        setTimeout(() => {
-            console.log("aRe we here");
-            client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-        }, 1000);
     });
+
+    setTimeout(() => {
+        console.log("aRe we here");
+        client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+    }, 0);
     
     client.on('end', () => {
         console.log('Disconnected from master');
