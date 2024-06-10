@@ -15,9 +15,7 @@ if (isSlave != -1){
         });
     });
 
-        client.on('drain', (info) => {
-            client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-        })
+        client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
         
     
     client.on('end', () => {
