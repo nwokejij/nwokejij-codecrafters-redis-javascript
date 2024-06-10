@@ -14,7 +14,7 @@ if (isSlave != -1){
             
         });
     });
-    client.end();
+    // client.end();
 }
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
