@@ -18,7 +18,7 @@ if (isSlave != -1){
     setTimeout(() => {
         console.log("aRe we here");
         client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-    }, 100);
+    }, 10);
     
     client.on('end', () => {
         console.log('Disconnected from master');
