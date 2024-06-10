@@ -15,10 +15,10 @@ if (isSlave != -1){
         });
     });
 
-    setTimeout(() => {
-        console.log("aRe we here");
-        client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-    }, 6);
+        client.on('drain', (info) => {
+            client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+        })
+        
     
     client.on('end', () => {
         console.log('Disconnected from master');
