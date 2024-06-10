@@ -14,7 +14,7 @@ if (isSlave != -1){
             client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
             setTimeout(() => {
                 client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-            }, 1);
+            }, 0);
         });
     });
     
