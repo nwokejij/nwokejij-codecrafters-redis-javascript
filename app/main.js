@@ -15,6 +15,7 @@ if (isSlave != -1){
             // }, 2);
             const resData = Buffer.from(data).toString();
             if (resData){
+                console.log(resData);
                 const resp = resData.split['\r\n'][0];
                 if (resp === "+PONG"){
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
