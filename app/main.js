@@ -15,7 +15,7 @@ if (isSlave != -1){
         });
         setTimeout(() => {
             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-        }, 5);
+        }, 0);
         
     });
         
