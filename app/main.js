@@ -10,7 +10,11 @@ if (isSlave != -1){
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            executeOperations(client);
+            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+        });
+        client.on('drain', () => {
+            client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
         });
         
     });
@@ -29,27 +33,26 @@ if (isSlave != -1){
     });
     // client.end();
 }
-function firstAsyncOperation(client) {
-    return new Promise((resolve) => {
-        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
-        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
-        resolve();
-    });
-}
+// function firstAsyncOperation(client) {
+//     return new Promise((resolve) => {
+        
+//         resolve();
+//     });
+// }
 
-function secondAsyncOperation(client) {
-    return new Promise((resolve) => {
-        client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-        resolve();
-    });
-}
+// function secondAsyncOperation(client) {
+//     return new Promise((resolve) => {
+        
+//         resolve();
+//     });
+// }
 
-async function executeOperations(client) {
-    await firstAsyncOperation(client);
-    console.log('First operation done, moving to second');
-    await secondAsyncOperation(client);
-    console.log('Second operation done');
-}
+// async function executeOperations(client) {
+//     await firstAsyncOperation(client);
+//     console.log('First operation done, moving to second');
+//     await secondAsyncOperation(client);
+//     console.log('Second operation done');
+// }
 
 
 
