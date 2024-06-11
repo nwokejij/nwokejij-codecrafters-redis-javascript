@@ -73,6 +73,7 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
         const command = data.toString();
         const message = parseRedisResponse(command);
+        console.log("have we reached here");
         connection.write(message);
     })
 
@@ -113,7 +114,7 @@ function parseRedisResponse(data) {
                         return getBulkString("role:slave");
                     }
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
-                } else if (stringArray[i] == "REPL"){
+                } else if (stringArray[i] == "REPL" || stringArray[i] == "REPLCONF"){
                     return "+0K\r\n";
                 }
                 else if (stringArray[i] == "ECHO"){
