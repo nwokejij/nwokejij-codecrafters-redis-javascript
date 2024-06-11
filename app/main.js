@@ -38,17 +38,14 @@ function firstAsyncOperation(client) {
 }
 
 function secondAsyncOperation(client) {
-    return new Promise((resolve) => {
         client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
         resolve();
-    });
 }
 
 async function executeOperations(client) {
     await firstAsyncOperation(client);
     console.log('First operation done, moving to second');
-    
-    await secondAsyncOperation(client);
+    secondAsyncOperation(client);
     console.log('Second operation done');
 }
 
