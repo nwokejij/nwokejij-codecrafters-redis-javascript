@@ -48,7 +48,7 @@ async function executeOperations(client) {
     await firstAsyncOperation(client);
     console.log('First operation done, moving to second');
     
-    secondAsyncOperation(client);
+    await secondAsyncOperation(client);
     console.log('Second operation done');
 }
 
