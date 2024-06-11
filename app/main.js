@@ -10,12 +10,8 @@ if (isSlave != -1){
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
-            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+            executeOperations();
         });
-        setTimeout(() => {
-            client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-        }, 2);
         
     });
         
@@ -33,6 +29,29 @@ if (isSlave != -1){
     });
     // client.end();
 }
+function firstAsyncOperation(client) {
+    return new Promise((resolve) => {
+        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+        client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+    });
+}
+
+function secondAsyncOperation() {
+    return new Promise((resolve) => {
+        client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+    });
+}
+
+async function executeOperations() {
+    await firstAsyncOperation();
+    console.log('First operation done, moving to second');
+    
+    await secondAsyncOperation();
+    console.log('Second operation done');
+}
+
+
+
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
