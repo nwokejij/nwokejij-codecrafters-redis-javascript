@@ -13,10 +13,17 @@ if (isSlave != -1){
             // setTimeout(() => {
             //     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
             // }, 2);
-            const rdata = Buffer.from(data).toString();
-            console.log(rdata);
-            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
-            client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+            const resData = Buffer.from(data).toString();
+            if (resData){
+                const resp = resData.split['\r\n'][0];
+                if (resp === "+PONG"){
+                    client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+                    client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+                } else if (resp == "+OK"){
+                    client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+                }
+            }
+            
             
             
         });
