@@ -39,7 +39,6 @@ function firstAsyncOperation(client) {
 
 function secondAsyncOperation(client) {
         client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-        resolve();
 }
 
 async function executeOperations(client) {
