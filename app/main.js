@@ -10,7 +10,7 @@ if (isSlave != -1){
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            executeOperations();
+            executeOperations(client);
         });
         
     });
@@ -36,17 +36,17 @@ function firstAsyncOperation(client) {
     });
 }
 
-function secondAsyncOperation() {
+function secondAsyncOperation(client) {
     return new Promise((resolve) => {
         client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
     });
 }
 
-async function executeOperations() {
-    await firstAsyncOperation();
+async function executeOperations(client) {
+    await firstAsyncOperation(client);
     console.log('First operation done, moving to second');
     
-    await secondAsyncOperation();
+    await secondAsyncOperation(client);
     console.log('Second operation done');
 }
 
