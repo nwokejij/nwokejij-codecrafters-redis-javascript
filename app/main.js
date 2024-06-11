@@ -10,7 +10,7 @@ if (isSlave != -1){
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            const resData = Buffer.from(data).toString();
+            const resData = data.toString();
             if (resData){
                 const resp = resData.split('\r\n')[0];
                 if (resp === "+PONG"){
