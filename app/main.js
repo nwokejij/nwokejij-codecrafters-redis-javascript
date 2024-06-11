@@ -115,7 +115,7 @@ function parseRedisResponse(data) {
                     }
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
                 } else if (stringArray[i] == "REPL" || stringArray[i] == "REPLCONF"){
-                    return "+0K\r\n";
+                    return "+OK\r\n";
                 }
                 else if (stringArray[i] == "ECHO"){
                     noNewLine.pop();
