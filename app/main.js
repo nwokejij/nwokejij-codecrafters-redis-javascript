@@ -10,12 +10,8 @@ if (isSlave != -1){
     const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            // setTimeout(() => {
-            //     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-            // }, 2);
             const resData = Buffer.from(data).toString();
             if (resData){
-                console.log(resData);
                 const resp = resData.split('\r\n')[0];
                 if (resp === "+PONG"){
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
