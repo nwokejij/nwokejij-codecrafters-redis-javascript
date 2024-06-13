@@ -78,14 +78,13 @@ const server = net.createServer((connection) => {
         if (command.indexOf("PSYNC") != -1){
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
             const bytes = hex.length / 2;
-            rdbFile = `$${bytes}\r\n`;
-            const hexString = parseInt(hex, 16);
-            console.log("Hex Representation:" + hexString);
-
-            const binary = hexString.toString(2);
-            console.log("Length: " + binary.length);
-            console.log("Binary String: "+ binary);
-            rdbFile += binary;
+            rdbFile = `$${bytes}\r\n`; // 88 bytes, 176 hex digits
+            // const hexString = parseInt(hex, 10);
+            // console.log("Hex Representation:" + hexString);
+            // const binary = hexString.toString(2);
+            // console.log("Length: " + binary.length);
+            // console.log("Binary String: "+ binary);
+            rdbFile += hexToBinary(hex);
             console.log("RDBFile:" + rdbFile);
             connection.write(rdbFile);
         }
@@ -93,10 +92,65 @@ const server = net.createServer((connection) => {
     })
 
 });
-// server.on('error', (err) => {
-//     console.error("Already Used Port");
-//     server.listen(PORT + 1, "127.0.0.1");
-// })
+
+function hexToBinary(hex){
+    binaryRes = ""
+    for (let i = 0; i < hex.length; i++){
+        switch(hex[i]) {
+            case "0":
+                binaryRes += "0000";
+                break;
+            case "1":
+                binaryRes += "0001";
+                break;
+            case "2":
+                binaryRes += "0010";
+                break;
+            case "3":
+                binaryRes += "0011";
+                break;
+            case "4":
+                binaryRes += "0100";
+                break;
+            case "5":
+                binaryRes += "0101";
+                break;
+            case "6":
+                binaryRes += "0110";
+                break;
+            case "7":
+                binaryRes += "0111";
+                break;
+            case "8":
+                binaryRes += "1000";
+                break;
+            case "9":
+                binaryRes += "1001";
+                break;
+            case "a":
+                binaryRes += "1010";
+                break;
+            case "b":
+                binaryRes += "1011";
+                break;
+            case "c":
+                binaryRes += "1100"; // 12
+                break;
+            case "d":
+                binaryRes += "1101";
+                break;
+            case "e":
+                binaryRes += "1110";
+                break;
+            case "f":
+                binaryRes += "1111";
+                break;
+            
+        }
+    }
+    return binaryRes;
+
+}
 
 
 
