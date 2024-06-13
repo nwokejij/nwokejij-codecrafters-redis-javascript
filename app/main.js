@@ -80,7 +80,7 @@ const server = net.createServer((connection) => {
             const bytes = hex.length / 2;
             rdbFile = `$${bytes}\r\n`;
             const hexString = parseInt(hex, 16);
-            print("Hex Representation:" + hexString);
+            console.log("Hex Representation:" + hexString);
 
             const binary = hexString.toString(2);
             console.log("Length: " + binary.length);
