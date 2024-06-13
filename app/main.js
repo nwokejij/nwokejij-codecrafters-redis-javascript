@@ -87,7 +87,7 @@ const server = net.createServer((connection) => {
             rdbFile += hexToBinary(hex);
             console.log("Length:" + hexToBinary(hex).length);
             console.log("RDBFile:" + rdbFile);
-            test = `$1\r\n00000000`;
+            test = `$1\r\n00010000`;
             connection.write(test);
         }
         
