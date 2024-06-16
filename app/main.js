@@ -84,11 +84,10 @@ const server = net.createServer((connection) => {
             // const binary = hexString.toString(2);
             // console.log("Length: " + binary.length);
             // console.log("Binary String: "+ binary);
-            rdbFile += hexToBinary(hex);
-            console.log("Length:" + hexToBinary(hex).length);
-            console.log("RDBFile:" + rdbFile);
-            test = "$4\r\n" + hexToBinary("52454449");
-            connection.write(test);
+            const buffer = Buffer.from(hex, 'hex');
+            console.log("Buffer:" + buffer);
+            rdbFile += buffer;
+            connection.write(rdbFile);
         }
         
     })
