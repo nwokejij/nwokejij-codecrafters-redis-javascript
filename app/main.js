@@ -77,15 +77,16 @@ const server = net.createServer((connection) => {
         connection.write(message);
         if (command.indexOf("PSYNC") != -1){
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
-            const bytes = hex.length / 2;
-            rdbFile = `$${bytes}\r\n`; // 88 bytes, 176 hex digit
             const buffer = Buffer.from(hex, 'hex');
-            const binaryRepresentation = Array.from(buffer)
-    .map(byte => byte.toString(2).padStart(8, '0')) // Convert byte to binary and pad with leading zeros
-    .join('');
-    console.log("Binary Representation:" + binaryRepresentation);
-            rdbFile += binaryRepresentation;
-            console.log("RDBFile:" + rdbFile);
+            console.log("Buffer:" + buffer);
+// Calculate the length of the file in bytes
+            const bytes = buffer.length;
+
+// Create the RDB file header with the length of the file
+            let rdbFile = `$${bytes}\r\n`;
+
+// Append the raw binary content from the buffer
+            rdbFile += buffer.toString('binary');
             connection.write(rdbFile);
         }
         
