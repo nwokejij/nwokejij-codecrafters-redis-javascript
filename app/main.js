@@ -85,7 +85,7 @@ const server = net.createServer((connection) => {
             // console.log("Length: " + binary.length);
             // console.log("Binary String: "+ binary);
             const buffer = Buffer.from(hex, 'hex');
-            const binaryString = buffer.toString();
+            const binaryString = buffer.toString('binary');
             console.log("Buffer:" + binaryString + "\n");
             rdbFile += binaryString;
             console.log("RDBFile:" + rdbFile);
