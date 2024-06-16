@@ -78,16 +78,13 @@ const server = net.createServer((connection) => {
         if (command.indexOf("PSYNC") != -1){
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
             const bytes = hex.length / 2;
-            rdbFile = `$${bytes}\r\n`; // 88 bytes, 176 hex digits
-            // const hexString = parseInt(hex, 10);
-            // console.log("Hex Representation:" + hexString);
-            // const binary = hexString.toString(2);
-            // console.log("Length: " + binary.length);
-            // console.log("Binary String: "+ binary);
+            rdbFile = `$${bytes}\r\n`; // 88 bytes, 176 hex digit
             const buffer = Buffer.from(hex, 'hex');
-            const binaryString = buffer.toString('binary');
-            console.log("Buffer:" + binaryString + "\n");
-            rdbFile += binaryString;
+            const binaryRepresentation = Array.from(buffer)
+    .map(byte => byte.toString(2).padStart(8, '0')) // Convert byte to binary and pad with leading zeros
+    .join('');
+    console.log("Binary Representation:" + binaryRepresentation);
+            rdbFile += binaryRepresentation;
             console.log("RDBFile:" + rdbFile);
             connection.write(rdbFile);
         }
