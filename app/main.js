@@ -39,28 +39,7 @@ if (isSlave != -1){
             console.error('Connection error:', err);
         }
     });
-    // client.end();
-}
-// function firstAsyncOperation(client) {
-//     return new Promise((resolve) => {
-        
-//         resolve();
-//     });
-// }
-
-// function secondAsyncOperation(client) {
-//     return new Promise((resolve) => {
-        
-//         resolve();
-//     });
-// }
-
-// async function executeOperations(client) {
-//     await firstAsyncOperation(client);
-//     console.log('First operation done, moving to second');
-//     await secondAsyncOperation(client);
-//     console.log('Second operation done');
-// }
+ 
 
 
 
@@ -89,69 +68,14 @@ let rdbFileHeader = `$${bytes}\r\n`;
 const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
             connection.write(rdbFileBuffer);
         }
+        if (command.indexOf("SET" != -1)){
+            connection.write(message);
+        }
         
     })
 
 });
 
-function hexToBinary(hex){
-    binaryRes = ""
-    for (let i = 0; i < hex.length; i++){
-        switch(hex[i]) {
-            case "0":
-                binaryRes += "0000";
-                break;
-            case "1":
-                binaryRes += "0001";
-                break;
-            case "2":
-                binaryRes += "0010";
-                break;
-            case "3":
-                binaryRes += "0011";
-                break;
-            case "4":
-                binaryRes += "0100";
-                break;
-            case "5":
-                binaryRes += "0101";
-                break;
-            case "6":
-                binaryRes += "0110";
-                break;
-            case "7":
-                binaryRes += "0111";
-                break;
-            case "8":
-                binaryRes += "1000";
-                break;
-            case "9":
-                binaryRes += "1001";
-                break;
-            case "a":
-                binaryRes += "1010";
-                break;
-            case "b":
-                binaryRes += "1011";
-                break;
-            case "c":
-                binaryRes += "1100"; // 12
-                break;
-            case "d":
-                binaryRes += "1101";
-                break;
-            case "e":
-                binaryRes += "1110";
-                break;
-            case "f":
-                binaryRes += "1111";
-                break;
-            
-        }
-    }
-    return binaryRes;
-
-}
 
 
 
