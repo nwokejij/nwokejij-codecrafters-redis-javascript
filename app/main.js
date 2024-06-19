@@ -2,7 +2,7 @@ const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
-console.log("port:" + PORT);
+const replicaDict = {};
 if (isSlave != -1){
     console.log("Called: once");
     masterPort = process.argv[isSlave + 1];
@@ -68,9 +68,6 @@ let rdbFileHeader = `$${bytes}\r\n`;
 const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
             connection.write(rdbFileBuffer);
         }
-        if (command.indexOf("SET") != -1){
-            connection.write(message);
-        }
         
     })
 
@@ -120,6 +117,7 @@ function parseRedisResponse(data) {
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
+                    replicaDict[stringArray[i+2]] = stringArray[i + 4];
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
