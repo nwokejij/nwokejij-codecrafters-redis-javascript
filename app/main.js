@@ -39,7 +39,7 @@ if (isSlave != -1){
             console.error('Connection error:', err);
         }
     });
- 
+}
 
 
 
