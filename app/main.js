@@ -68,9 +68,9 @@ let rdbFileHeader = `$${bytes}\r\n`;
 const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
             connection.write(rdbFileBuffer);
         }
-        // if (command.indexOf("SET" != -1)){
-        //     connection.write(message);
-        // }
+        if (command.indexOf("SET" != -1)){
+            connection.write(message);
+        }
         
     })
 
