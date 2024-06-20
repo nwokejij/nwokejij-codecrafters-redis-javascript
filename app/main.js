@@ -3,13 +3,16 @@ const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 const replicas = [];
-
+let masterPort = 0;
 const replicaDict = {};
 if (isSlave != -1){
-    console.log("Called: once");
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
-    const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
+} else {
+    masterPort = PORT;
+}
+
+ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
             const resData = data.toString();
@@ -41,41 +44,42 @@ if (isSlave != -1){
             console.error('Connection error:', err);
         }
     });
-}
+    replicas.push(client);
+
+
 
 
 
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
-const replica = net.createServer((connection) => {
+// const replica = net.createServer((connection) => {
 
-    connection.on('data', (data) => {
-        // const command = data.toString();
-        // parseRedisResponseFromMaster(command);
-        connection.write(data);
-    })
-});
+//     connection.on('data', (data) => {
+//         // const command = data.toString();
+//         // parseRedisResponseFromMaster(command);
+//         connection.write(data);
+//     })
+// });
 
-const connectToMaster = (port) => {
-    const client = new net.Socket();
-    client.connect(port, 'localhost', () => {
-      console.log(`Replica connected to master on port ${port}`);
-      replicas.push(client);
-    });
+// const connectToMaster = (port) => {
+//     const client = new net.Socket();
+//     client.connect(port, 'localhost', () => {
+//       console.log(`Replica connected to master on port ${port}`);
+//       replicas.push(client);
+//     });
   
-    client.on('data', (data) => {
-      console.log(`Replica received from master: ${data}`);
-      // Handle the received command
-      console.log("This time's the charm");
-      const command = data.toString();
-      parseRedisResponseFromMaster(command);
-    });
+//     client.on('data', (data) => {
+//       console.log(`Replica received from master: ${data}`);
+//       // Handle the received command
+//       const command = data.toString();
+//       parseRedisResponseFromMaster(command);
+//     });
   
-    client.on('close', () => {
-      console.log('Connection to master closed');
-    });
-  };
+//     client.on('close', () => {
+//       console.log('Connection to master closed');
+//     });
+//   };
   
 const server = net.createServer((connection) => {
   // Handle connection
@@ -147,8 +151,6 @@ function parseRedisResponse(data) {
                     // for set commands, pass the message to the replica
                     if (stringArray[i + 2] == "listening-port"){
                         replica.listen(parseInt(stringArray[i + 4], "127.0.0.1"));  // listening port
-
-                        connectToMaster(parseInt(stringArray[i + 4]));
                         
                     }
                     return "+OK\r\n";
