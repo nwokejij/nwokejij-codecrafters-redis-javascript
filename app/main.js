@@ -251,6 +251,8 @@ function parseRedisResponseFromMaster(data){
             strings = noNewLine.join("\r\n");
             // console.log(strings);
             return strings;
+        case '+':
+            break;
         default:
             throw new Error('Invalid Redis response');
     }
