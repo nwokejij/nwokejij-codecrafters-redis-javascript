@@ -53,7 +53,7 @@ const replica = net.createServer((connection) => {
     connection.on('data', (data) => {
         const command = data.toString();
         parseRedisResponseFromMaster(command);
-        return data;
+        connection.write(data);
     })
 });
 
@@ -67,8 +67,9 @@ const connectToMaster = (port) => {
     client.on('data', (data) => {
       console.log(`Replica received from master: ${data}`);
       // Handle the received command
-      const command = data.toString();
-      parseRedisResponseFromMaster(command);
+      console.log("This time's the charm");
+    //   const command = data.toString();
+    //   parseRedisResponseFromMaster(command);
     });
   
     client.on('close', () => {
