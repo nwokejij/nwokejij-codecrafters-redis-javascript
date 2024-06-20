@@ -26,7 +26,7 @@ if (isSlave != -1){
 
             // }
             const command = data.toString();
-            parseRedisResponseFromMaster(command);
+            parseRedisResponse(command);
             
         });
         
