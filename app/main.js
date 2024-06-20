@@ -15,18 +15,18 @@ if (isSlave != -1){
  const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            const resData = data.toString();
-            if (resData){
-                const resp = resData.split('\r\n')[0];
-                if (resp === "+PONG"){
-                    client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
-                    client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
-                } else if (resp == "+OK"){
-                    client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-                }
-            }
-            
-            
+            // if (resData){
+            //     // const resp = resData.split('\r\n')[0];
+            //     // if (resp === "+PONG"){
+            //     //     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+            //     //     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+            //     // } else if (resp == "+OK"){
+            //     //     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+            //     // }
+
+            // }
+            const command = data.toString();
+            parseRedisResponseFromMaster(command);
             
         });
         
@@ -105,7 +105,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.forEach((replica) => {
                 console.log("# of Replics: " + replicas.length);
                 console.log("Data from client to be sent to Replica:" + data);
-                replica.write(data);
+                connection.write(data);
             })
         }
         
@@ -162,7 +162,7 @@ function parseRedisResponse(data) {
                 } else if (stringArray[i] == "PING"){
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
-                    replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    dictionary[stringArray[i+2]] = stringArray[i + 4];
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
