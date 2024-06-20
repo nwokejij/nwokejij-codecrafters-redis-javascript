@@ -223,6 +223,7 @@ function parseRedisResponseFromMaster(data){
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    console.log("ReplicaDict: " + replicaDict);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
