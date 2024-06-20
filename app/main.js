@@ -79,6 +79,7 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
         const command = data.toString();
         const message = parseRedisResponse(command);
+        console.log("Message given:" + message);
         connection.write(message);
         if (command.indexOf("PSYNC") != -1){
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
@@ -97,8 +98,8 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         if (command.indexOf("SET") != -1){
             replicas.forEach((replica) => {
                 console.log("# of Replics: " + replicas.length);
-                // console.log("Data from client to be sent to Replica:" + data);
-                replica.write(data);
+                console.log("Data from client to be sent to Replica:" + command);
+                replica.write(command);
             })
         }
         
@@ -144,7 +145,8 @@ function parseRedisResponse(data) {
                     // for set commands, pass the message to the replica
                     if (stringArray[i + 2] == "listening-port"){
                         replica.listen(parseInt(stringArray[i + 4], "127.0.0.1"));  // listening port
-                        connectToMaster(PORT);
+
+                        connectToMaster(parseInt(stringArray[i + 4]));
                         
                     }
                     return "+OK\r\n";
