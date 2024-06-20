@@ -98,8 +98,8 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         if (command.indexOf("SET") != -1){
             replicas.forEach((replica) => {
                 console.log("# of Replics: " + replicas.length);
-                console.log("Data from client to be sent to Replica:" + command);
-                replica.write(command);
+                console.log("Data from client to be sent to Replica:" + data);
+                replica.write(data);
             })
         }
         
@@ -190,6 +190,7 @@ function parseRedisResponseFromMaster(data){
     const type = data.charAt(0);
     const content = data.slice(1).trim();
     console.log("Data received:" + data);
+    console.log("Type:" + type);
     switch(type){
         case '*':
             delimiter = data.indexOf('\r\n');
