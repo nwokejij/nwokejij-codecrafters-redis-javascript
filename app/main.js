@@ -207,10 +207,9 @@ function parseRedisResponseFromMaster(data){
                     // for set commands, pass the message to the replica
                     if (stringArray[i + 2] == "listening-port"){
                         replica.listen(parseInt(stringArray[i + 4], "127.0.0.1"));  // listening port
-                        replicas.append(replica);
                         
                     }
-                    return "+OK\r\n";
+                    break;
                 } else if (stringArray[i] == "PSYNC"){
                     return "+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n";
                 }
