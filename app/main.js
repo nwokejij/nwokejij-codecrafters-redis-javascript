@@ -214,7 +214,6 @@ function parseRedisResponseFromMaster(data){
                     //store the replica in a list
                     // for set commands, pass the message to the replica
                     if (stringArray[i + 2] == "listening-port"){
-                        replica.listen(parseInt(stringArray[i + 4], "127.0.0.1"));  // listening port
                         
                     }
                     break;
