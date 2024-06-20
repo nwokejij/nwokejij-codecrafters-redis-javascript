@@ -222,6 +222,7 @@ function parseRedisResponseFromMaster(data){
                 } else if (stringArray[i] == "PING"){
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
+                    console.log("Have we even entered here?");
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
                     console.log("ReplicaDict: " + replicaDict);
                     if (i + 6 < stringArrayLen){
