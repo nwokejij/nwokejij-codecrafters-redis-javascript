@@ -252,7 +252,7 @@ function parseRedisResponseFromMaster(data){
             // console.log(strings);
             return strings;
         case '+':
-            break;
+            return;
         default:
             throw new Error('Invalid Redis response');
     }
