@@ -236,7 +236,7 @@ function parseRedisResponseFromMaster(data){
                             )
                         }
                     }
-                    return "+OK\r\n";
+                    return replicaDict;
                 }else if (stringArray[i] == "GET"){
                     if (!(stringArray[i+2] in dictionary)) {
                         console.log("Should not see this");
