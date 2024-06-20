@@ -105,7 +105,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.forEach((replica) => {
                 console.log("# of Replics: " + replicas.length);
                 console.log("Data from client to be sent to Replica:" + data);
-                connection.write(data);
+                replica.write(data);
             })
         }
         
