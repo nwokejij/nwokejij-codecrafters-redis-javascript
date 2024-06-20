@@ -51,7 +51,8 @@ console.log("Logs from your program will appear here!");
 const replica = net.createServer((connection) => {
 
     connection.on('data', (data) => {
-        console.log("i'd be surprised if we entered here");
+        const command = data.toString();
+        parseRedisResponseFromMaster(command);
     })
 });
 
