@@ -186,6 +186,7 @@ function parseRedisResponse(data) {
 function parseRedisResponseFromMaster(data){
     const type = data.charAt(0);
     const content = data.slice(1).trim();
+    console.log("Type:" + type);
     switch(type){
         case '*':
             delimiter = data.indexOf('\r\n');
