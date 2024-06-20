@@ -2,6 +2,8 @@ const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
+const replicas = [];
+
 const replicaDict = {};
 if (isSlave != -1){
     console.log("Called: once");
@@ -46,7 +48,12 @@ if (isSlave != -1){
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
-
+const replica = net.createConnection({ port: PORT, host: 'localhost'}, () => {
+    replica.on('data', (data) => {
+        const command = data.toString();
+        const message = parseRedisResponseFromMaster(command);
+    })
+});
 const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
@@ -69,7 +76,9 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             connection.write(rdbFileBuffer);
         }
         if (command.indexOf("SET") != -1){
-            client.write(data);
+            replicas.forEach((replica) => {
+                replica.write(data);
+            })
         }
         
     })
@@ -109,6 +118,14 @@ function parseRedisResponse(data) {
                     }
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
                 } else if (stringArray[i] == "REPLCONF"){
+                    // create a replica based off of the port
+                    //store the replica in a list
+                    // for set commands, pass the message to the replica
+                    if (stringArray[i + 2] == "listening-port"){
+                        replica.listen(parseInt(stringArray[i + 4], "127.0.0.1"));  // listening port
+                        replicas.append(replica);
+                        
+                    }
                     return "+OK\r\n";
                 } else if (stringArray[i] == "PSYNC"){
                     return "+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n";
@@ -119,7 +136,69 @@ function parseRedisResponse(data) {
                 } else if (stringArray[i] == "PING"){
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
-                    dictionary[stringArray[i+2]] = stringArray[i + 4];
+                    replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    if (i + 6 < stringArrayLen){
+                        if (stringArray[i+6] == "px"){
+                            setTimeout(() => {
+                                delete dictionary[stringArray[i + 2]];
+                                }, parseInt(stringArray[i + 8])
+                            )
+                        }
+                    }
+                    return "+OK\r\n";
+                }else if (stringArray[i] == "GET"){
+                    if (!(stringArray[i+2] in dictionary)) {
+                        console.log("Should not see this");
+                        return getBulkString(null);
+                    }
+                    return getBulkString(dictionary[stringArray[i+2]]);
+                } else {
+                    noNewLine.push(stringArray[i]);
+                }
+                }
+            strings = noNewLine.join("\r\n");
+            // console.log(strings);
+            return strings;
+        default:
+            throw new Error('Invalid Redis response');
+    }
+}
+function parseRedisResponseFromMaster(data){
+    const type = data.charAt(0);
+    const content = data.slice(1).trim();
+    switch(type){
+        case '*':
+            delimiter = data.indexOf('\r\n');
+            bulkStrings = data.slice(delimiter+2); 
+            stringArray = bulkStrings.split('\r\n');
+            stringArrayLen = stringArray.length;
+            noNewLine = [];
+            
+            for (let i = 0; i < stringArrayLen; i++){
+                if (stringArray[i] == "INFO"){
+                    if (isSlave != -1){
+                        return getBulkString("role:slave");
+                    }
+                    return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
+                } else if (stringArray[i] == "REPLCONF"){
+                    // create a replica based off of the port
+                    //store the replica in a list
+                    // for set commands, pass the message to the replica
+                    if (stringArray[i + 2] == "listening-port"){
+                        replica.listen(parseInt(stringArray[i + 4], "127.0.0.1"));  // listening port
+                        replicas.append(replica);
+                        
+                    }
+                    return "+OK\r\n";
+                } else if (stringArray[i] == "PSYNC"){
+                    return "+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n";
+                }
+                else if (stringArray[i] == "ECHO"){
+                    noNewLine.pop();
+                    continue;
+                } else if (stringArray[i] == "PING"){
+                    return "+PONG\r\n";
+                } else if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
