@@ -44,41 +44,47 @@ if (isSlave != -1){
             console.error('Connection error:', err);
         }
     });
-    replicas.push(client);
 
 
 
+// const propagateToReplicas = (args) => {
+//         if (replicas.length == 0) return ;
+//         const arrMsg = args.map((arg) => getBulkString(arg));
+//         for (const replica of replicaList) {
+//           replica.write(createRespArrayMsg(arrMsg));
+//         }
+// };
 
 
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
-const replica = net.createServer((connection) => {
+// const replica = net.createServer((connection) => {
 
-    connection.on('data', (data) => {
-        const command = data.toString();
-        parseRedisResponseFromMaster(command);
-        // connection.write(data);
-    })
-});
+//     connection.on('data', (data) => {
+//         const command = data.toString();
+//         parseRedisResponseFromMaster(command);
+//         // connection.write(data);
+//     })
+// });
 
-const connectToMaster = (port) => {
+// const connectToMaster = (port) => {
 
-    client.connect(port, 'localhost', () => {
-      console.log(`Replica connected to master on port ${port}`);
-    });
+//     client.connect(port, 'localhost', () => {
+//       console.log(`Replica connected to master on port ${port}`);
+//     });
   
-    client.on('data', (data) => {
-      console.log(`Replica received from master: ${data}`);
-      // Handle the received command
-      const command = data.toString();
-      parseRedisResponseFromMaster(command);
-    });
+//     client.on('data', (data) => {
+//       console.log(`Replica received from master: ${data}`);
+//       // Handle the received command
+//       const command = data.toString();
+//       parseRedisResponseFromMaster(command);
+//     });
   
-    client.on('close', () => {
-      console.log('Connection to master closed');
-    });
-  };
+//     client.on('close', () => {
+//       console.log('Connection to master closed');
+//     });
+//   };
   
 const server = net.createServer((connection) => {
   // Handle connection
@@ -99,12 +105,13 @@ let rdbFileHeader = `$${bytes}\r\n`;
 // Combine the header and the buffer into a single buffer
 const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
             connection.write(rdbFileBuffer);
+            replicas.push(connection);
         }
         if (command.indexOf("SET") != -1){
             replicas.forEach((replica) => {
-                console.log("# of Replics: " + replicas.length);
-                console.log("Data from client to be sent to Replica:" + data);
-                replica.write(data);
+                // console.log("# of Replics: " + replicas.length);
+                // console.log("Data from client to be sent to Replica:" + data);
+                replica.write(command);
             })
         }
         
@@ -149,8 +156,6 @@ function parseRedisResponse(data) {
                     //store the replica in a list
                     // for set commands, pass the message to the replica
                     if (stringArray[i + 2] == "listening-port"){
-                        replica.listen(parseInt(stringArray[i+4]), "127.0.0.1");
-                        connectToMaster(PORT);
                         
                     }
                     return "+OK\r\n";
