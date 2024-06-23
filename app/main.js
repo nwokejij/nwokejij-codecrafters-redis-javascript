@@ -57,8 +57,8 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
         const command = data.toString();
         if (command.indexOf("GET") != -1){
+            console.log("Do we even reach here?");
             replicas.forEach((replica) => {
-                console.log("Do we even reach here?");
                 response = parseRedisResponseFromMaster(command, replicaDict);
                 replica.write(response);
                 console.log(response)
