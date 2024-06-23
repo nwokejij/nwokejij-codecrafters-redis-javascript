@@ -10,9 +10,8 @@ if (isSlave != -1){
 } else {
     masterPort = PORT;
 }
-
+const replicaDict = {};
  const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-    replicaDict = {};
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
             resData = data.toString().trim();
@@ -23,11 +22,6 @@ if (isSlave != -1){
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-                } else{
-                    const message = parseRedisResponseFromMaster(resData, replicaDict);
-                    if (message != null){
-                        client.write(message);
-                    }
                 }
 
             }
@@ -63,9 +57,7 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
         const command = data.toString();
         const message = parseRedisResponse(command);
-        if (command.indexOf("GET") != -1){
-            connection.write("")
-        }
+        
         connection.write(message);
         if (command.indexOf("PSYNC") != -1){
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
@@ -86,6 +78,12 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.forEach((replica) => {
                 replica.write(command);
             })
+        }
+        if (command.indexOf("GET") != -1){
+            replicas.forEach((replica) => {
+                replica.write(parseRedisResponseFromMaster(command, replicaDict));
+            })
+            
         }
         
     })
@@ -174,7 +172,6 @@ function getBulkString(string){
 function parseRedisResponseFromMaster(data, replicaDict){
     console.log("Incoming Message " + data);
     const type = data.charAt(0);
-    const content = data.slice(1).trim();
     switch(type) {
         case '+':
             return;
@@ -204,6 +201,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    console.log("Value:" + replicaDict[stringArray[i+2]]);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
