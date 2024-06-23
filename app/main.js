@@ -57,6 +57,12 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
         const command = data.toString();
         const message = parseRedisResponse(command);
+        if (command.indexOf("GET") != -1){
+            replicas.forEach((replica) => {
+                replica.write(parseRedisResponseFromMaster(command, replicaDict));
+            })
+            
+        }
         
         connection.write(message);
         if (command.indexOf("PSYNC") != -1){
@@ -79,12 +85,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                 replica.write(command);
             })
         }
-        if (command.indexOf("GET") != -1){
-            replicas.forEach((replica) => {
-                replica.write(parseRedisResponseFromMaster(command, replicaDict));
-            })
-            
-        }
+        
         
     })
 
