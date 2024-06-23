@@ -176,6 +176,8 @@ function parseRedisResponseFromMaster(data, replicaDict){
     const type = data.charAt(0);
     const content = data.slice(1).trim();
     switch(type) {
+        case '+':
+            return;
         case '*': // Array
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+2); 
