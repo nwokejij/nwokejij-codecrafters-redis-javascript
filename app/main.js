@@ -56,13 +56,17 @@ const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
-        const message = parseRedisResponse(command);
         if (command.indexOf("GET") != -1){
             replicas.forEach((replica) => {
-                replica.write(parseRedisResponseFromMaster(command, replicaDict));
+                console.log("Do we even reach here?");
+                response = parseRedisResponseFromMaster(command, replicaDict);
+                replica.write(response);
+                console.log(response)
             })
             
         }
+        const message = parseRedisResponse(command);
+       
         
         connection.write(message);
         if (command.indexOf("PSYNC") != -1){
