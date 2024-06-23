@@ -172,7 +172,7 @@ function getBulkString(string){
     return `\$${string.length}\r\n${string}\r\n`
 }
 function parseRedisResponseFromMaster(data, replicaDict){
-    console.log("Data to Client: " + data);
+    console.log("Incoming Message " + data);
     const type = data.charAt(0);
     const content = data.slice(1).trim();
     switch(type) {
