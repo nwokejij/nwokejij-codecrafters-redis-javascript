@@ -179,7 +179,6 @@ function getBulkString(string){
     return `\$${string.length}\r\n${string}\r\n`
 }
 function parseRedisResponseFromMaster(data, replicaDict){
-    console.log("Incoming Message " + data);
     const type = data.charAt(0);
     switch(type) {
         case '+':
@@ -191,39 +190,8 @@ function parseRedisResponseFromMaster(data, replicaDict){
             stringArrayLen = stringArray.length;
             noNewLine = [];
             for (let i = 0; i < stringArrayLen; i++){
-                if (stringArray[i] == "INFO"){
-                    if (isSlave != -1){
-                        return getBulkString("role:slave");
-                    }
-                    return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
-                } else if (stringArray[i] == "REPLCONF"){
-                    
-                    return "+OK\r\n";
-                } else if (stringArray[i] == "PSYNC"){
-                    return "+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n";
-                }
-                else if (stringArray[i] == "ECHO"){
-                    noNewLine.pop();
-                    continue;
-                } else if (stringArray[i] == "PING"){
-                    return "+PONG\r\n";
-                } else if (stringArray[i] == "SET"){
+                if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
-                    console.log("Value:" + replicaDict[stringArray[i+2]]);
-                    console.log("Length of Dictionary:" + Object.keys(replicaDict).length);
-                    if (i + 6 < stringArrayLen){
-                        if (stringArray[i+6] == "px"){
-                            setTimeout(() => {
-                                delete replicaDict[stringArray[i + 2]];
-                                }, parseInt(stringArray[i + 8])
-                            )
-                        }
-                    }
-                }else if (stringArray[i] == "GET"){
-                    if (!(stringArray[i+2] in replicaDict)) {
-                        return getBulkString(null);
-                    }
-                    return getBulkString(replicaDict[stringArray[i+2]]);
                 } else {
                     noNewLine.push(stringArray[i]);
                 }
