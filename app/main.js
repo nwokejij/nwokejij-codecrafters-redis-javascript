@@ -58,10 +58,11 @@ const server = net.createServer((connection) => {
         const command = data.toString();
         if (command.indexOf("GET") != -1){
             console.log("Do we even reach here?");
+            console.log("Length of Replicas: " + replicas.length);
             replicas.forEach((replica) => {
                 response = parseRedisResponseFromMaster(command, replicaDict);
                 replica.write(response);
-                console.log(response)
+                console.log(response);
             })
             
         }
