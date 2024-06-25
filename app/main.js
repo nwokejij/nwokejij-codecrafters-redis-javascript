@@ -190,7 +190,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
             stringArray = bulkStrings.split('\r\n');
             stringArrayLen = stringArray.length;
             noNewLine = [];
-            while stringArray.indexOf()
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "INFO"){
                     if (isSlave != -1){
