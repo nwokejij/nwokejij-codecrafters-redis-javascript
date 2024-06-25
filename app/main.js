@@ -179,6 +179,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
         case '+':
             break;
         case '*': // Array
+        console.log("Data recieved" + data);
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+2); 
             stringArray = bulkStrings.split('\r\n');
