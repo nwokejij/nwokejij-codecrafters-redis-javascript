@@ -29,6 +29,7 @@ const replicaResponse = "";
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
                     if (resData.indexOf("GET") != -1){
                         replicaResponse = message;
+                        console.log("replicaResponse: " + replicaResponse);
                     }
                 }
 
