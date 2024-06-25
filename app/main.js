@@ -190,7 +190,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
             stringArray = bulkStrings.split('\r\n');
             stringArrayLen = stringArray.length;
             noNewLine = [];
-            
+            while stringArray.indexOf()
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "INFO"){
                     if (isSlave != -1){
@@ -209,9 +209,9 @@ function parseRedisResponseFromMaster(data, replicaDict){
                 } else if (stringArray[i] == "PING"){
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
-                    replicaDict[stringArray[i+2]] = stringArray[i + 4];
-                    console.log("Value:" + replicaDict[stringArray[i+2]]);
-                    console.log("Length of Dictionary:" + Object.keys(replicaDict).length);
+                    // replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    // console.log("Value:" + replicaDict[stringArray[i+2]]);
+                    // console.log("Length of Dictionary:" + Object.keys(replicaDict).length);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
@@ -220,7 +220,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
                             )
                         }
                     }
-                    return;
                 }else if (stringArray[i] == "GET"){
                     if (!(stringArray[i+2] in replicaDict)) {
                         return getBulkString(null);
