@@ -1,3 +1,4 @@
+const { ClientRequest } = require("http");
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
@@ -11,6 +12,7 @@ if (isSlave != -1){
     masterPort = PORT;
 }
 const replicaDict = {};
+const replicaResponse = "";
  const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
@@ -23,6 +25,11 @@ const replicaDict = {};
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+                } else {
+                    let message = parseRedisResponseFromMaster(resData, replicaDict);
+                    if (resData.indexOf("GET") != -1){
+                        replicaResponse = message;
+                    }
                 }
 
             }
@@ -57,16 +64,16 @@ const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
-        if (command.indexOf("GET") != -1){
+        if (command.indexOf("GET") != -1 && replicaResponse){
             console.log("Do we even reach here?");
             console.log("Length of Replicas: " + replicas.length);
-            connection.write()
-            
-        }
+            connection.write(replicaResponse);
+        } else {
         const message = parseRedisResponse(command);
        //want to return what 
         
         connection.write(message);
+        }
         if (command.indexOf("PSYNC") != -1){
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
             const buffer = Buffer.from(hex, 'hex');
@@ -91,7 +98,9 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         
     })
 
+
 });
+
 
 
 
@@ -177,7 +186,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
     const type = data.charAt(0);
     switch(type) {
         case '+':
-            return;
+            break;
         case '*': // Array
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+2); 
