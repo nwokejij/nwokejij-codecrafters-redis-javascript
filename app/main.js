@@ -24,6 +24,7 @@ const replicaDict = {};
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
                 } else {
+                    console.log("Have we entered this if/else block");
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
                     client.write(message)
                 }
