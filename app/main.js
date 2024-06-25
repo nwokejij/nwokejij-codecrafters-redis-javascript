@@ -16,6 +16,7 @@ const replicaDict = {};
         client.on('data', (data) => {
             resData = data.toString().trim();
             if (resData){
+                console.log("What Type of ResData are we receiving: " + resData);
                 const resp = resData.split('\r\n')[0];
                 if (resp === "+PONG"){
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
@@ -59,15 +60,11 @@ const server = net.createServer((connection) => {
         if (command.indexOf("GET") != -1){
             console.log("Do we even reach here?");
             console.log("Length of Replicas: " + replicas.length);
-            replicas.forEach((replica) => {
-                response = parseRedisResponseFromMaster(command, replicaDict);
-                replica.write(response);
-                console.log(response);
-            })
+            connection.write()
             
         }
         const message = parseRedisResponse(command);
-       
+       //want to return what 
         
         connection.write(message);
         if (command.indexOf("PSYNC") != -1){
