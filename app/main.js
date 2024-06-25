@@ -235,11 +235,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
                     noNewLine.push(stringArray[i]);
                 }
                 }
-            // strings = noNewLine.join("\r\n");
-            // // console.log(strings);
-            // return strings;
-        default:
-            throw new Error('Invalid Redis response');
     }
 
 
