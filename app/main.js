@@ -16,7 +16,6 @@ const replicaDict = {};
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
             resData = data.toString().trim();
-            console.log("Data Received: " + resData);
             if (resData){
                 const resp = resData.split('\r\n')[0];
                 if (resp === "+PONG"){
@@ -62,7 +61,7 @@ const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
-        
+        console.log("Data Received To Master: " + command);
         const message = parseRedisResponse(command);
        //want to return what 
         connection.write(message);
