@@ -208,9 +208,9 @@ function parseRedisResponseFromMaster(data, replicaDict){
                 } else if (stringArray[i] == "PING"){
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
-                    // replicaDict[stringArray[i+2]] = stringArray[i + 4];
-                    // console.log("Value:" + replicaDict[stringArray[i+2]]);
-                    // console.log("Length of Dictionary:" + Object.keys(replicaDict).length);
+                    replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    console.log("Value:" + replicaDict[stringArray[i+2]]);
+                    console.log("Length of Dictionary:" + Object.keys(replicaDict).length);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
