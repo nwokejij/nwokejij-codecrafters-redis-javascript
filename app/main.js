@@ -192,6 +192,14 @@ function parseRedisResponseFromMaster(data, replicaDict){
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    if (i + 6 < stringArrayLen){
+                        if (stringArray[i+6] == "px"){
+                            setTimeout(() => {
+                                delete replicaDict[stringArray[i + 2]];
+                                }, parseInt(stringArray[i + 8])
+                            )
+                        }
+                    }
                 } else {
                     noNewLine.push(stringArray[i]);
                 }
