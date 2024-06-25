@@ -18,7 +18,6 @@ const replicaResponse = "";
         client.on('data', (data) => {
             resData = data.toString().trim();
             if (resData){
-                console.log("What Type of ResData are we receiving: " + resData);
                 const resp = resData.split('\r\n')[0];
                 if (resp === "+PONG"){
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
@@ -28,6 +27,7 @@ const replicaResponse = "";
                 } else {
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
                     if (resData.indexOf("GET") != -1){
+                        console.log("Entered the Get Phase");
                         replicaResponse = message;
                         console.log("replicaResponse: " + replicaResponse);
                     }
@@ -65,9 +65,8 @@ const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
-        if (command.indexOf("GET") != -1 && replicaResponse){
+        if (command.indexOf("GET") != -1){
             console.log("Do we even reach here?");
-            console.log("Length of Replicas: " + replicas.length);
             connection.write(replicaResponse);
         } else {
         const message = parseRedisResponse(command);
@@ -158,9 +157,11 @@ function parseRedisResponse(data) {
                     }
                     return "+OK\r\n";
                 }else if (stringArray[i] == "GET"){
-                    if (!(stringArray[i+2] in dictionary)) {
+                    if (!(stringArray[i+2] in dictionary) && !(stringArray[i+2] in replicaDict)) {
                         console.log("Should not see this");
                         return getBulkString(null);
+                    } else if (stringArray[i +2] in replicaDict){
+                        return getBulkString(replicaDict[stringArray[i+2]]);
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
                 } else {
@@ -215,6 +216,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
                 } else if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
                     console.log("Value:" + replicaDict[stringArray[i+2]]);
+                    console.log("Length of Dictionary:" + Object.keys(replicaDict).length);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
