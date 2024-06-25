@@ -16,6 +16,7 @@ const replicaDict = {};
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
             resData = data.toString().trim();
+            console.log("Here's the Data" + resData);
             if (resData){
                 const resp = resData.split('\r\n')[0];
                 if (resp === "+PONG"){
@@ -26,7 +27,7 @@ const replicaDict = {};
                 } else {
                     console.log("Have we entered this if/else block");
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
-                    client.write(message)
+                    client.write(message);
                 }
 
             }
