@@ -1,4 +1,4 @@
-const { ClientRequest } = require("http");
+
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
@@ -24,6 +24,8 @@ const replicaResponse = "";
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+                } else if (resData === "*3\r\n$8\r\nreplconf\r\n$6\r\ngetack\r\n$1\r\n*\r\n"){
+                    client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
                 } else {
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
                     if (resData.indexOf("GET") != -1){
