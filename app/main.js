@@ -12,7 +12,6 @@ if (isSlave != -1){
     masterPort = PORT;
 }
 const replicaDict = {};
-const replicaResponse = "";
  const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
@@ -23,16 +22,10 @@ const replicaResponse = "";
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
-                    client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-                } else if (resData === "*3\r\n$8\r\nreplconf\r\n$6\r\ngetack\r\n$1\r\n*\r\n"){
-                    client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+                    client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
                 } else {
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
-                    if (resData.indexOf("GET") != -1){
-                        console.log("Entered the Get Phase");
-                        replicaResponse = message;
-                        console.log("replicaResponse: " + replicaResponse);
-                    }
+                    client.write(message)
                 }
 
             }
@@ -191,6 +184,9 @@ function parseRedisResponseFromMaster(data, replicaDict){
             stringArray = bulkStrings.split('\r\n');
             stringArrayLen = stringArray.length;
             noNewLine = [];
+            if ((stringArray.indexOf("REPLCONF") != -1) && (stringArray.indexOf("GETACK") != -1) && (stringArray.indexOf("*") != -1)){
+                return "*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0");
+            }
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
