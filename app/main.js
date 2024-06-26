@@ -31,6 +31,8 @@ const replicaDict = {};
                     client.write(message);
                 }
 
+            } else {
+                client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
             }
 
             
