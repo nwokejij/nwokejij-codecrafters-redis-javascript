@@ -15,8 +15,9 @@ const replicaDict = {};
  const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
+            console.log("Data recieved: " + data);
+            console.log(typeof data);
             resData = data.toString().trim();
-            console.log("Here's the Data" + resData);
             if (resData){
                 const resp = resData.split('\r\n')[0];
                 if (resp === "+PONG"){
@@ -34,7 +35,6 @@ const replicaDict = {};
 
             
         });
-        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
         
     });
         
