@@ -25,9 +25,7 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
                     toMaster = true;
-                    if (toMaster){
-                        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
-                    }
+                    
                 } else {
                     console.log("Have we entered this if/else block");
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
@@ -53,6 +51,11 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
             console.error('Connection error:', err);
         }
     });
+    if (toMaster){
+        setTimeout(() => {
+            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+        }, 1000);
+    }
 
 
 
