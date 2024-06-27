@@ -7,7 +7,6 @@ const replicas = [];
 let masterPort = 0;
 if (isSlave != -1){
     masterPort = process.argv[isSlave + 1];
-    console.log("This is the masterPort" + masterPort);
     masterPort = masterPort.split("localhost ")[1];
 } else {
     masterPort = PORT;
@@ -215,5 +214,5 @@ function parseRedisResponseFromMaster(data, replicaDict){
 
 }
 
-server.listen(PORT, "127.0.0.1");
+server.listen(6379, "127.0.0.1");
 
