@@ -214,5 +214,5 @@ function parseRedisResponseFromMaster(data, replicaDict){
 
 }
 
-server.listen(6379, "127.0.0.2");
+server.listen(6379, "128.0.0.2");
 
