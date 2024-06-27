@@ -23,6 +23,9 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
+                    setTimeout(() => {
+                        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+                    }, 10000);
                 } else {
                     console.log("Have we entered this if/else block");
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
@@ -37,7 +40,6 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
     });
         
     client.on('end', () => {
-        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
         console.log('Disconnected from master');
     });
 
@@ -60,7 +62,6 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
-        connection.write("*3\r\n$8\r\nREPLCONF\r\n$6\r\nGETACK\r\n$1\r\n*\r\n");
         const command = data.toString();
         console.log("Data Received To Master: " + command);
         const message = parseRedisResponse(command);
