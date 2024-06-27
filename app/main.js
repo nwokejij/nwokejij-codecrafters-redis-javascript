@@ -12,11 +12,9 @@ if (isSlave != -1){
     masterPort = PORT;
 }
 const replicaDict = {};
- const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
+const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
-            console.log("Data recieved: " + data);
-            console.log(typeof data);
             resData = data.toString().trim();
             if (resData){
                 const resp = resData.split('\r\n')[0];
@@ -25,9 +23,6 @@ const replicaDict = {};
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
-                    setTimeout(() => {
-                        
-                    }, 5000);
                 } else {
                     console.log("Have we entered this if/else block");
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
@@ -35,7 +30,6 @@ const replicaDict = {};
                 }
 
             } 
-            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
             
             
         });
@@ -43,6 +37,7 @@ const replicaDict = {};
     });
         
     client.on('end', () => {
+        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
         console.log('Disconnected from master');
     });
 
@@ -65,10 +60,10 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
+        connection.write("*3\r\n$8\r\nREPLCONF\r\n$6\r\nGETACK\r\n$1\r\n*\r\n");
         const command = data.toString();
         console.log("Data Received To Master: " + command);
         const message = parseRedisResponse(command);
-       //want to return what 
         connection.write(message);
         if (command.indexOf("PSYNC") != -1){
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
@@ -131,7 +126,6 @@ function parseRedisResponse(data) {
                     }
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
                 } else if (stringArray[i] == "REPLCONF"){
-                    
                     return "+OK\r\n";
                 } else if (stringArray[i] == "PSYNC"){
                     return "+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n";
