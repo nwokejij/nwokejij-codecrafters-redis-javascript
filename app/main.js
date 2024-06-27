@@ -12,6 +12,7 @@ if (isSlave != -1){
     masterPort = PORT;
 }
 const replicaDict = {};
+toMaster = false;
 const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
@@ -23,7 +24,10 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
-                    
+                    toMaster = true;
+                    if (toMaster){
+                        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+                    }
                 } else {
                     console.log("Have we entered this if/else block");
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
@@ -34,9 +38,7 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
             
             
         });
-        setTimeout(() => {
-            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
-        }, 1000);
+       
         
     });
         
