@@ -34,10 +34,9 @@ const replicaDict = {};
                     client.write(message);
                 }
 
-            } else {
-                
-            }
-
+            } 
+            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+            
             
         });
         
@@ -48,7 +47,6 @@ const replicaDict = {};
     });
 
     client.on('error', (err) => {
-        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
         if (err.code === 'EPIPE') {
             console.error('EPIPE error: attempting to write to a closed stream');
         } else {
