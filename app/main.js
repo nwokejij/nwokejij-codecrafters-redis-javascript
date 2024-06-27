@@ -25,6 +25,9 @@ const replicaDict = {};
                     client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
+                    setTimeout(() => {
+                        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+                    }, 5000);
                 } else {
                     console.log("Have we entered this if/else block");
                     let message = parseRedisResponseFromMaster(resData, replicaDict);
@@ -32,7 +35,7 @@ const replicaDict = {};
                 }
 
             } else {
-                client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+                
             }
 
             
