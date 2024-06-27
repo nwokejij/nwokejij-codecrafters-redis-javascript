@@ -26,7 +26,7 @@ const replicaDict = {};
                 } else if (resp == "+OK"){
                     client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
                     setTimeout(() => {
-                        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+                        
                     }, 5000);
                 } else {
                     console.log("Have we entered this if/else block");
@@ -43,12 +43,12 @@ const replicaDict = {};
         
     });
         
-    
     client.on('end', () => {
         console.log('Disconnected from master');
     });
 
     client.on('error', (err) => {
+        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
         if (err.code === 'EPIPE') {
             console.error('EPIPE error: attempting to write to a closed stream');
         } else {
