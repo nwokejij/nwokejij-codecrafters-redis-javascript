@@ -52,9 +52,8 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
         }
     });
     if (toMaster){
-        setTimeout(() => {
-            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
-        }, 1000);
+    
+        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
     }
 
 
