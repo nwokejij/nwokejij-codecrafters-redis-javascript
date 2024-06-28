@@ -112,11 +112,11 @@ client.on('data', (data) => {
             toMaster = true;
         } else {
             console.log("Handling other message types");
+            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
             
         }
     } 
     console.log("End of data processing block");
-    client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
 });
 
 client.on('end', () => {
