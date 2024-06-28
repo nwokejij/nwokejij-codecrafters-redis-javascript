@@ -84,7 +84,7 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
 });
 
 client.on('data', (data) => {
-    buffer += data.toString();
+    buffer += data.toString('utf8');
     console.log('Raw data received:', buffer);
 
     let messages = buffer.split('\n');
