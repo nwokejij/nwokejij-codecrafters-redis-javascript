@@ -87,7 +87,7 @@ client.on('data',  async (data) => {
     buffer += await data.toString('utf8');
     if (buffer.indexOf("FULLRESYNC") != -1) {
         console.log("Reached This If/Else Block");
-        client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
+        
     }
     console.log('Raw data received:', buffer);
     console.log('Type of Data' + typeof buffer);
@@ -103,7 +103,7 @@ client.on('data',  async (data) => {
         }
     });
 
-    let resData = data.toString().trim();
+    let resData = data.toString('utf8').trim();
     if (resData) {
         const resp = resData.split('\r\n')[0];
         console.log('Parsed response:', resp);
@@ -119,7 +119,9 @@ client.on('data',  async (data) => {
             
             
         }
-    } 
+    } else {
+        client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
+    }
     console.log("End of data processing block");
 });
 
