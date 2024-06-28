@@ -32,9 +32,9 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
                 }
 
             } 
-            if (toMaster){
-                client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
-            }
+            // if (toMaster){
+            //     client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+            // }
             
             
         });
