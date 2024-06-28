@@ -85,10 +85,15 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
 
 client.on('data', async (data) => {
     buffer += data.toString('utf8');
+    console.log("Buffer Length", buffer.length);
+    for (let i = 0; i < buffer.length; i++) {
+        let byte = buffer[i];
+        console.log("Byte:" +byte);
+    }
+    console.log('Raw data received:', buffer);
     if (buffer.indexOf("FULLRESYNC") != -1) {
         console.log("Reached This If/Else Block");
     }
-    console.log('Raw data received:', buffer);
     let messages = buffer.split('\n');
     buffer = messages.pop(); // Keep incomplete message in buffer
 
@@ -113,10 +118,6 @@ client.on('data', async (data) => {
             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
             toMaster = true;
         } else {
-            // client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
-            console.log("Handling other message types");
-            
-            
         }
     }
     console.log("End of data processing block");
