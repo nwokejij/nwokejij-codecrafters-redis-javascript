@@ -15,6 +15,7 @@ toMaster = false;
 const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
+            console.log("Do we enter this block again?");
             resData = data.toString().trim();
             if (resData){
                 const resp = resData.split('\r\n')[0];
