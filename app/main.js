@@ -100,7 +100,7 @@ client.on('data', async (data) => {
         }
     });
 
-    // let resData = data.toString('utf8').trim(); //
+    let resData = data.toString('utf8').trim(); 
 
     if (buffer) {
         const resp = buffer.split('\r\n')[0];
