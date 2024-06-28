@@ -83,8 +83,8 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
     client.write("*1\r\n" + getBulkString("PING"));
 });
 
-client.on('data', (data) => {
-    buffer += data.toString('utf8');
+client.on('data',  async (data) => {
+    buffer += await data.toString('utf8');
     if (buffer.indexOf("FULLRESYNC") != -1) {
         console.log("Reached This If/Else Block");
         client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
