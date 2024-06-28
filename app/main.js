@@ -12,9 +12,21 @@ if (isSlave != -1){
 }
 const replicaDict = {};
 toMaster = false;
+let buffer = '';
 const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
         client.write("*1\r\n" + getBulkString("PING"));
         client.on('data', (data) => {
+    buffer += data.toString();
+    let messages = buffer.split('\n');
+    buffer = messages.pop(); 
+    messages.forEach((message) => {
+        console.log(`Received message: ${message.trim()}`);
+        // Process the complete message here
+        if (message.startsWith('> REPLCONF GETACK')) {
+            console.log('Received REPLCONF GETACK');
+            // Handle REPLCONF GETACK message
+        }
+    });
             resData = data.toString().trim();
             if (resData){
                 const resp = resData.split('\r\n')[0];
