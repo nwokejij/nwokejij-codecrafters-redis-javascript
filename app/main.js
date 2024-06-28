@@ -85,9 +85,10 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
 
 client.on('data', (data) => {
     buffer += data.toString('utf8');
-    // if (buffer.indexOf("FULLRESYNC") != -1) {
-    //     client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
-    // }
+    if (buffer.indexOf("FULLRESYNC") != -1) {
+        console.log("Reached This If/Else Block");
+        client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
+    }
     console.log('Raw data received:', buffer);
     console.log('Type of Data' + typeof buffer);
 
@@ -96,7 +97,6 @@ client.on('data', (data) => {
 
     messages.forEach((message) => {
         console.log(`Received message: ${message.trim()}`);
-        client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
         if (message.startsWith('> REPLCONF GETACK')) {
             console.log('Received REPLCONF GETACK');
             // Handle REPLCONF GETACK message
