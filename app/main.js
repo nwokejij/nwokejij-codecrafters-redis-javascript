@@ -115,7 +115,7 @@ client.on('data',  async (data) => {
             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
             toMaster = true;
         } else {
-            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
+            // client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
             console.log("Handling other message types");
             
             
