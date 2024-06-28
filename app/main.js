@@ -103,7 +103,7 @@ client.on('data', async (data) => {
     // let resData = data.toString('utf8').trim(); //
 
     if (buffer) {
-        const resp = resData.split('\r\n')[0];
+        const resp = buffer.split('\r\n')[0];
         console.log('Parsed response:', resp);
 
         if (resp === "+PONG") {
