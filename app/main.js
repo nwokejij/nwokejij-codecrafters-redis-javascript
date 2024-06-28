@@ -26,7 +26,7 @@ client.on('data', (data) => {
     console.log('Raw data received:', buffer);
     if (buffer.indexOf("FULLRESYNC") != -1) {
         console.log("Reached This If/Else Block");
-        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+        // client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0")); //commented out the replica response
     }
     let messages = buffer.split('\r\n');
     messages.forEach((message) => {
@@ -34,10 +34,9 @@ client.on('data', (data) => {
         if (message.startsWith('> REPLCONF GETACK')) {
             console.log('Received REPLCONF GETACK');
             // Handle REPLCONF GETACK message
+            // Never reaches this block
         }
     });
-
-    // let resData = data.toString('utf8').trim(); 
 
     if (buffer) {
         const resp = buffer.split('\r\n')[0];
