@@ -86,6 +86,7 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
 client.on('data', (data) => {
     buffer += data.toString('utf8');
     console.log('Raw data received:', buffer);
+    console.log('Type of Data' + typeof buffer);
 
     let messages = buffer.split('\n');
     buffer = messages.pop(); // Keep incomplete message in buffer
