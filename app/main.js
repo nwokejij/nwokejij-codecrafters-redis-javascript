@@ -1,69 +1,132 @@
+// const net = require("net");
+// const portIndex = process.argv.indexOf("--port");
+// const isSlave = process.argv.indexOf("--replicaof");
+// const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
+// const replicas = [];
+// let masterPort = 0;
+// if (isSlave != -1){
+//     masterPort = process.argv[isSlave + 1];
+//     masterPort = masterPort.split("localhost ")[1];
+// } else {
+//     masterPort = PORT;
+// }
+// const replicaDict = {};
+// toMaster = false;
+// let buffer = '';
+// const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
+//         client.write("*1\r\n" + getBulkString("PING"));
+//     });
+//     client.on('data', (data) => {
+//         buffer += data.toString();
+//         let messages = buffer.split('\n');
+//         buffer = messages.pop(); 
+//         messages.forEach((message) => {
+//             console.log(`Received message: ${message.trim()}`);
+//             // Process the complete message here
+//             if (message.startsWith('> REPLCONF GETACK')) {
+//                 console.log('Received REPLCONF GETACK');
+//                 // Handle REPLCONF GETACK message
+//             }
+//         });
+//                 resData = data.toString().trim();
+//                 if (resData){
+//                     const resp = resData.split('\r\n')[0];
+//                     if (resp === "+PONG"){
+//                         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+//                         client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+//                     } else if (resp == "+OK"){
+//                         client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
+//                         toMaster = true;
+//                     } else {
+//                         console.log("Have we entered this if/else block");
+//                         let message = parseRedisResponseFromMaster(resData, replicaDict);
+//                         client.write(message);
+//                     }
+    
+//                 } 
+//                 console.log("Have we reached here");
+                
+                
+                
+//             });
+        
+//     client.on('end', () => {
+//         console.log('Disconnected from master');
+//     });
+
+//     client.on('error', (err) => {
+//         if (err.code === 'EPIPE') {
+//             console.error('EPIPE error: attempting to write to a closed stream');
+//         } else {
+//             console.error('Connection error:', err);
+//         }
+//     });
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 const replicas = [];
 let masterPort = 0;
-if (isSlave != -1){
+
+if (isSlave != -1) {
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split("localhost ")[1];
 } else {
     masterPort = PORT;
 }
+
 const replicaDict = {};
-toMaster = false;
 let buffer = '';
-const client = net.createConnection({ port: masterPort, host: 'localhost'}, () => {
-        client.write("*1\r\n" + getBulkString("PING"));
-        client.on('data', (data) => {
+let toMaster = false;
+
+const client = net.createConnection({ port: masterPort, host: 'localhost' }, () => {
+    console.log('Connected to master');
+    client.write("*1\r\n" + getBulkString("PING"));
+});
+
+client.on('data', (data) => {
     buffer += data.toString();
     let messages = buffer.split('\n');
-    buffer = messages.pop(); 
+    buffer = messages.pop(); // Keep incomplete message in buffer
+
     messages.forEach((message) => {
         console.log(`Received message: ${message.trim()}`);
-        // Process the complete message here
+        
         if (message.startsWith('> REPLCONF GETACK')) {
             console.log('Received REPLCONF GETACK');
             // Handle REPLCONF GETACK message
         }
     });
-            resData = data.toString().trim();
-            if (resData){
-                const resp = resData.split('\r\n')[0];
-                if (resp === "+PONG"){
-                    client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
-                    client.write("*3\r\n"+ getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
-                } else if (resp == "+OK"){
-                    client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1")); 
-                    toMaster = true;
-                } else {
-                    console.log("Have we entered this if/else block");
-                    let message = parseRedisResponseFromMaster(resData, replicaDict);
-                    client.write(message);
-                }
 
-            } 
-            console.log("Have we reached here");
-            
-            
-            
-        });
-       
-        
-    });
-        
-    client.on('end', () => {
-        console.log('Disconnected from master');
-    });
-
-    client.on('error', (err) => {
-        if (err.code === 'EPIPE') {
-            console.error('EPIPE error: attempting to write to a closed stream');
+    let resData = data.toString().trim();
+    if (resData) {
+        const resp = resData.split('\r\n')[0];
+        if (resp === "+PONG") {
+            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
+            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
+        } else if (resp === "+OK") {
+            client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
+            toMaster = true;
         } else {
-            console.error('Connection error:', err);
+            console.log("Have we entered this if/else block");
+            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
         }
-    });
-    
+    } 
+    console.log("Have we reached here");
+});
+
+client.on('end', () => {
+    console.log('Disconnected from master');
+});
+
+client.on('error', (err) => {
+    if (err.code === 'EPIPE') {
+        console.error('EPIPE error: attempting to write to a closed stream');
+    } else {
+        console.error('Connection error:', err);
+    }
+});
+
 
 
 
