@@ -26,9 +26,9 @@ client.on('data', (data) => {
     console.log('Raw data received:', buffer);
     if (buffer.indexOf("FULLRESYNC") != -1) {
         console.log("Reached This If/Else Block");
+        client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
     }
     let messages = buffer.split('\r\n');
-
     messages.forEach((message) => {
         console.log(`Received message: ${message.trim()}`);
         if (message.startsWith('> REPLCONF GETACK')) {
@@ -48,7 +48,6 @@ client.on('data', (data) => {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
         } else if (resp === "+OK") {
             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
-            toMaster = true;
         }
     }
     console.log("End of data processing block");
