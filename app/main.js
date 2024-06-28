@@ -94,7 +94,7 @@ client.on('data', async (data) => {
     if (buffer.indexOf("FULLRESYNC") != -1) {
         console.log("Reached This If/Else Block");
     }
-    let messages = buffer.split('\n');
+    let messages = buffer.split('\r\n');
     buffer = messages.pop(); // Keep incomplete message in buffer
 
     messages.forEach((message) => {
