@@ -77,7 +77,6 @@ if (isSlave != -1) {
 
 const replicaDict = {};
 let buffer = '';
-let toMaster = false;
 
 const client = net.createConnection({ port: masterPort, host: 'localhost' }, () => {
     console.log('Connected to master');
@@ -86,12 +85,14 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
 
 client.on('data', (data) => {
     buffer += data.toString();
+    console.log('Raw data received:', buffer);
+
     let messages = buffer.split('\n');
     buffer = messages.pop(); // Keep incomplete message in buffer
 
     messages.forEach((message) => {
         console.log(`Received message: ${message.trim()}`);
-        
+
         if (message.startsWith('> REPLCONF GETACK')) {
             console.log('Received REPLCONF GETACK');
             // Handle REPLCONF GETACK message
@@ -101,6 +102,8 @@ client.on('data', (data) => {
     let resData = data.toString().trim();
     if (resData) {
         const resp = resData.split('\r\n')[0];
+        console.log('Parsed response:', resp);
+
         if (resp === "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
@@ -108,11 +111,11 @@ client.on('data', (data) => {
             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
             toMaster = true;
         } else {
-            console.log("Have we entered this if/else block");
-            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+            console.log("Handling other message types");
+            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
         }
     } 
-    console.log("Have we reached here");
+    console.log("End of data processing block");
 });
 
 client.on('end', () => {
@@ -126,6 +129,8 @@ client.on('error', (err) => {
         console.error('Connection error:', err);
     }
 });
+
+
 
 
 
@@ -287,5 +292,5 @@ function parseRedisResponseFromMaster(data, replicaDict){
 
 }
 
-server.listen(6380, "127.0.0.2");
+server.listen(PORT, "127.0.0.2");
 
