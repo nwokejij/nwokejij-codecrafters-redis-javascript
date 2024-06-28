@@ -84,7 +84,7 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
 });
 
 client.on('data',  async (data) => {
-    buffer += await data.toString('utf8');
+    buffer += data.toString('utf8');
     if (buffer.indexOf("FULLRESYNC") != -1) {
         console.log("Reached This If/Else Block");
         
