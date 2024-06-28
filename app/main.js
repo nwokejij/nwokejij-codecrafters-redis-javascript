@@ -89,8 +89,6 @@ client.on('data', async (data) => {
         console.log("Reached This If/Else Block");
     }
     console.log('Raw data received:', buffer);
-    console.log('Type of Data' + typeof buffer);
-
     let messages = buffer.split('\n');
     buffer = messages.pop(); // Keep incomplete message in buffer
 
@@ -102,9 +100,9 @@ client.on('data', async (data) => {
         }
     });
 
-    let resData = data.toString('utf8').trim();
+    // let resData = data.toString('utf8').trim(); //
 
-    if (resData) {
+    if (buffer) {
         const resp = resData.split('\r\n')[0];
         console.log('Parsed response:', resp);
 
