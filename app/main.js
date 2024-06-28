@@ -29,6 +29,8 @@ client.on('data', (data) => {
         // client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0")); //commented out the replica response
     }
     let messages = buffer.split('\r\n');
+    let resData = buffer;
+    buffer = messages.pop();
     messages.forEach((message) => {
         console.log(`Received message: ${message.trim()}`);
         if (message.startsWith('> REPLCONF GETACK')) {
@@ -38,8 +40,8 @@ client.on('data', (data) => {
         }
     });
 
-    if (buffer) {
-        const resp = buffer.split('\r\n')[0];
+    if (resData) {
+        const resp = resData.split('\r\n')[0];
         console.log('Parsed response:', resp);
 
         if (resp === "+PONG") {
