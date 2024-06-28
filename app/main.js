@@ -31,7 +31,7 @@ const client = net.createConnection({ port: masterPort, host: 'localhost'}, () =
                 }
 
             } 
-            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+            console.log("Have we reached here");
             
             
             
