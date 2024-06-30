@@ -1,18 +1,5 @@
 const { parseRequest } = "./utils.js";
-const net = require("net");
-const portIndex = process.argv.indexOf("--port");
-const isSlave = process.argv.indexOf("--replicaof");
-const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
-const replicas = [];
-let masterPort = 0;
 
-if (isSlave != -1) {
-    masterPort = process.argv[isSlave + 1];
-    masterPort = masterPort.split(" ")[1];
-    handleHandshake(masterPort);
-} else {
-    masterPort = PORT;
-}
 
 const replicaDict = {};
 let buffer = '';
@@ -63,23 +50,34 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
         }
         console.log("End of data processing block");
     });
+    client.on('end', () => {
+        console.log('Disconnected from master');
+    });
+    
+    client.on('error', (err) => {
+        if (err.code === 'EPIPE') {
+            console.error('EPIPE error: attempting to write to a closed stream');
+        } else {
+            console.error('Connection error:', err);
+        }
+    });
 });
 }
 
+const net = require("net");
+const portIndex = process.argv.indexOf("--port");
+const isSlave = process.argv.indexOf("--replicaof");
+const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
+const replicas = [];
+let masterPort = 0;
 
-
-client.on('end', () => {
-    console.log('Disconnected from master');
-});
-
-client.on('error', (err) => {
-    if (err.code === 'EPIPE') {
-        console.error('EPIPE error: attempting to write to a closed stream');
-    } else {
-        console.error('Connection error:', err);
-    }
-});
-
+if (isSlave != -1) {
+    masterPort = process.argv[isSlave + 1];
+    masterPort = masterPort.split(" ")[1];
+    handleHandshake(masterPort);
+} else {
+    masterPort = PORT;
+}
 
 
 function parseEvents(events) {
