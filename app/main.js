@@ -25,6 +25,7 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
           console.log("queries:" + queries);
         }
     }
+    console.log("Queries:" + queries);
         commands = Buffer.from(queries).toString().split("\r\n");
         console.log("First command:" + commands[0]);
         if (commands[0] == "+PONG") {
