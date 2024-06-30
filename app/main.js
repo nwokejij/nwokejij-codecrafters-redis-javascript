@@ -25,7 +25,7 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
           console.log("queries:" + queries);
         }
     }
-        commands = Buffer.from(query).toString().split("\r\n");
+        commands = Buffer.from(queries).toString().split("\r\n");
         if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
