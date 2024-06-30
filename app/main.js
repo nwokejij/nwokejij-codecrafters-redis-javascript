@@ -10,20 +10,20 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
     client.on('data', (data) => {
         let commands = Buffer.from(data).toString().split("\r\n");
         console.log(`Command received by replica:`, commands);
-        // for (const request of requests){
-        //     console.log("Request:" + request);
-        //     if (request.startsWith('*')){
-        //     const parsedRequest = parseRequest(request);
-        //     const command = parsedRequest[0];
-        //     const args = parsedRequest.slice(1);
-        //     if (command.toLowerCase() === 'replconf' && args[0] === 'GETACK') {
-        //         client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
-        //         continue
-        //       }
-        //     } else if (request.indexOf("FULLRESYNC") != -1){
-        //             client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
-        //         }
-        //     }
+        let queries = data.toString();
+      while (queries.length > 0) {
+        let index = queries.indexOf("*", 1);
+        let query;
+        if (index == -1) {
+          query = queries;
+          queries = "";
+        } else {
+          query = queries.substring(0, index);
+          print("query:" + query);
+          queries = queries.substring(index);
+          print("queries:" + queries);
+        }
+    }
         buffer = data.toString('utf8');
         let messages = buffer.split('\r\n');
         let resData = buffer; // will use to handle the handshake responses
