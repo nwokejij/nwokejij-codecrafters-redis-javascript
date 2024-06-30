@@ -32,7 +32,7 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
         } else if (commands[0] == "+OK"){
             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
         } else {
-            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
         }
 
         // buffer = data.toString('utf8');
