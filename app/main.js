@@ -11,6 +11,7 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
         let commands = Buffer.from(data).toString().split("\r\n");
         console.log(`Command received by replica:`, commands);
         let queries = data.toString();
+        print("Raw queries:" + queries);
       while (queries.length > 0) {
         let index = queries.indexOf("*", 1);
         let query;
