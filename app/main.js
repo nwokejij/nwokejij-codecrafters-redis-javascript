@@ -19,9 +19,9 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
           queries = "";
         } else {
           query = queries.substring(0, index);
-          print("query:" + query);
+          console.log("query:" + query);
           queries = queries.substring(index);
-          print("queries:" + queries);
+          console.log("queries:" + queries);
         }
     }
         buffer = data.toString('utf8');
