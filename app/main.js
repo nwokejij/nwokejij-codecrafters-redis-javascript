@@ -30,9 +30,13 @@ client.on('data', (data) => {
         const command = parsedRequest[0];
         const args = parsedRequest.slice(1);
         if (command.toLowerCase() === 'replconf' && args[0] === 'GETACK') {
-            client.write(encodeArray(['REPLCONF', 'ACK', '0']))
+            client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
             continue
           }
+        } else if (request.startsWith('+')){
+            if (request.indexOf("FULLRESYNC") != -1){
+                client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
+            }
         }
     }
     buffer = data.toString('utf8');
