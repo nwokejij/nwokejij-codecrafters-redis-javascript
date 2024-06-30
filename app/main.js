@@ -35,12 +35,7 @@ client.on('data', (data) => {
           }
         }
     }
-    console.log("Buffer Length", buffer.length);
-    console.log('Raw data received:', buffer);
-    if (buffer.indexOf("FULLRESYNC") != -1) {
-        console.log("Reached This If/Else Block");
-        // client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0")); //commented out the replica response
-    }
+    buffer = data.toString('ut8');
     let messages = buffer.split('\r\n');
     let resData = buffer; // will use to handle the handshake responses
     buffer = messages.pop(); // resets the buffer with ""
