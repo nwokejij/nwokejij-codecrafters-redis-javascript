@@ -62,7 +62,6 @@ client.on('data', async (data) => {
             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
         }
     }
-    console.log("Requests array:" + requests);
     console.log("End of data processing block");
 });
 
