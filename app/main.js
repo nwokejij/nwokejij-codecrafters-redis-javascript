@@ -12,20 +12,6 @@ const client = net.createConnection({ port: port, host: 'localhost' }, () => {
         console.log(`Command received by replica:`, commands);
         let queries = data.toString();
         console.log("Raw queries:" + queries);
-      while (queries.length > 0) {
-        let index = queries.indexOf("*", 1);
-        let query;
-        if (index == -1) {
-          query = queries;
-          queries = "";
-        } else {
-          query = queries.substring(0, index);
-          console.log("query:" + query);
-          queries = queries.substring(index);
-          console.log("queries:" + queries);
-        }
-    }
-    console.log("Queries:" + queries);
         commands = Buffer.from(queries).toString().split("\r\n");
         console.log("First command:" + commands);
         if (commands[0] == "+PONG") {
