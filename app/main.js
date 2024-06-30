@@ -8,18 +8,19 @@ let masterPort = 0;
 
 if (isSlave != -1) {
     masterPort = process.argv[isSlave + 1];
-    masterPort = masterPort.split("localhost ")[1];
+    masterPort = masterPort.split(" ")[1];
+    handleHandshake(masterPort);
 } else {
     masterPort = PORT;
 }
 
 const replicaDict = {};
 let buffer = '';
-
-const client = net.createConnection({ port: masterPort, host: 'localhost' }, () => {
+const handleHandshake = (port) => {
+const client = net.createConnection({ port: port, host: 'localhost' }, () => {
     console.log('Connected to master');
     client.write("*1\r\n" + getBulkString("PING"));
-    client.on('data', async (data) => {
+    client.on('data', (data) => {
         let commands = Buffer.from(data).toString().split("\r\n");
         console.log(`Command received by replica:`, commands);
         // for (const request of requests){
@@ -63,6 +64,7 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
         console.log("End of data processing block");
     });
 });
+}
 
 
 
