@@ -1,4 +1,4 @@
-const parseEvents = (events) => {
+function parseEvents(events) {
     let stEvent = null
     const parsedEvents = []
     while (stEvent !== -1) {
@@ -12,13 +12,13 @@ const parseEvents = (events) => {
     return parsedEvents
   }
   
-  const isValidCommand = (command, commandLength) => {
+  function isValidCommand(command, commandLength){
     if (!commandLength.startsWith('$')) throw new Error('Incorrect Length')
     const commandLen = Number(commandLength.slice(1))
     if (command.length !== commandLen) throw new Error('Incorrect Element Length')
   }
   
-  const parseRequest = (request) => {
+  function parseRequest(request) {
     // Check if request starts with '*', throw error if not
     if (request[0] != '*') {
       throw new Error('Invalid Request')
