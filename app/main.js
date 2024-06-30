@@ -35,7 +35,7 @@ client.on('data', (data) => {
           }
         }
     }
-    buffer = data.toString('ut8');
+    buffer = data.toString('utf8');
     let messages = buffer.split('\r\n');
     let resData = buffer; // will use to handle the handshake responses
     buffer = messages.pop(); // resets the buffer with ""
