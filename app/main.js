@@ -1,3 +1,4 @@
+const { parseEvents, parseRequest } = "./utils.js";
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
@@ -21,7 +22,19 @@ const client = net.createConnection({ port: masterPort, host: 'localhost' }, () 
 });
 
 client.on('data', (data) => {
-    buffer += data.toString('utf8');
+    let requests = parseEvents(data.toString('utf8'));
+    for (const request of requests){
+        console.log("Request:" + request);
+        if (request.startsWith('*')){
+        const parsedRequest = parseRequest(request);
+        const command = parsedRequest[0];
+        const args = parsedRequest.slice(1);
+        if (command.toLowerCase() === 'replconf' && args[0] === 'GETACK') {
+            client.write(encodeArray(['REPLCONF', 'ACK', '0']))
+            continue
+          }
+        }
+    }
     console.log("Buffer Length", buffer.length);
     console.log('Raw data received:', buffer);
     if (buffer.indexOf("FULLRESYNC") != -1) {
@@ -29,8 +42,8 @@ client.on('data', (data) => {
         // client.write("*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0")); //commented out the replica response
     }
     let messages = buffer.split('\r\n');
-    let resData = buffer;
-    buffer = messages.pop();
+    let resData = buffer; // will use to handle the handshake responses
+    buffer = messages.pop(); // resets the buffer with ""
     messages.forEach((message) => {
         console.log(`Received message: ${message.trim()}`);
         if (message.startsWith('> REPLCONF GETACK')) {
