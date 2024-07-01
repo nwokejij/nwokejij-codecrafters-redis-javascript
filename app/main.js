@@ -23,65 +23,6 @@ const handleHandshake = (port) => {
             })
           })
         }
-// const handleHandshake = (port) => {
-// const client = net.createConnection({ port: port, host: 'localhost' }, () => {
-//     console.log('Connected to master');
-//     client.write("*1\r\n" + getBulkString("PING"));
-//     client.on('data', (data) => {
-//         let commands = Buffer.from(data).toString().split("\r\n");
-//         console.log(`Command received by replica:`, commands);
-//         let queries = data.toString();
-//         console.log("Raw queries:" + queries);
-//         commands = Buffer.from(queries).toString().split("\r\n");
-//         console.log("First command:" + commands);
-//         if (commands[0] == "+PONG") {
-//             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port") + getBulkString(PORT));
-//             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2")); 
-//         } else if (commands[0] == "+OK"){
-//             client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?") + getBulkString("-1")); 
-//         } else {
-//             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0"));
-//         }
-
-//         // buffer = data.toString('utf8');
-//         // let messages = buffer.split('\r\n');
-//         // let resData = buffer; // will use to handle the handshake responses
-//         // buffer = messages.pop(); // resets the buffer with ""
-//         // messages.forEach((message) => {
-//         //     console.log(`Received message: ${message.trim()}`);
-//         //     if (message.startsWith('> REPLCONF GETACK')) {
-//         //         console.log('Received REPLCONF GETACK');
-//         //         // Handle REPLCONF GETACK message
-//         //         // Never reaches this block
-//         //     }
-//         // });
-    
-//         // if (resData) {
-//         //     const resp = resData.split('\r\n')[0];
-//         //     console.log('Parsed response:', resp);
-    
-//         //     if (resp === "+PONG") {
-                
-                
-//         //     } else if (resp === "+OK") {
-                
-//         //     }
-//         // }
-//         console.log("End of data processing block");
-//     });
-    // client.on('end', () => {
-    //     console.log('Disconnected from master');
-    // });
-    
-    // client.on('error', (err) => {
-    //     if (err.code === 'EPIPE') {
-    //         console.error('EPIPE error: attempting to write to a closed stream');
-    //     } else {
-    //         console.error('Connection error:', err);
-    //     }
-    // });
-// });
-// }
 
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
@@ -235,7 +176,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
-                    console.log("ReplicaDict", replicaDict[stringArray[i+2]]);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
