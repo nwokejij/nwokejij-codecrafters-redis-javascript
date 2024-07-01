@@ -50,12 +50,10 @@ const handleHandshake = (port) => {
             } else {
               client.write("$-1\r\n");
             }
-          } else if (commands[2] == "REPLCONF") {
-            if (commands[4] == "GETACK") {
+          } else if (commands[0].includes("+FULLRESYNC")) {
               return client.write(
                 `*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n`
               );
-            }
           }
         }
       });
@@ -132,6 +130,7 @@ if (isSlave != -1) {
     masterPort = process.argv[isSlave + 1];
     masterPort = masterPort.split(" ")[1];
     handleHandshake(masterPort);
+    console.log("Master Port:" + masterPort)
 } else {
     masterPort = PORT;
 }
@@ -292,4 +291,4 @@ function parseRedisResponseFromMaster(data, replicaDict){
 
 }
 
-server.listen(PORT, "127.0.0.2");
+server.listen(PORT, "127.0.0.1");
