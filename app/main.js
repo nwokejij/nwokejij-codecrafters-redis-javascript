@@ -158,7 +158,6 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         
         
     })
-    connection.write("Hello");
 
 
 });
