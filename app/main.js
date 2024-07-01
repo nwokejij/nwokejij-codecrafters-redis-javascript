@@ -1,8 +1,4 @@
-const { parseRequest } = "./utils.js";
-// at least 7 
-
 const replicaDict = {};
-let buffer = '';
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, () => {
       console.log("connected to master", "Port: ", port);
@@ -12,17 +8,17 @@ const handleHandshake = (port) => {
         let commands = Buffer.from(data).toString().split("\r\n");
         console.log(`Command recieved by replica:`, commands);
         let queries = data.toString();
-        while (queries.length > 0) {
-          let index = queries.indexOf("*", 1);
-          let query;
-          if (index == -1) {
-            query = queries;
-            queries = "";
-          } else {
-            query = queries.substring(0, index);
-            queries = queries.substring(index);
-          }
-        }
+        // while (queries.length > 0) {
+        //   let index = queries.indexOf("*", 1);
+        //   let query;
+        //   if (index == -1) {
+        //     query = queries;
+        //     queries = "";
+        //   } else {
+        //     query = queries.substring(0, index);
+        //     queries = queries.substring(index);
+        //   }
+        // }
          
           if (commands[0] == "+PONG") {
             client.write(
@@ -41,8 +37,7 @@ const handleHandshake = (port) => {
             );
         } else {
             let resData = data.toString().trim();
-            let message = parseRedisResponseFromMaster(resData, replicaDict);
-            
+            parseRedisResponseFromMaster(resData, replicaDict);
           }
             })
           })
