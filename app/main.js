@@ -220,6 +220,7 @@ function getBulkString(string){
     return `\$${string.length}\r\n${string}\r\n`
 }
 function parseRedisResponseFromMaster(data, replicaDict){
+    console.log("Data received to Client", data);
     const type = data.charAt(0);
     switch(type) {
         case '+':
@@ -231,12 +232,10 @@ function parseRedisResponseFromMaster(data, replicaDict){
             stringArray = bulkStrings.split('\r\n');
             stringArrayLen = stringArray.length;
             noNewLine = [];
-            if ((stringArray.indexOf("REPLCONF") != -1) && (stringArray.indexOf("GETACK") != -1) && (stringArray.indexOf("*") != -1)){
-                return "*3/r/n" + getBulkString("REPLCONF") + getBulkString("ACK")+ getBulkString("0");
-            }
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    console.log("ReplicaDict", replicaDict[stringArray[i+2]]);
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
