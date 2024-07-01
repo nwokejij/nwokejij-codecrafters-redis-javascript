@@ -3,34 +3,17 @@ const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, () => {
       console.log("connected to master", "Port: ", port);
       client.write("*1\r\n$4\r\nPING\r\n");
-      let repl1 = false;
       client.on("data", (data) => {
         let commands = Buffer.from(data).toString().split("\r\n");
         console.log(`Command recieved by replica:`, commands);
-        // let queries = data.toString();
-        // while (queries.length > 0) {
-        //   let index = queries.indexOf("*", 1);
-        //   let query;
-        //   if (index == -1) {
-        //     query = queries;
-        //     queries = "";
-        //   } else {
-        //     query = queries.substring(0, index);
-        //     queries = queries.substring(index);
-        //   }
-        // }
-         
           if (commands[0] == "+PONG") {
             client.write(
               `*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n${PORT}\r\n`
             );
           } else if (commands[0] == "+OK") {
-            if (repl1 == false) {
               client.write(
-                `*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n`
-              );
-              repl1 = true;
-            } else client.write(`*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n`);
+                `*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n`)
+            client.write(`*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n`);
           } else if (commands[0].includes("+FULLRESYNC")) {
             return client.write(
               `*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n`
