@@ -22,6 +22,7 @@ const handleHandshake = (port) => {
             query = queries.substring(0, index);
             queries = queries.substring(index);
           }
+        }
           commands = Buffer.from(query).toString().split("\r\n");
           if (commands[0] == "+PONG") {
             client.write(
@@ -34,31 +35,18 @@ const handleHandshake = (port) => {
               );
               repl1 = true;
             } else client.write(`*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n`);
-          } else if (commands[2] == "SET") {
-            const key = commands[4];
-            const value = commands[6];
-            db[key] = value;
-            if (commands[8] == "px")
-              setTimeout(() => {
-                delete db[key];
-              }, commands[10]);
-          } else if (commands[2] == "GET") {
-            const answer = db[commands[4]];
-            if (answer) {
-              const l = answer.length;
-              client.write("$" + l + "\r\n" + answer + "\r\n");
-            } else {
-              client.write("$-1\r\n");
-            }
           } else if (commands[0].includes("+FULLRESYNC")) {
-              return client.write(
-                `*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n`
-              );
+            return client.write(
+              `*3\r\n$8\r\nREPLCONF\r\n$3\r\nACK\r\n$1\r\n0\r\n`
+            );
+        } else {
+            let resData = data.toString().trim();
+            let message = parseRedisResponseFromMaster(resData, replicaDict);
+            
           }
+            })
+          })
         }
-      });
-    });
-  };
 // const handleHandshake = (port) => {
 // const client = net.createConnection({ port: port, host: 'localhost' }, () => {
 //     console.log('Connected to master');
