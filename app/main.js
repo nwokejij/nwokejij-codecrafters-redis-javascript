@@ -23,7 +23,7 @@ const handleHandshake = (port) => {
             queries = queries.substring(index);
           }
         }
-          commands = Buffer.from(query).toString().split("\r\n");
+         
           if (commands[0] == "+PONG") {
             client.write(
               `*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n${PORT}\r\n`
