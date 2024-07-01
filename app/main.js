@@ -7,7 +7,7 @@ const handleHandshake = (port) => {
       client.on("data", (data) => {
         let commands = Buffer.from(data).toString().split("\r\n");
         console.log(`Command recieved by replica:`, commands);
-        let queries = data.toString();
+        // let queries = data.toString();
         // while (queries.length > 0) {
         //   let index = queries.indexOf("*", 1);
         //   let query;
