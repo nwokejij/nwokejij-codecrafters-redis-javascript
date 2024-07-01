@@ -5,7 +5,7 @@ const replicaDict = {};
 let buffer = '';
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, () => {
-      console.log("connected to master", "Host: ", host, "Port: ", port);
+      console.log("connected to master", "Port: ", port);
       client.write("*1\r\n$4\r\nPING\r\n");
       let repl1 = false;
       client.on("data", (data) => {
