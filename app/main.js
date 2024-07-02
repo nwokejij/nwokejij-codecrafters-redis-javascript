@@ -27,16 +27,16 @@ const handleHandshake = (port) => {
                 offset += message.length;
             }
         }
-            console.log("Offset: " + offset);
+            console.log("Offset IN REPLCONF Block: " + offset);
         } else if (commands[0] == "+PING"){
             if (firstAck){
                 offset += message.length;
-                console.log("Offset:" + offset);
+                console.log("Offset in Ping Block:" + offset);
             }
         }else {
             if (firstAck){
                 offset += message.length;
-                console.log("Offset: "+ offset);
+                console.log("Offset in Else Block: "+ offset);
             }
             parseRedisResponseFromMaster(message, replicaDict);
           }
