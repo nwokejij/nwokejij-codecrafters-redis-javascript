@@ -28,7 +28,7 @@ const handleHandshake = (port) => {
             }
         }
             console.log("Offset IN REPLCONF Block: " + offset);
-        } else if (commands[0] == "+PING"){
+        } else if (commands.includes("PING") ){
             if (firstAck){
                 offset += message.length;
                 console.log("Offset in Ping Block:" + offset);
