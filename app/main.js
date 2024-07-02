@@ -3,9 +3,12 @@ const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, () => {
       console.log("connected to master", "Port: ", port);
       client.write("*1\r\n$4\r\nPING\r\n");
+      let firstAck = false;
+      let offset = 0;
       let repl1 = false;
       client.on("data", (data) => {
-        let commands = Buffer.from(data).toString().split("\r\n");
+        let message = Buffer.from(data).toString();
+        let commands = message.split("\r\n");
         console.log(`Command recieved by replica:`, commands);
           if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
@@ -14,11 +17,28 @@ const handleHandshake = (port) => {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-          } else if (commands[0].includes("+FULLRESYNC")) {
-            return client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("0"));
-        } else {
-            let resData = data.toString().trim();
-            parseRedisResponseFromMaster(resData, replicaDict);
+          } else if (commands[0].includes("+FULLRESYNC") || commands[0] == "REPLCONF") {
+            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
+            firstAck = true;
+            if (firstAck){
+            if (commands[0].includes("+FULLRESYNC")){
+                offset += 37;
+            } else {
+                offset += message.length;
+            }
+        }
+            console.log("Offset: " + offset);
+        } else if (commands[0] == "+PING"){
+            if (firstAck){
+                offset += message.length;
+                console.log("Offset:" + offset);
+            }
+        }else {
+            if (firstAck){
+                offset += message.length;
+                console.log("Offset: "+ offset);
+            }
+            parseRedisResponseFromMaster(message, replicaDict);
           }
             })
           })
