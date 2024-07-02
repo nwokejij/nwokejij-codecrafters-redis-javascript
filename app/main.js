@@ -1,4 +1,8 @@
 const replicaDict = {};
+// 2 cases
+// 1. the array contains REPLCONF
+// 2. commands does not include REPLCONF
+// still need to reply with 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, () => {
       console.log("connected to master", "Port: ", port);
@@ -17,18 +21,17 @@ const handleHandshake = (port) => {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-          } else if (commands[0].includes("+FULLRESYNC") || commands.includes("REPLCONF") ){
+          } else if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
-            if (firstAck){
-            if (commands[0].includes("+FULLRESYNC")){
-                offset += 37;
-            } else {
-                offset += message.length;
-            }
-        }
+            offset += message.length;
             console.log("Offset IN REPLCONF Block: " + offset);
-        } else if (commands.includes("PING") ){
+        }else if (commands[0].includes("+FULLRESYNC")){
+            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
+            firstAck = true;
+            console.log("Offset IN FULLRESYNC Block: " + offset);
+        }
+            else if (commands.includes("PING") ){
             if (firstAck){
                 offset += message.length;
                 console.log("Offset in Ping Block:" + offset);
