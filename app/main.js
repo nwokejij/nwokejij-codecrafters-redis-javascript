@@ -17,7 +17,7 @@ const handleHandshake = (port) => {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-          } else if (commands[0].includes("+FULLRESYNC") || commands.includes("REPLCONF") {
+          } else if (commands[0].includes("+FULLRESYNC") || commands.includes("REPLCONF") ){
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
             if (firstAck){
