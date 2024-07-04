@@ -21,17 +21,14 @@ const handleHandshake = (port) => {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-          } else if (commands.includes("REPLCONF")) {
+          } else if (commands.includes("REPLCONF") || commands[0].includes("+FULLRESYNC")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
-            offset += 37;
+            if (commands.includes("REPLCONF")){
+                offset += 37;
+            } 
             console.log("Offset IN REPLCONF Block: " + offset);
-        }else if (commands[0].includes("+FULLRESYNC")){
-            client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
-            firstAck = true;
-            console.log("Offset IN FULLRESYNC Block: " + offset);
-        }
-            else if (commands.includes("PING") ){
+        }else if (commands.includes("PING") ){
             if (firstAck){
                 offset += message.length;
                 console.log("Offset in Ping Block:" + offset);
