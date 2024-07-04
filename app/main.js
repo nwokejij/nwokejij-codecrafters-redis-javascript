@@ -24,7 +24,7 @@ const handleHandshake = (port) => {
           } else if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
-            offset += message.length;
+            offset += 37;
             console.log("Offset IN REPLCONF Block: " + offset);
         }else if (commands[0].includes("+FULLRESYNC")){
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
