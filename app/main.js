@@ -28,7 +28,7 @@ const handleHandshake = (port) => {
                 if (commands.includes("REPLCONF")){
                     client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
                 }
-                offset += 37;
+                offset += 37; // length of REPLCONF GETACK command
             }
             
         }else if (commands.includes("REPLCONF") || commands[0].includes("+FULLRESYNC")) {
@@ -38,7 +38,7 @@ const handleHandshake = (port) => {
                 offset += 37;
             } 
             console.log("Offset IN REPLCONF Block: " + offset);
-        }else {
+        }else { // for SET and GET commands received
             if (firstAck){
                 offset += message.length;
                 console.log("Offset in Else Block: "+ offset);
