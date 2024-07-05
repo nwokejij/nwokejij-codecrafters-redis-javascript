@@ -1,14 +1,15 @@
 const replicaDict = {};
 
 const handleHandshake = (port) => {
-    const client = net.createConnection({ host: "localhost", port: port }, () => {
+    const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
       client.write("*1\r\n$4\r\nPING\r\n");
       let firstAck = false;
       let offset = 0;
       let repl1 = false;
       client.on("data", (data) => {
-        let message = Buffer.from(data).toString();
+        dat = await readData(data);
+        let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
         console.log(`Command recieved by replica:`, commands);
         while (message.length > 0) {
@@ -58,6 +59,19 @@ const handleHandshake = (port) => {
             })
           })
         }
+
+async function readData(data){
+
+    return new Promise((resolve, reject) => {
+        try{
+            dat = data.toString();
+            resolve(dat);
+        } catch (e){
+            reject(e);
+        }
+    })
+
+}
 const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
@@ -200,7 +214,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
     switch(type) {
         case '+':
         case '*': // Array
-        console.log("Data recieved" + data);
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+2); 
             stringArray = bulkStrings.split('\r\n');
