@@ -12,6 +12,7 @@ const handleHandshake = (port) => {
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
         console.log(`Command recieved by replica:`, commands);
+        console.log("Raw message", message);
         while (message.length > 0) {
             let index = message.indexOf("*", 1);
             let query;
@@ -36,12 +37,7 @@ const handleHandshake = (port) => {
             if (firstAck){
                 offset += 14;
                 console.log("Offset in Ping Block:" + offset);
-                if (commands.includes("REPLCONF")){
-                    client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
-                }
-                offset += 37; // length of REPLCONF GETACK command
             }
-
             
         }
         if (commands.includes("REPLCONF")) {
