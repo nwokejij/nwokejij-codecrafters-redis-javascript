@@ -3,7 +3,7 @@ let numOfAcks = 0;
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
-      client.write("*1\r\n$4\r\nPING\r\n");
+    //   client.write("*1\r\n$4\r\nPING\r\n");
       let firstAck = false;
       let offset = 0;
       let repl1 = false;
