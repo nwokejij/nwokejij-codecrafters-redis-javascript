@@ -1,5 +1,5 @@
 const replicaDict = {};
-const numOfAcks = 0;
+let numOfAcks = 0;
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
