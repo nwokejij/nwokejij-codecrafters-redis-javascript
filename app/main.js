@@ -7,7 +7,7 @@ const handleHandshake = (port) => {
       let firstAck = false;
       let offset = 0;
       let repl1 = false;
-      client.on("data", (data) => {
+      client.on("data", async (data) => {
         dat = await readData(data);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
