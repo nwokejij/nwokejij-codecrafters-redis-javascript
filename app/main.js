@@ -41,7 +41,7 @@ const handleHandshake = (port) => {
             }
 
             
-        }else if (commands.includes("REPLCONF") || commands[0].includes("+FULLRESYNC")) {
+        }else if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
             if (commands.includes("REPLCONF")){
