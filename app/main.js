@@ -199,7 +199,8 @@ function parseRedisResponse(data) {
                     console.log("Number of Replicas", numOfAcks);
                     setTimeout(()=> {
                         if (numOfAcks == stringArray[i+2]){
-                            return numOfAcks;
+                            console.log("Numb of Acks", stringArray[i+2]);
+                            return `:${numOfAcks}\r\n`
                         }
                     }, 500);
                     return `:${numOfAcks}\r\n`;
