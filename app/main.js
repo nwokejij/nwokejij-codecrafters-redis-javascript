@@ -45,7 +45,7 @@ const handleHandshake = (port) => {
                 offset += query.toString().length;
                 console.log("Updated Offset in SET block", offset);
             }
-            parseRedisResponseFromMaster(message, replicaDict);
+            parseRedisResponseFromMaster(query, replicaDict);
         }
 
         if (commands.includes("REPLCONF")) {
@@ -225,6 +225,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
+
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
