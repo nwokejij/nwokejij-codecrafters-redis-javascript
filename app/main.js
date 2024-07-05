@@ -25,14 +25,16 @@ const handleHandshake = (port) => {
             commands = Buffer.from(query).toString().split("\r\n");
           if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
-          } else if (commands[0] == "+OK") {
+          } 
+          if (commands[0] == "+OK") {
             if (repl1 == false) {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-          } else if (commands.includes("PING") ){
+          } 
+          if (commands.includes("PING") ){
             if (firstAck){
-                offset += message.length;
+                offset += 14;
                 console.log("Offset in Ping Block:" + offset);
                 if (commands.includes("REPLCONF")){
                     client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
@@ -41,24 +43,25 @@ const handleHandshake = (port) => {
             }
 
             
-        }else if (commands.includes("REPLCONF")) {
+        }
+        if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
             if (commands.includes("REPLCONF")){
                 offset += 37;
             } 
             console.log("Offset IN REPLCONF Block: " + offset);
-        }else { // for SET and GET commands received
-            if (firstAck){
-                offset += message.length;
-                console.log("Offset in Else Block: "+ offset);
-            }
+        }
+        if (commands.includes("SET") || commands.includes("GET")) {
+
             parseRedisResponseFromMaster(message, replicaDict);
+        }
+        
+            
           }
-        }
+        })
             })
-          })
-        }
+          }
 
 async function readData(data){
 
