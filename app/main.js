@@ -8,6 +8,7 @@ const handleHandshake = (port) => {
       let offset = 0;
       let repl1 = false;
       client.on("data", async (data) => {
+        try {
         dat = await readData(data);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
@@ -54,7 +55,12 @@ const handleHandshake = (port) => {
         
             
           }
+        } catch (e){
+            console.error(e);
+            client.destroy();
+        }
         })
+
             })
           }
 
@@ -187,6 +193,9 @@ function parseRedisResponse(data) {
                         return getBulkString(replicaDict[stringArray[i+2]]);
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
+                } else if (stringArray[i] == "WAIT") {
+                    return getBulkString("0");
+                    
                 } else {
                     noNewLine.push(stringArray[i]);
                 }
