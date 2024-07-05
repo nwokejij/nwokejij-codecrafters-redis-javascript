@@ -1,7 +1,7 @@
 const replicaDict = {};
 
 const handleHandshake = (port) => {
-    const client = createConnection({ host: "localhost", port: port }, () => {
+    const client = net.createConnection({ host: "localhost", port: port }, () => {
       console.log("connected to master", "Port: ", port);
       client.write("*1\r\n$4\r\nPING\r\n");
       let firstAck = false;
@@ -47,8 +47,7 @@ const handleHandshake = (port) => {
             })
           })
         }
-
-import { createConnection, createServer } from "net";
+const net = require("net");
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
@@ -69,7 +68,7 @@ if (isSlave != -1) {
 console.log("Logs from your program will appear here!");
 
 
-const server = createServer((connection) => {
+const server = met.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
