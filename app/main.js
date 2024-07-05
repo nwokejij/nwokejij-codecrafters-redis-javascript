@@ -119,6 +119,7 @@ let rdbFileHeader = `$${bytes}\r\n`;
 const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
             connection.write(rdbFileBuffer);
             replicas.push(connection);
+            numOfAcks += 1;
         }
         if (command.indexOf("SET") != -1){
             replicas.forEach((replica) => {
@@ -196,8 +197,8 @@ function parseRedisResponse(data) {
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
                 } else if (stringArray[i] == "WAIT") {
-                    console.log("Number of Replicas", numOsfAcks);
-                    return ":0\r\n";
+                    console.log("Number of Replicas", numOfAcks);
+                    return `${numOfAcks}:\r\n`;
                     
                 } else {
                     noNewLine.push(stringArray[i]);
