@@ -120,11 +120,12 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.push(connection);
             numOfAcks += 1;
         }
-        if (command.indexOf("SET") != -1){
-            replicas.forEach((replica) => {
-                replica.write(command);
-            })
-        }
+    if (replicas){
+        replicas.forEach((replica) => {
+            replica.write(command);
+        })
+    }
+
         
         
     })
