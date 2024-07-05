@@ -194,7 +194,7 @@ function parseRedisResponse(data) {
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
                 } else if (stringArray[i] == "WAIT") {
-                    return "0";
+                    return "+0\r\n";
                     
                 } else {
                     noNewLine.push(stringArray[i]);
