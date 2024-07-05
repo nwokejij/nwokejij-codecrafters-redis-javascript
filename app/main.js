@@ -197,6 +197,11 @@ function parseRedisResponse(data) {
                     return getBulkString(dictionary[stringArray[i+2]]);
                 } else if (stringArray[i] == "WAIT") {
                     console.log("Number of Replicas", numOfAcks);
+                    setTimeout(()=> {
+                        if (numOfAcks == stringArray[i+2]){
+                            return numOfAcks;
+                        }
+                    }, 500);
                     return `:${numOfAcks}\r\n`;
                     
                 } else {
