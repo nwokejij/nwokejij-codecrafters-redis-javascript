@@ -68,7 +68,7 @@ if (isSlave != -1) {
 console.log("Logs from your program will appear here!");
 
 
-const server = met.createServer((connection) => {
+const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
