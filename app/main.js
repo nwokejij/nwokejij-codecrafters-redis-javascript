@@ -11,7 +11,6 @@ const handleHandshake = (port) => {
         dat = await readData(data);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
-        console.log(`Command recieved by replica:`, commands);
         while (message.length > 0) {
             let index = message.indexOf("*", 1);
             let query;
@@ -23,6 +22,7 @@ const handleHandshake = (port) => {
              message = message.substring(index);
             }
             commands = Buffer.from(query).toString().split("\r\n");
+            console.log("Query Commands", commands)
           if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
           } 
@@ -42,10 +42,11 @@ const handleHandshake = (port) => {
         if (commands.includes("SET") || commands.includes("GET")) {
             if (firstAck){
                 offset += query.toString().length + 1;
+                console.log("Updated Offset in SET block", offset);
             }
             parseRedisResponseFromMaster(message, replicaDict);
         }
-        
+
         if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
