@@ -1,16 +1,14 @@
 const replicaDict = {};
-// 2 cases
-// 1. the array contains REPLCONF
-// 2. commands does not include REPLCONF
-// still need to reply with 
+
 const handleHandshake = (port) => {
-    const client = net.createConnection({ host: "localhost", port: port }, () => {
+    const client = createConnection({ host: "localhost", port: port }, () => {
       console.log("connected to master", "Port: ", port);
       client.write("*1\r\n$4\r\nPING\r\n");
       let firstAck = false;
       let offset = 0;
       let repl1 = false;
       client.on("data", (data) => {
+        while (data) {
         let message = Buffer.from(data).toString();
         let commands = message.split("\r\n");
         console.log(`Command recieved by replica:`, commands);
@@ -45,11 +43,12 @@ const handleHandshake = (port) => {
             }
             parseRedisResponseFromMaster(message, replicaDict);
           }
+        }
             })
           })
         }
 
-const net = require("net");
+import { createConnection, createServer } from "net";
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
@@ -70,7 +69,7 @@ if (isSlave != -1) {
 console.log("Logs from your program will appear here!");
 
 
-const server = net.createServer((connection) => {
+const server = createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
