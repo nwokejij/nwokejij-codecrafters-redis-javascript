@@ -41,7 +41,8 @@ const handleHandshake = (port) => {
         }
         if (commands.includes("SET") || commands.includes("GET")) {
             if (firstAck){
-                offset += query.toString().length + 1;
+                console.log(query.toString());
+                offset += query.toString().length;
                 console.log("Updated Offset in SET block", offset);
             }
             parseRedisResponseFromMaster(message, replicaDict);
