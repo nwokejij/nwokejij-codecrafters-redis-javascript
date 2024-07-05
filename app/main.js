@@ -3,6 +3,7 @@ let numOfAcks = 0;
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
+      console.log("")
     //   client.write("*1\r\n$4\r\nPING\r\n");
       let firstAck = false;
       let offset = 0;
@@ -42,7 +43,8 @@ const handleHandshake = (port) => {
             if (firstAck){
                 offset += query.toString().length;
             }
-            parseRedisResponseFromMaster(query, replicaDict);
+            message = parseRedisResponseFromMaster(query, replicaDict);
+            client.write(message);
         }
 
         if (commands.includes("REPLCONF")) {
@@ -102,9 +104,8 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
         const command = data.toString();
         console.log("Data Received To Master: " + command);
-        const message = parseRedisResponse(command);
-        connection.write(message);
         if (command.indexOf("PSYNC") != -1){
+            connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
             const buffer = Buffer.from(hex, 'hex');
 
@@ -119,12 +120,18 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             connection.write(rdbFileBuffer);
             replicas.push(connection);
             numOfAcks += 1;
-        } else if (replicas){
-        replicas.forEach((replica) => {
-            console.log("Command propagated to replica", command);
-            replica.write(command);
-        })
-    }
+        } else {
+        const message = parseRedisResponse(command);
+        
+        connection.write(message);
+        if (replicas){
+            replicas.forEach((replica) => {
+                console.log("Command propagated to replica", command);
+                replica.write(command);
+            })
+        }
+        }
+          
 
         
         
@@ -141,19 +148,8 @@ const dictionary = {};
 function parseRedisResponse(data) {
     console.log("Data to Be Parsed", data);
     const type = data.charAt(0);
-    const content = data.slice(1).trim();
 
     switch (type) {
-        case '+': // Simple string
-            return content;
-        case '-': // Error
-            return new Error(content);
-        case ':': // Integer
-            return parseInt(content, 10);
-        case '$': // Bulk string
-            const length = parseInt(content, 10);
-            // console.log("Length: " + length);
-            return data.slice(data.indexOf('\r\n') + 2, data.indexOf('\r\n') + 2 + length);
         case '*': // Array
             delimiter = data.indexOf('\r\n');
             bulkStrings = data.slice(delimiter+2); 
