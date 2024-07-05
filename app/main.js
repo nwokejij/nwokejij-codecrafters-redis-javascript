@@ -121,7 +121,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             numOfAcks += 1;
         } else if (replicas){
         replicas.forEach((replica) => {
-            console.log("hello");
+            console.log("Command propagated to replica", command);
             replica.write(command);
         })
     }
