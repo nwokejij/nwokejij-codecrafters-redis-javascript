@@ -22,7 +22,6 @@ const handleHandshake = (port) => {
              message = message.substring(index);
             }
             commands = Buffer.from(query).toString().split("\r\n");
-            console.log("Query Commands", commands)
           if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
           } 
@@ -35,15 +34,12 @@ const handleHandshake = (port) => {
           if (commands.includes("PING") ){
             if (firstAck){
                 offset += 14;
-                console.log("Offset in Ping Block:" + offset);
             }
             
         }
         if (commands.includes("SET") || commands.includes("GET")) {
             if (firstAck){
-                console.log(query.toString());
                 offset += query.toString().length;
-                console.log("Updated Offset in SET block", offset);
             }
             parseRedisResponseFromMaster(query, replicaDict);
         }
@@ -54,7 +50,6 @@ const handleHandshake = (port) => {
             if (commands.includes("REPLCONF")){
                 offset += 37;
             } 
-            console.log("Offset IN REPLCONF Block: " + offset);
         }
         
             
