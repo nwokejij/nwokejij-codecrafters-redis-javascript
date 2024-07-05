@@ -119,8 +119,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             connection.write(rdbFileBuffer);
             replicas.push(connection);
             numOfAcks += 1;
-        }
-    if (replicas){
+        } else if (replicas){
         replicas.forEach((replica) => {
             replica.write(command);
         })
