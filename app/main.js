@@ -1,5 +1,5 @@
 const replicaDict = {};
-
+const numOfAcks = 0;
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
@@ -46,6 +46,7 @@ const handleHandshake = (port) => {
         }
 
         if (commands.includes("REPLCONF")) {
+            numofAcks += 1;
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
             if (commands.includes("REPLCONF")){
@@ -137,6 +138,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
 
 const dictionary = {};
 function parseRedisResponse(data) {
+    console.log("Data to Be Parsed", data);
     const type = data.charAt(0);
     const content = data.slice(1).trim();
 
@@ -194,6 +196,7 @@ function parseRedisResponse(data) {
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
                 } else if (stringArray[i] == "WAIT") {
+                    console.log("Number of Replicas", numOsfAcks);
                     return ":0\r\n";
                     
                 } else {
