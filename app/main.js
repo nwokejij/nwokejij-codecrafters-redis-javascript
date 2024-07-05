@@ -8,19 +8,27 @@ const handleHandshake = (port) => {
       let offset = 0;
       let repl1 = false;
       client.on("data", (data) => {
-        while (data) {
         let message = Buffer.from(data).toString();
         let commands = message.split("\r\n");
         console.log(`Command recieved by replica:`, commands);
+        while (message.length > 0) {
+            let index = message.indexOf("*", 1);
+            let query;
+            if (index == -1) {
+              query = message;
+             message = "";
+            } else {
+              query = message.substring(0, index);
+             message = message.substring(index);
+            }
+            commands = Buffer.from(query).toString().split("\r\n");
           if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
-            break;
           } else if (commands[0] == "+OK") {
             if (repl1 == false) {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
-            break;
           } else if (commands.includes("PING") ){
             if (firstAck){
                 offset += message.length;
@@ -31,7 +39,6 @@ const handleHandshake = (port) => {
                 offset += 37; // length of REPLCONF GETACK command
             }
 
-            break;
             
         }else if (commands.includes("REPLCONF") || commands[0].includes("+FULLRESYNC")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
@@ -40,14 +47,12 @@ const handleHandshake = (port) => {
                 offset += 37;
             } 
             console.log("Offset IN REPLCONF Block: " + offset);
-            break;
         }else { // for SET and GET commands received
             if (firstAck){
                 offset += message.length;
                 console.log("Offset in Else Block: "+ offset);
             }
             parseRedisResponseFromMaster(message, replicaDict);
-            break;
           }
         }
             })
@@ -194,7 +199,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
     const type = data.charAt(0);
     switch(type) {
         case '+':
-            break;
         case '*': // Array
         console.log("Data recieved" + data);
             delimiter = data.indexOf('\r\n');
