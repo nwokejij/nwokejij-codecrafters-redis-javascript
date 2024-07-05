@@ -12,7 +12,6 @@ const handleHandshake = (port) => {
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
         console.log(`Command recieved by replica:`, commands);
-        console.log("Raw message", message);
         while (message.length > 0) {
             let index = message.indexOf("*", 1);
             let query;
@@ -40,6 +39,13 @@ const handleHandshake = (port) => {
             }
             
         }
+        if (commands.includes("SET") || commands.includes("GET")) {
+            if (firstAck){
+                offset += query.toString().length + 1;
+            }
+            parseRedisResponseFromMaster(message, replicaDict);
+        }
+        
         if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
@@ -47,10 +53,6 @@ const handleHandshake = (port) => {
                 offset += 37;
             } 
             console.log("Offset IN REPLCONF Block: " + offset);
-        }
-        if (commands.includes("SET") || commands.includes("GET")) {
-
-            parseRedisResponseFromMaster(message, replicaDict);
         }
         
             
