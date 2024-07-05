@@ -46,7 +46,6 @@ const handleHandshake = (port) => {
         }
 
         if (commands.includes("REPLCONF")) {
-            numofAcks += 1;
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
             if (commands.includes("REPLCONF")){
