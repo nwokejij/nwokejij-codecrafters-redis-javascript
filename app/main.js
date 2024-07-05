@@ -14,11 +14,13 @@ const handleHandshake = (port) => {
         console.log(`Command recieved by replica:`, commands);
           if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
+            break;
           } else if (commands[0] == "+OK") {
             if (repl1 == false) {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
+            break;
           } else if (commands.includes("PING") ){
             if (firstAck){
                 offset += message.length;
@@ -28,6 +30,8 @@ const handleHandshake = (port) => {
                 }
                 offset += 37; // length of REPLCONF GETACK command
             }
+
+            break;
             
         }else if (commands.includes("REPLCONF") || commands[0].includes("+FULLRESYNC")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
@@ -36,12 +40,14 @@ const handleHandshake = (port) => {
                 offset += 37;
             } 
             console.log("Offset IN REPLCONF Block: " + offset);
+            break;
         }else { // for SET and GET commands received
             if (firstAck){
                 offset += message.length;
                 console.log("Offset in Else Block: "+ offset);
             }
             parseRedisResponseFromMaster(message, replicaDict);
+            break;
           }
         }
             })
