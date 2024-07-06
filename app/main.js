@@ -122,6 +122,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             handshakePhase = false;
         } else {
         const message = parseRedisResponse(command);
+        console.log("handshakePhase", handshakePhase);
         if (!handshakePhase){
                 replicas.forEach((replica) => {
                     console.log("Command propagated to replica", command);
@@ -166,14 +167,13 @@ function parseRedisResponse(data) {
                     return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
                 } else if (stringArray[i] == "REPLCONF"){
                     return "+OK\r\n";
-                } else if (stringArray[i] == "PSYNC"){
-                    handshakePhase = true;
-                    return "+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n";
-                }
+                } 
                 else if (stringArray[i] == "ECHO"){
                     noNewLine.pop();
                     continue;
                 } else if (stringArray[i] == "PING"){
+                    handshakePhase = true;
+                    console.log("handshakePhase", handshakePhase)
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
