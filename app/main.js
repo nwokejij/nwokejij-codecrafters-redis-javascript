@@ -122,19 +122,19 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.push(connection);
             numOfReplicas += 1;
             handshakePhase = false;
-        } else if (command.indexOf("WAIT") != -1) {
-            console.log("Do we wenter this block");
-            connection.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
-            console.log("Number of Replicas", numOfReplicas);
-        } else {
+        }else {
         const message = parseRedisResponse(command);
         console.log("handshakePhase", handshakePhase);
         connection.write(message);
         if (!handshakePhase){
 
                 replicas.forEach((replica) => {
+                    if (command.indexOf("WAIT") != -1){
+                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
+                    } else {
                     console.log("Command propagated to replica", command);
                     replica.write(command);
+                    }
                 })
             }
         } 
