@@ -125,7 +125,9 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         }else {
         const message = parseRedisResponse(command);
         console.log("handshakePhase", handshakePhase);
+        if (message){
         connection.write(message);
+        }
         if (!handshakePhase){
 
                 replicas.forEach((replica) => {
