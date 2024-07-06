@@ -97,7 +97,7 @@ if (isSlave != -1) {
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
-
+let handshakePhase = false;
 const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
@@ -119,16 +119,18 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             connection.write(rdbFileBuffer);
             replicas.push(connection);
             numOfAcks += 1;
+            handshakePhase = false;
         } else {
         const message = parseRedisResponse(command);
+        if (!handshakePhase){
+                replicas.forEach((replica) => {
+                    console.log("Command propagated to replica", command);
+                    replica.write(command);
+                })
+        } 
         
         connection.write(message);
-        if (replicas){
-            replicas.forEach((replica) => {
-                console.log("Command propagated to replica", command);
-                replica.write(command);
-            })
-        }
+        
         }
           
 
@@ -165,6 +167,7 @@ function parseRedisResponse(data) {
                 } else if (stringArray[i] == "REPLCONF"){
                     return "+OK\r\n";
                 } else if (stringArray[i] == "PSYNC"){
+                    handshakePhase = true;
                     return "+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n";
                 }
                 else if (stringArray[i] == "ECHO"){
