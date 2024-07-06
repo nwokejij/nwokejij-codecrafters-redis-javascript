@@ -1,4 +1,5 @@
 const replicaDict = {};
+let numOfReplicas = 0;
 let numOfAcks = 0;
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
@@ -48,6 +49,7 @@ const handleHandshake = (port) => {
 
         if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
+            numOfAcks += 1;
             firstAck = true;
             if (commands.includes("REPLCONF")){
                 offset += 37;
@@ -118,29 +120,31 @@ let rdbFileHeader = `$${bytes}\r\n`;
 const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
             connection.write(rdbFileBuffer);
             replicas.push(connection);
-            numOfAcks += 1;
+            numOfReplicas += 1;
             handshakePhase = false;
+        } else if (command.includes("WAIT")) {
+            connection.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
+            console.log("Number of Replicas", numOfReplicas);
         } else {
         const message = parseRedisResponse(command);
         console.log("handshakePhase", handshakePhase);
         if (!handshakePhase){
+
                 replicas.forEach((replica) => {
                     console.log("Command propagated to replica", command);
                     replica.write(command);
                 })
+            }
         } 
         
         connection.write(message);
         
-        }
+        })
           
 
         
         
-    })
-
-
-});
+    });
 
 
 
@@ -173,7 +177,6 @@ function parseRedisResponse(data) {
                     continue;
                 } else if (stringArray[i] == "PING"){
                     handshakePhase = true;
-                    console.log("handshakePhase", handshakePhase)
                     return "+PONG\r\n";
                 } else if (stringArray[i] == "SET"){
                     dictionary[stringArray[i+2]] = stringArray[i + 4];
@@ -195,14 +198,16 @@ function parseRedisResponse(data) {
                     }
                     return getBulkString(dictionary[stringArray[i+2]]);
                 } else if (stringArray[i] == "WAIT") {
-                    console.log("Number of Replicas", numOfAcks);
-                    setTimeout(()=> {
+                    console.log("Number of Replicas", numOfReplicas);
+            
                         if (numOfAcks == stringArray[i+2]){
                             console.log("Numb of Acks", stringArray[i+2]);
                             return `:${numOfAcks}\r\n`
                         }
-                    }, 500);
-                    return `:${numOfAcks}\r\n`;
+                    setTimeout(() => {
+                        return `:${numOfAcks}\r\n`
+                    }, parseInt(stringArray[i + 4]));
+                    return `:${numOfReplicas}\r\n`;
                     
                 } else {
                     noNewLine.push(stringArray[i]);
