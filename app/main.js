@@ -129,7 +129,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         if (!handshakePhase){
 
                 replicas.forEach((replica) => {
-                    if (command.includes("WAIT") != -1){
+                    if (command.includes("WAIT")){
                         replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
                     } else {
                         if (!command.includes("ACK")){
