@@ -122,7 +122,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.push(connection);
             numOfReplicas += 1;
             handshakePhase = false;
-        } else if (command.includes("WAIT")) {
+        } else if (command.indexOf("WAIT") != -1) {
             connection.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
             console.log("Number of Replicas", numOfReplicas);
         } else {
