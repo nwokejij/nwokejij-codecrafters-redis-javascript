@@ -104,8 +104,45 @@ const server = net.createServer((connection) => {
   // Handle connection
     connection.on('data', (data) => {
         const command = data.toString();
-        console.log("Data Received To Master: " + command);
-        if (command.indexOf("PSYNC") != -1){
+        let commands = command.slice(3).split('\r\n');
+        commands.pop();
+            if (commands.includes("INFO")){
+                if (isSlave != -1){
+                    connection.write( getBulkString("role:slave"));
+                }
+                connection.write(getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0"));
+            } else if (commands.includes("REPLCONF")){
+                connection.write("+OK\r\n");
+            } 
+            else if (commands.includes("ECHO")){
+                index = commands.indexOf("ECHO");
+                connection.write(commands.slice(index+1).join("\r\n"));
+                
+            } else if (commands.includes("PING")){
+                handshakePhase = true;
+                connection.write("+PONG\r\n");
+            } else if (commands.includes("SET")){
+                index = commands.indexOf("SET");
+                dictionary[commands[index + 2]] = dictionary[commands[index + 4]];
+                    if (commands.includes("px")){
+                        let px = commands.indexOf("px");
+                        setTimeout(() => {
+                            delete dictionary[commands[index + 2]];
+                            }, parseInt(commands[px + 2])
+                        )
+                    }
+                    connection.write("+OK\r\n");
+                } else if (commands.includes("GET")){
+                   index = commands.indexOf("GET");
+                if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
+                    connection.write(getBulkString(null));
+                } else if (commands[index + 2] in replicaDict) {
+                    connection.write(getBulkString(replicaDict[commands[index + 2]]));
+                } else{
+                    connection.write(getBulkString(dictionary[commands[index + 2]]));
+                }
+                
+            } else if (commands.includes("PSYNC") != -1){
             connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
             const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
             const buffer = Buffer.from(hex, 'hex');
@@ -122,17 +159,14 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.push(connection);
             numOfReplicas += 1;
             handshakePhase = false;
-        }else {
-        const message = parseRedisResponse(command);
-        console.log("handshakePhase", handshakePhase);
-        if (message){
-        connection.write(message);
-        }
-        if (!handshakePhase){
-
+        }else if (commands.includes("WAIT")) {
+            if (!handshakePhase){
                 replicas.forEach((replica) => {
-                    if (command.includes("WAIT")){
+                    if (commands.includes("WAIT")){
                         replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
+                        // return either when # of replicas acknowledge command or timeout expires
+                        
+
                     } else {
                         if (!command.includes("ACK")){
                     console.log("Command propagated to replica", command);
@@ -141,82 +175,15 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     }
                 })
             }
-        } 
-        
-        
-        
-        })
-          
-
-        
-        
-    });
-
+            //TODO
+        }
+    })
+})
 
 
 
 
 const dictionary = {};
-function parseRedisResponse(data) {
-    console.log("Data to Be Parsed", data);
-    const type = data.charAt(0);
-
-    switch (type) {
-        case '*': // Array
-            delimiter = data.indexOf('\r\n');
-            bulkStrings = data.slice(delimiter+2); 
-            stringArray = bulkStrings.split('\r\n');
-            stringArrayLen = stringArray.length;
-            noNewLine = [];
-            
-            for (let i = 0; i < stringArrayLen; i++){
-                if (stringArray[i] == "INFO"){
-                    if (isSlave != -1){
-                        return getBulkString("role:slave");
-                    }
-                    return getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0");
-                } else if (stringArray[i] == "REPLCONF"){
-                    return "+OK\r\n";
-                } 
-                else if (stringArray[i] == "ECHO"){
-                    noNewLine.pop();
-                    continue;
-                } else if (stringArray[i] == "PING"){
-                    handshakePhase = true;
-                    return "+PONG\r\n";
-                } else if (stringArray[i] == "SET"){
-                    dictionary[stringArray[i+2]] = stringArray[i + 4];
-                    if (i + 6 < stringArrayLen){
-                        if (stringArray[i+6] == "px"){
-                            setTimeout(() => {
-                                delete dictionary[stringArray[i + 2]];
-                                }, parseInt(stringArray[i + 8])
-                            )
-                        }
-                    }
-                    return "+OK\r\n";
-                }else if (stringArray[i] == "GET"){
-                    if (!(stringArray[i+2] in dictionary) && !(stringArray[i+2] in replicaDict)) {
-                        console.log("Should not see this");
-                        return getBulkString(null);
-                    } else if (stringArray[i +2] in replicaDict){
-                        return getBulkString(replicaDict[stringArray[i+2]]);
-                    }
-                    return getBulkString(dictionary[stringArray[i+2]]);
-                } else if (stringArray[i] == "WAIT") {
-                    return;
-                
-                } else {
-                    noNewLine.push(stringArray[i]);
-                }
-                }
-            strings = noNewLine.join("\r\n");
-            // console.log(strings);
-            return strings;
-        default:
-            throw new Error('Invalid Redis response');
-    }
-}
 
 function getBulkString(string){
     if (string == null){
@@ -239,7 +206,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
             for (let i = 0; i < stringArrayLen; i++){
                 if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
-
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
                             setTimeout(() => {
@@ -253,8 +219,5 @@ function parseRedisResponseFromMaster(data, replicaDict){
                 }
                 }
     }
-
-
 }
-
 server.listen(PORT, "127.0.0.1");
