@@ -106,6 +106,7 @@ const server = net.createServer((connection) => {
         const command = data.toString();
         let commands = command.slice(3).split('\r\n');
         commands.pop();
+        console.log("Commands", commands);
             if (commands.includes("INFO")){
                 if (isSlave != -1){
                     connection.write( getBulkString("role:slave"));
