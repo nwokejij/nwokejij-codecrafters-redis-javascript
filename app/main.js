@@ -124,7 +124,7 @@ const server = net.createServer((connection) => {
                     }
                 })
             }
-            else if (commands.includes("INFO")){
+        } else if (commands.includes("INFO")){
                 if (isSlave != -1){
                     connection.write( getBulkString("role:slave"));
                 }
@@ -197,9 +197,8 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         //     }
         //     //TODO
         // }
-        }
+        })
     })
-})
 
 
 
