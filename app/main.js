@@ -105,19 +105,35 @@ const server = net.createServer((connection) => {
         let commands = command.slice(3).split('\r\n');
         commands.pop();
         console.log("Commands", commands);
-        console.log(commands.includes("WAIT"));
-            if (commands.includes("INFO")){
+        if (commands.includes("WAIT")) {
+            console.log("HandshakePhase", handshakePhase);
+            
+            if (!handshakePhase){
+                console.log("Have we arrived");
+                replicas.forEach((replica) => {
+                    if (commands.includes("WAIT")){
+                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
+                        // return either when # of replicas acknowledge command or timeout expires
+
+                    } else {
+                        if (!commands.includes("ACK")){
+                            numOfAcks += 1;
+                    console.log("Command propagated to replica", command);
+                    replica.write(command);
+                        }
+                    }
+                })
+            }
+            else if (commands.includes("INFO")){
                 if (isSlave != -1){
                     connection.write( getBulkString("role:slave"));
                 }
                 connection.write(getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0"));
             } else if (commands.includes("REPLCONF")){
                 connection.write("+OK\r\n");
-            } 
-            else if (commands.includes("ECHO")){
+            } else if (commands.includes("ECHO")){
                 index = commands.indexOf("ECHO");
                 connection.write(commands.slice(index+1).join("\r\n"));
-                
             } else if (commands.includes("PING")){
                 handshakePhase = true;
                 connection.write("+PONG\r\n");
@@ -159,25 +175,28 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.push(connection);
             numOfReplicas += 1;
             handshakePhase = false;
-        }else if (commands.includes("WAIT")) {
-            console.log("HandshakePhase", handshakePhase);
-            if (!handshakePhase){
-                console.log("Have we arrived");
-                replicas.forEach((replica) => {
-                    if (commands.includes("WAIT")){
-                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
-                        // return either when # of replicas acknowledge command or timeout expires
-
-                    } else {
-                        if (!commands.includes("ACK")){
-                            numOfAcks += 1;
-                    console.log("Command propagated to replica", command);
-                    replica.write(command);
-                        }
-                    }
-                })
             }
-            //TODO
+        // }else if (commands.includes("WAIT")) {
+        //     console.log("HandshakePhase", handshakePhase);
+
+        //     if (!handshakePhase){
+        //         console.log("Have we arrived");
+        //         replicas.forEach((replica) => {
+        //             if (commands.includes("WAIT")){
+        //                 replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
+        //                 // return either when # of replicas acknowledge command or timeout expires
+
+        //             } else {
+        //                 if (!commands.includes("ACK")){
+        //                     numOfAcks += 1;
+        //             console.log("Command propagated to replica", command);
+        //             replica.write(command);
+        //                 }
+        //             }
+        //         })
+        //     }
+        //     //TODO
+        // }
         }
     })
 })
