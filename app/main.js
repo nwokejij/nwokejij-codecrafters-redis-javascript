@@ -104,27 +104,7 @@ const server = net.createServer((connection) => {
         const command = data.toString();
         let commands = command.slice(3).split('\r\n');
         commands.pop();
-        console.log("Commands", commands);
-        if (commands.includes("WAIT")) {
-            console.log("HandshakePhase", handshakePhase);
-            
-            if (!handshakePhase){
-                console.log("Have we arrived");
-                replicas.forEach((replica) => {
-                    if (commands.includes("WAIT")){
-                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
-                        // return either when # of replicas acknowledge command or timeout expires
-
-                    } else {
-                        if (!commands.includes("ACK")){
-                            numOfAcks += 1;
-                    console.log("Command propagated to replica", command);
-                    replica.write(command);
-                        }
-                    }
-                })
-            }
-        } else if (commands.includes("INFO")){
+        if (commands.includes("INFO")){
                 if (isSlave != -1){
                     connection.write( getBulkString("role:slave"));
                 }
@@ -175,7 +155,22 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.push(connection);
             numOfReplicas += 1;
             handshakePhase = false;
-            }
+            } 
+            if (!handshakePhase){
+                replicas.forEach((replica) => {
+                    if (commands.includes("WAIT")){
+                        // return either when # of replicas acknowledge command or timeout expires
+
+                    } else {
+                        if (!commands.includes("ACK")){
+                    numOfAcks += 1;
+                    console.log("Command propagated to replica", command);
+                    replica.write(command);
+                        }
+                    }
+                })
+                }
+            })
         // }else if (commands.includes("WAIT")) {
         //     console.log("HandshakePhase", handshakePhase);
 
@@ -198,7 +193,6 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
         //     //TODO
         // }
         })
-    })
 
 
 
