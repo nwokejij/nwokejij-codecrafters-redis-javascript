@@ -49,11 +49,9 @@ const handleHandshake = (port) => {
 
         if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
-            numOfAcks += 1;
             firstAck = true;
-            if (commands.includes("REPLCONF")){
-                offset += 37;
-            } 
+            offset += 37;
+        
         }
         
             
@@ -107,6 +105,7 @@ const server = net.createServer((connection) => {
         let commands = command.slice(3).split('\r\n');
         commands.pop();
         console.log("Commands", commands);
+        console.log(commands.includes("WAIT"));
             if (commands.includes("INFO")){
                 if (isSlave != -1){
                     connection.write( getBulkString("role:slave"));
@@ -171,6 +170,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
 
                     } else {
                         if (!commands.includes("ACK")){
+                            numOfAcks += 1;
                     console.log("Command propagated to replica", command);
                     replica.write(command);
                         }
