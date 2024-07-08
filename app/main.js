@@ -160,15 +160,16 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             numOfReplicas += 1;
             handshakePhase = false;
         }else if (commands.includes("WAIT")) {
+            console.log("HandshakePhase", handshakePhase);
             if (!handshakePhase){
+                console.log("Have we arrived");
                 replicas.forEach((replica) => {
                     if (commands.includes("WAIT")){
                         replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK")+ getBulkString("*"));
                         // return either when # of replicas acknowledge command or timeout expires
-                        
 
                     } else {
-                        if (!command.includes("ACK")){
+                        if (!commands.includes("ACK")){
                     console.log("Command propagated to replica", command);
                     replica.write(command);
                         }
