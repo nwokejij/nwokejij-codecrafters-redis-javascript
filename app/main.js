@@ -156,7 +156,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             numOfReplicas += 1;
             handshakePhase = false;
             } 
-            if (!handshakePhase){
+            if (!handshakePhase && !commands.includes("PSYNC")){
                 replicas.forEach((replica) => {
                     if (commands.includes("WAIT")){
                         // return either when # of replicas acknowledge command or timeout expires
