@@ -166,9 +166,9 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     numOfAcks += 1;
                     console.log("Command propagated to replica", command);
                     replica.write(command);
+                    replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                         }
                     }
-                    replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                 })
                 }
             })
