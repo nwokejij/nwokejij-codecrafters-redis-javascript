@@ -127,6 +127,7 @@ const server = net.createServer((connection) => {
                             }, parseInt(commands[px + 2])
                         )
                     }
+                    console.log("How many times do we enter this block");
                     connection.write("+OK\r\n");
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
