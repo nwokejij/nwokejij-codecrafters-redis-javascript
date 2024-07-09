@@ -161,6 +161,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             } else if (!handshakePhase){
                 if (!commands.includes("WAIT")){
                     if (!commands.includes("ACK")){
+                        console.log("Entered the handshake phase");
                     numOfReplicas -= 1;
                     replicas.forEach((replica)=>{
                         replica.write(command);
@@ -174,7 +175,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     // maybe this needs to be an async function
                     while (true){
                         if (numOfAcks == commands[index +2]){
-                            console.log("Entere the if statement")
+                            console.log("Entere the if statement");
                             connection.write(`:${numOfAcks}\r\n`);
                             break;
                         }
@@ -191,12 +192,16 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
 
 // async function waitCommand(howMany, time){
 //     return new Promise((resolve, reject) => {
+//         try{
 //         if (numOfAcks == howMany){
 //             resolve(`:${numOfAcks}\r\n`);
 //         } 
 //         setTimeout(()=> {
 //             resolve(`:${numOfAcks}\r\n`)
-//         })
+//         }, time)
+//     } catch (e){
+//         reject(e);
+//     }
 
 //     })
     
