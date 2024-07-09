@@ -115,7 +115,7 @@ const server = net.createServer((connection) => {
                 index = commands.indexOf("ECHO");
                 connection.write(commands.slice(index+1).join("\r\n"));
             } else if (commands.includes("PING")){
-                
+                handshakePhase = true;
                 connection.write("+PONG\r\n");
             } else if (commands.includes("SET")){
                 handshakePhase = true;
