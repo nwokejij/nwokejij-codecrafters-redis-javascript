@@ -174,14 +174,25 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                         replica.write(command);
                         replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                     })
+                    numOfAcks += 1;
+                    
+                } else {
+                    index = commands.indexOf("WAIT")
+                    while (true){
+                        if (numOfAcks == parseInt(commands[index+2])){
+                            connection.write(`:${numOfAcks}\r\n`);
+                            break;
+                        }
+                        setTimeout(()=> {
+                            connection.write(`:${numOfAcks}\r\n`)
+                        }, parseInt(commands[index + 4]))
+                    }
                     
                 }
             }
             })
             
         })
-
-
 
 
 const dictionary = {};
