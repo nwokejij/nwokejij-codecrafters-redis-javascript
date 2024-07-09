@@ -172,7 +172,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     numOfReplicas -= 1;
                     replicas.forEach((replica)=>{
                         replica.write(command);
-                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("*"));
+                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                     })
                     
                 }
