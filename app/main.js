@@ -138,11 +138,7 @@ const server = net.createServer((connection) => {
             } else if (commands.includes("ECHO")){
                 index = commands.indexOf("ECHO");
                 connection.write(commands.slice(index+1).join("\r\n"));
-            } else if (commands.includes("PING")){
-                
-                connection.write("+PONG\r\n");
             } else if (commands.includes("SET")){
-                handshakePhase = true;
                 index = commands.indexOf("SET");
                 dictionary[commands[index + 2]] = dictionary[commands[index + 4]];
                     if (commands.includes("px")){
