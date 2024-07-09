@@ -181,10 +181,12 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     while (true){
                         if (numOfAcks == parseInt(commands[index+2])){
                             connection.write(`:${numOfAcks}\r\n`);
+                            console.log("we have entered here")
                             break;
                         }
                         setTimeout(()=> {
                             connection.write(`:${numOfAcks}\r\n`)
+                            console.log("timeout block");
                         }, parseInt(commands[index + 4]))
                     }
                     
