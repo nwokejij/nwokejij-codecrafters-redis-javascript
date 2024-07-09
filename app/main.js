@@ -138,17 +138,6 @@ const server = net.createServer((connection) => {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
                 }
                 
-            } else if (commands.includes("WAIT")){
-                index = commands.indexOf("WAIT");
-                    // maybe this needs to be an async function
-                    while (true){
-                        if (numOfAcks == commands[index +2]){
-                            connection.write(`:${numOfAcks}\r\n`);
-                        }
-                        setTimeout(()=> {
-                            connection.write(`:${numOfAcks}\r\n`);
-                        }, parseInt(commands[index + 4]))
-                    }
             }
             if (commands.includes("PSYNC")){
             connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
@@ -177,28 +166,36 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     numOfAcks += 1;
                     
                 } else {
-                    index = commands.indexOf("WAIT")
+                    index = commands.indexOf("WAIT");
+                    // maybe this needs to be an async function
                     while (true){
-                        console.log("Entered the true block");
-                        // if (numOfAcks == parseInt(commands[index+2])){
-                        //     connection.write(`:${numOfAcks}\r\n`);
-                        //     console.log("we have entered here")
-                        //     break;
-                        // }
+                        if (numOfAcks == commands[index +2]){
+                            console.log("Entere the if statement")
+                            connection.write(`:${numOfAcks}\r\n`);
+                            break;
+                        }
                         setTimeout(()=> {
-                            connection.write(`:${numOfAcks}\r\n`)
-                            console.log("timeout block");
+                            console.log("it's the timeout");
+                            connection.write(`:${numOfAcks}\r\n`);
                         }, parseInt(commands[index + 4]))
                     }
-                    
                 }
             }
             })
             
         })
 
-// async function waitCommand(replicas, time){
-//     if 
+// async function waitCommand(howMany, time){
+//     return new Promise((resolve, reject) => {
+//         if (numOfAcks == howMany){
+//             resolve(`:${numOfAcks}\r\n`);
+//         } 
+//         setTimeout(()=> {
+//             resolve(`:${numOfAcks}\r\n`)
+//         })
+
+//     })
+    
 // }
 const dictionary = {};
 
