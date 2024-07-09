@@ -104,31 +104,7 @@ const server = net.createServer((connection) => {
         const command = data.toString();
         let commands = command.slice(3).split('\r\n');
         commands.pop();
-        if (commands.includes("PING")){
-            handshakePhase = true;
-            connection.write("+PONG\r\n");
-        }
-        if (!handshakePhase){
-            if (commands.includes("WAIT")){
-                index = commands.indexOf("WAIT");
-                    // maybe this needs to be an async function
-                    while (true){
-                        if (numOfAcks == commands[index +2]){
-                            connection.write(`:${numOfAcks}\r\n`);
-                        }
-                        setTimeout(()=> {
-                            connection.write(`:${numOfAcks}\r\n`);
-                        }, parseInt(commands[index + 4]))
-                    }
-            } else {
-                    numOfReplicas -= 1;
-                    replicas.forEach((replica)=>{
-                        replica.write(command);
-                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("*"));
-            })
-        }
-        } else {
-            if (commands.includes("INFO")){
+        if (commands.includes("INFO")){
                 if (isSlave != -1){
                     connection.write( getBulkString("role:slave"));
                 }
@@ -138,7 +114,11 @@ const server = net.createServer((connection) => {
             } else if (commands.includes("ECHO")){
                 index = commands.indexOf("ECHO");
                 connection.write(commands.slice(index+1).join("\r\n"));
+            } else if (commands.includes("PING")){
+                
+                connection.write("+PONG\r\n");
             } else if (commands.includes("SET")){
+                handshakePhase = true;
                 index = commands.indexOf("SET");
                 dictionary[commands[index + 2]] = dictionary[commands[index + 4]];
                     if (commands.includes("px")){
@@ -159,26 +139,45 @@ const server = net.createServer((connection) => {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
                 }
                 
-            } else if (commands.includes("PSYNC")){
-                connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
-                const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
-                const buffer = Buffer.from(hex, 'hex');
-    
-    // Calculate the length of the file in bytes
-    const bytes = buffer.length;
-    
-    // Create the RDB file header with the length of the file
-    let rdbFileHeader = `$${bytes}\r\n`;
-    
-    // Combine the header and the buffer into a single buffer
-    const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
-                connection.write(rdbFileBuffer);
-                replicas.push(connection);
-                numOfReplicas += 1;
-                handshakePhase = false;
+            } else if (commands.includes("WAIT")){
+                index = commands.indexOf("WAIT");
+                    // maybe this needs to be an async function
+                    while (true){
+                        if (numOfAcks == commands[index +2]){
+                            connection.write(`:${numOfAcks}\r\n`);
+                        }
+                        setTimeout(()=> {
+                            connection.write(`:${numOfAcks}\r\n`);
+                        }, parseInt(commands[index + 4]))
+                    }
+            }
+            if (commands.includes("PSYNC")){
+            connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
+            const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
+            const buffer = Buffer.from(hex, 'hex');
+
+// Calculate the length of the file in bytes
+const bytes = buffer.length;
+
+// Create the RDB file header with the length of the file
+let rdbFileHeader = `$${bytes}\r\n`;
+
+// Combine the header and the buffer into a single buffer
+const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
+            connection.write(rdbFileBuffer);
+            replicas.push(connection);
+            numOfReplicas += 1;
+            handshakePhase = false;
+            } else if (!handshakePhase){
+                if (!commands.includes("WAIT")){
+                    numOfReplicas -= 1;
+                    replicas.forEach((replica)=>{
+                        replica.write(command);
+                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString("*"));
+                    })
+                    
                 }
-        }
-        
+            }
             })
             
         })
