@@ -118,7 +118,6 @@ const server = net.createServer((connection) => {
                 handshakePhase = true;
                 connection.write("+PONG\r\n");
             } else if (commands.includes("SET")){
-                handshakePhase = true;
                 index = commands.indexOf("SET");
                 dictionary[commands[index + 2]] = dictionary[commands[index + 4]];
                     if (commands.includes("px")){
