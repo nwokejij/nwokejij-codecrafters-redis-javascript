@@ -175,6 +175,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     howMany = parseInt(commands[index + 2]);
                     time = parseInt(commands[index + 4]);
                     message = await waitCommand(howMany, time);
+                    console.log("Message", message);
                     connection.write(message);
                     }
                 }
