@@ -158,12 +158,14 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             handshakePhase = false;
             } else if (!handshakePhase){
                 if (!commands.includes("WAIT")){
+                    if (!commands.includes("ACK")){
                     numOfReplicas -= 1;
                     replicas.forEach((replica)=>{
                         replica.write(command);
                         replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                     })
                     numOfAcks += 1;
+                }
                     
                 } else {
                     index = commands.indexOf("WAIT");
