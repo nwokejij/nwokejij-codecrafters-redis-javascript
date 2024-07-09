@@ -177,7 +177,6 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     numOfAcks += 1;
                     
                 } else {
-                    console.log("we ");
                     index = commands.indexOf("WAIT")
                     while (true){
                         console.log("Entered the true block");
@@ -186,10 +185,10 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                             console.log("we have entered here")
                             break;
                         }
-                        setTimeout(()=> {
-                            connection.write(`:${numOfAcks}\r\n`)
-                            console.log("timeout block");
-                        }, parseInt(commands[index + 4]))
+                        // setTimeout(()=> {
+                        //     connection.write(`:${numOfAcks}\r\n`)
+                        //     console.log("timeout block");
+                        // }, parseInt(commands[index + 4]))
                     }
                     
                 }
@@ -198,7 +197,9 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             
         })
 
-
+// async function waitCommand(replicas, time){
+//     if 
+// }
 const dictionary = {};
 
 function getBulkString(string){
