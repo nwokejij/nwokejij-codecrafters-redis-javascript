@@ -177,6 +177,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     numOfAcks += 1;
                     
                 } else {
+                    console.log("we ");
                     index = commands.indexOf("WAIT")
                     while (true){
                         console.log("Entered the true block");
