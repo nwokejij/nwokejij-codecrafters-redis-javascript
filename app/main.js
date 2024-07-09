@@ -100,7 +100,7 @@ console.log("Logs from your program will appear here!");
 let handshakePhase = false;
 const server = net.createServer((connection) => {
   // Handle connection
-    connection.on('data', (data) => {
+    connection.on('data', async (data) => {
         const command = data.toString();
         let commands = command.slice(3).split('\r\n');
         commands.pop();
@@ -173,39 +173,32 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                 } else {
                     index = commands.indexOf("WAIT");
                     // maybe this needs to be an async function
-                    while (true){
-                        if (numOfAcks == commands[index +2]){
-                            console.log("Entere the if statement");
-                            connection.write(`:${numOfAcks}\r\n`);
-                            break;
-                        }
-                        setTimeout(()=> {
-                            console.log("it's the timeout");
-                            connection.write(`:${numOfAcks}\r\n`);
-                        }, parseInt(commands[index + 4]))
+                    howMany = parseInt(commands[index + 2]);
+                    time = parseInt(commands[index + 4]);
+                    message = await waitCommand(howMany, time);
+                    connection.write(message);
                     }
                 }
-            }
             })
             
         })
 
-// async function waitCommand(howMany, time){
-//     return new Promise((resolve, reject) => {
-//         try{
-//         if (numOfAcks == howMany){
-//             resolve(`:${numOfAcks}\r\n`);
-//         } 
-//         setTimeout(()=> {
-//             resolve(`:${numOfAcks}\r\n`)
-//         }, time)
-//     } catch (e){
-//         reject(e);
-//     }
+async function waitCommand(howMany, time){
+    return new Promise((resolve, reject) => {
+        try{
+        if (numOfAcks == howMany){
+            resolve(`:${numOfAcks}\r\n`);
+        } 
+        setTimeout(()=> {
+            resolve(`:${numOfAcks}\r\n`)
+        }, time)
+    } catch (e){
+        reject(e);
+    }
 
-//     })
+    })
     
-// }
+}
 const dictionary = {};
 
 function getBulkString(string){
