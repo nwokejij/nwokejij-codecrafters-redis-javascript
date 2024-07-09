@@ -179,6 +179,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                 } else {
                     index = commands.indexOf("WAIT")
                     while (true){
+                        console.log("Entered the true block");
                         if (numOfAcks == parseInt(commands[index+2])){
                             connection.write(`:${numOfAcks}\r\n`);
                             console.log("we have entered here")
