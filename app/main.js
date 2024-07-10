@@ -1,6 +1,7 @@
 const replicaDict = {};
 let numOfReplicas = 0;
 let numOfAcks = 0;
+let propagatedCommands = 0;
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
@@ -93,7 +94,22 @@ if (isSlave != -1) {
     masterPort = PORT;
 }
 
+const propagateToReplicas = (command) => {
+    if (replicas.length == 0){
+        return
+    }
+    replicas.forEach((replica) => {
+        replica.write(command);
+        replica.once("data", (data) => {
+            const commands = data.toString().split('\r\n');
+            if (commands.includes("ACK")){
+                numOfAcks += 1;
+            }
+        })
 
+    })
+    propagatedCommands += 1;
+}
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
@@ -129,6 +145,7 @@ const server = net.createServer((connection) => {
                         )
                     }
                     console.log("How many times do we enter this block");
+                    propagateToReplicas(command);
                     connection.write("+OK\r\n");
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
@@ -138,8 +155,13 @@ const server = net.createServer((connection) => {
                     connection.write(getBulkString(replicaDict[commands[index + 2]]));
                 } else{
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
-                }
+                } 
                 
+            } else if (commands.includes("WAIT")){
+                index = commands.indexOf("WAIT");
+                noOfReps = parseInt(commands[index + 2])
+                time = parseInt(commands[index+4]);
+                connection.write(waitCommand(noOfReps, time));
             }
             if (commands.includes("PSYNC")){
             connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
@@ -158,46 +180,50 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             replicas.push(connection);
             numOfReplicas += 1;
             handshakePhase = false;
-            } else if (!handshakePhase){
-                if (!commands.includes("WAIT")){
-                    if (!commands.includes("ACK")){
-                    replicas.forEach((replica)=>{
-                        console.log("Command propagated to Replicas", command);
-                        replica.write(command);
-                        replica.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
-                    })
-                    numOfAcks += 1;
-                }
-                    
-                } else {
-                    index = commands.indexOf("WAIT");
-                    // maybe this needs to be an async function
-                    howMany = parseInt(commands[index + 2]);
-                    time = parseInt(commands[index + 4]);
-                    message = await waitCommand(howMany, time);
-                    connection.write(message);
-                    }
-                }
-            })
+            } 
             
         })
 
-async function waitCommand(howMany, time){
-    return new Promise((resolve, reject) => {
-        try{
-        if (numOfAcks == howMany){
-            resolve(`:${numOfAcks}\r\n`);
-        } 
-        setTimeout(()=> {
-            resolve(`:${numOfAcks}\r\n`)
-        }, time)
-    } catch (e){
-        reject(e);
+function waitCommand(howMany, time){
+    numOfAcks = 0;
+    if (propagatedCommands > 0){
+        propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
+        setTimeout(() => {
+            return `:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`;
+        }, time);
     }
-
-    })
     
-}
+
+
+    }
+    
+
+
+// const wait = (args, connection) => {
+//     // Parse arguments and reset acknowledgment tracking
+//     const noOfReplica = parseInt(args[0]);
+//     const delay = parseInt(args[1]);
+//     numOfAcks = 0;
+//     ack_needed = noOfReplica;
+//     reply_wait = false;
+  
+//     // If no commands need propagation, reply immediately
+//     if (propogated_commands === 0) {
+//       reply_wait = true;
+//       connection.write(`:${replicaList.size}\r\n`);
+//     } else {
+//       // Request acknowledgment status from replicas
+//       propagateToReplicas("*3\r\n$8\r\nREPLCONF\r\n$6\r\nGETACK\r\n$1\r\n*\r\n");
+//     }
+  
+//     // Set a timeout to send a reply if the required acknowledgments aren't received
+//     setTimeout(() => {
+//       if (!reply_wait)
+//         connection.write(
+//           `:${numOfAcks > noOfReplica ? noOfReplica : numOfAcks}\r\n`
+//         );
+//     }, delay);
+//   };
 const dictionary = {};
 
 function getBulkString(string){
@@ -235,4 +261,5 @@ function parseRedisResponseFromMaster(data, replicaDict){
                 }
     }
 }
+})
 server.listen(PORT, "127.0.0.1");
