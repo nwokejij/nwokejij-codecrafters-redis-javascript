@@ -161,8 +161,8 @@ const server = net.createServer((connection) => {
                 index = commands.indexOf("WAIT");
                 noOfReps = parseInt(commands[index + 2])
                 time = parseInt(commands[index+4]);
+                console.log("Reps and Wait", noOfReps, time);
                 message = waitCommand(noOfReps, time);
-                console.log("Wait Response", message)
                 connection.write(message);
             }
             if (commands.includes("PSYNC")){
