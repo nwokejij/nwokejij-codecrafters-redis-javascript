@@ -107,7 +107,7 @@ const server = net.createServer((connection) => {
         console.log("Commands", commands);
         if (commands.includes("INFO")){
                 if (isSlave != -1){
-                    connection.write( getBulkString("role:slave"));
+                    connection.write(getBulkString("role:slave"));
                 }
                 connection.write(getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0"));
             } else if (commands.includes("REPLCONF")){
@@ -175,7 +175,6 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
                     howMany = parseInt(commands[index + 2]);
                     time = parseInt(commands[index + 4]);
                     message = await waitCommand(howMany, time);
-                    console.log("Message", message);
                     connection.write(message);
                     }
                 }
