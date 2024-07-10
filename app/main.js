@@ -161,7 +161,9 @@ const server = net.createServer((connection) => {
                 index = commands.indexOf("WAIT");
                 noOfReps = parseInt(commands[index + 2])
                 time = parseInt(commands[index+4]);
-                connection.write(waitCommand(noOfReps, time));
+                message = waitCommand(noOfReps, time);
+                console.log("Wait Response", message)
+                connection.write(message);
             }
             if (commands.includes("PSYNC")){
             connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
@@ -186,6 +188,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
 
 function waitCommand(howMany, time){
     numOfAcks = 0;
+    console.log("This is the time", time);
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         setTimeout(() => {
