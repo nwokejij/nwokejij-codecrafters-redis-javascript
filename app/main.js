@@ -101,6 +101,7 @@ const propagateToReplicas = (command) => {
     replicas.forEach((replica) => {
         replica.write(command);
         replica.once("data", (data) => {
+            console.log("Have we reached this part of the code");
             const commands = data.toString().split('\r\n');
             if (commands.includes("ACK")){
                 numOfAcks += 1;
@@ -162,7 +163,7 @@ const server = net.createServer((connection) => {
                 noOfReps = parseInt(commands[index + 2])
                 time = parseInt(commands[index+4]);
                 console.log("Reps and Wait", noOfReps, time);
-                message = waitCommand(noOfReps, time);
+                message = waitCommand(noOfReps, time, connection);
                 connection.write(message);
             }
             if (commands.includes("PSYNC")){
@@ -186,13 +187,12 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             
         })
 
-function waitCommand(howMany, time){
+function waitCommand(howMany, time, connection){
     numOfAcks = 0;
-    console.log("This is the time", time);
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         setTimeout(() => {
-            return `:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`;
+            connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
         }, time);
     }
     
