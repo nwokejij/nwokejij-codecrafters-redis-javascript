@@ -192,7 +192,9 @@ function waitCommand(howMany, time, connection){
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         console.log("numOfAcks and HowMany", numOfAcks, howMany);
+        console.log("Time", time);
         setTimeout(() => {
+            console.log("Do we even enter this block");
             console.log(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
             connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
         }, time);
