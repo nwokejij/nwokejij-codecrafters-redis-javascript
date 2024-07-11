@@ -189,6 +189,7 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
 
 function waitCommand(howMany, time, connection){
     numOfAcks = 0;
+    console.log("Propagated Commands", propagatedCommands);
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         setTimeout(() => {
