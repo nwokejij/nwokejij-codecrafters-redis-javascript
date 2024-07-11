@@ -149,6 +149,7 @@ const server = net.createServer((connection) => {
                     }
                     console.log("How many times do we enter this block");
                     propagateToReplicas(command);
+                    console.log("Number of Replicas", replicas.length);
                     console.log("Message sent to client", "+OK\r\n");
                     connection.write("+OK\r\n");
 
@@ -195,8 +196,6 @@ function waitCommand(howMany, time, connection){
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         setTimeout(() => {
-            console.log("Do we even enter this block");
-            console.log(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
             connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
         }, time);
     }
