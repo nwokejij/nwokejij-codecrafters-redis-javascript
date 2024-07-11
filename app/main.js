@@ -5,6 +5,7 @@ let propagatedCommands = 0;
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
+      
     //   client.write("*1\r\n$4\r\nPING\r\n");
       let firstAck = false;
       let offset = 0;
@@ -14,6 +15,7 @@ const handleHandshake = (port) => {
         dat = await readData(data);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
+        console.log("Commands",commands);
         while (message.length > 0) {
             let index = message.indexOf("*", 1);
             let query;
@@ -70,7 +72,7 @@ async function readData(data){
 
     return new Promise((resolve, reject) => {
         try{
-            dat = data.toString();
+            let dat = data.toString();
             resolve(dat);
         } catch (e){
             reject(e);
@@ -192,10 +194,6 @@ function waitCommand(howMany, time, connection){
     console.log("Propagated Commands", propagatedCommands);
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
-        console.log("numOfAcks and HowMany", numOfAcks, howMany);
-        console.log("Time", time);
-        console.log("Type of", typeof time);
-        console.log("In my heart", typeof numOfAcks, typeof howMany)
         setTimeout(() => {
             console.log("Do we even enter this block");
             console.log(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
