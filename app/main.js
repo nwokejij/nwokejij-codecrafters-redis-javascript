@@ -185,4 +185,21 @@ const server = net.createServer((connection) => {
     });
 });
 
+function waitCommand(howMany, time, connection) {
+    numOfAcks = 0;
+    console.log("Propagated Commands", propagatedCommands);
+    if (propagatedCommands > 0) {
+        propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
+        setTimeout(() => {
+            connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
+        }, time);
+    }
+}
+const getBulkString = (str) => {
+    if (str === null) {
+        return '$-1\r\n';
+    }
+    return `$${str.length}\r\n${str}\r\n`;
+};
+
 server.listen(PORT, "127.0.0.1");
