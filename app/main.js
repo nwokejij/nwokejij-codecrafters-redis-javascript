@@ -162,6 +162,7 @@ const server = net.createServer((connection) => {
                 index = commands.indexOf("WAIT");
                 noOfReps = parseInt(commands[index + 2])
                 time = parseInt(commands[index+4]);
+                waitCommand(noOfReps, time, connection);
             }
             if (commands.includes("PSYNC")){
             connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
@@ -191,6 +192,8 @@ function waitCommand(howMany, time, connection){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         console.log("numOfAcks and HowMany", numOfAcks, howMany);
         console.log("Time", time);
+        console.log("Type of", typeof time);
+        console.log("In my heart", typeof numOfAcks, typeof howMany)
         setTimeout(() => {
             console.log("Do we even enter this block");
             console.log(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
