@@ -148,6 +148,7 @@ const server = net.createServer((connection) => {
                     }
                     propagateToReplicas(command);
                     if (connection.type === 'client') {
+                        console.log("connectiontypeshi")
                         connection.write("+OK\r\n");
                     }
                 } else if (commands.includes("GET")){
