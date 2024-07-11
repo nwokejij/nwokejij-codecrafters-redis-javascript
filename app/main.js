@@ -117,7 +117,7 @@ console.log("Logs from your program will appear here!");
 let handshakePhase = false;
 const server = net.createServer((connection) => {
   // Handle connection
-    connection.on('data', async (data) => {
+    connection.on('data', (data) => {
         const command = data.toString();
         let commands = command.slice(3).split('\r\n');
         commands.pop();
@@ -162,7 +162,6 @@ const server = net.createServer((connection) => {
                 index = commands.indexOf("WAIT");
                 noOfReps = parseInt(commands[index + 2])
                 time = parseInt(commands[index+4]);
-                console.log("Reps and Wait", noOfReps, time);
                 message = waitCommand(noOfReps, time, connection);
                 connection.write(message);
             }
@@ -192,6 +191,7 @@ function waitCommand(howMany, time, connection){
     console.log("Propagated Commands", propagatedCommands);
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
+        console.log("numOfAcks and HowMany", numOfAcks, howMany);
         setTimeout(() => {
             connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
         }, time);
