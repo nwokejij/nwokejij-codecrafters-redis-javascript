@@ -116,9 +116,9 @@ const propagateToReplicas = (command) => {
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
-let handshakePhase = false;
 const server = net.createServer((connection) => {
   // Handle connection
+    connection.type = 'client';
     connection.on('data', (data) => {
         const command = data.toString();
         let commands = command.slice(3).split('\r\n');
@@ -135,7 +135,6 @@ const server = net.createServer((connection) => {
                 index = commands.indexOf("ECHO");
                 connection.write(commands.slice(index+1).join("\r\n"));
             } else if (commands.includes("PING")){
-                handshakePhase = true;
                 connection.write("+PONG\r\n");
             } else if (commands.includes("SET")){
                 index = commands.indexOf("SET");
@@ -147,12 +146,10 @@ const server = net.createServer((connection) => {
                             }, parseInt(commands[px + 2])
                         )
                     }
-                    console.log("How many times do we enter this block");
                     propagateToReplicas(command);
-                    console.log("Number of Replicas", replicas.length);
-                    console.log("Message sent to client", "+OK\r\n");
-                    connection.write("+OK\r\n");
-
+                    if (connection.type === 'client') {
+                        connection.write("+OK\r\n");
+                    }
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
                 if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
@@ -183,9 +180,10 @@ let rdbFileHeader = `$${bytes}\r\n`;
 // Combine the header and the buffer into a single buffer
 const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer]);
             connection.write(rdbFileBuffer);
+            connection.type = 'replica'; // Set type as replica
             replicas.push(connection);
             numOfReplicas += 1;
-            handshakePhase = false;
+            
             } 
             
         })
