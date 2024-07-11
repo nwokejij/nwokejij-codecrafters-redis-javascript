@@ -147,7 +147,9 @@ const server = net.createServer((connection) => {
                     }
                     console.log("How many times do we enter this block");
                     propagateToReplicas(command);
+                    console.log("Message sent to client", "+OK\r\n");
                     connection.write("+OK\r\n");
+
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
                 if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
