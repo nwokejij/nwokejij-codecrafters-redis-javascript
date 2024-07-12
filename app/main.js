@@ -215,7 +215,7 @@ const waitCommand = (howMany, time, connection) => {
     numOfAcks = 0;
     console.log("Propagated Commands", propagatedCommands);
     if (propagatedCommands > 0) {
-        propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
+        propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"), connection);
         setTimeout(() => {
             connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
         }, time);
