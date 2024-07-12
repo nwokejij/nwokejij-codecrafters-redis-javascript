@@ -96,19 +96,15 @@ if (isSlave != -1) {
 } else {
     masterPort = PORT;
 }
-let flag = false;
+let flag;
 const propagateToReplicas = (command) => {
     if (replicas.length == 0){
         return
     }
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
-        if (!flag){
-            replica.write(command);
-            flag = true;
-        } else {
-            replica.write(":3\r\n");
-        }
+    
+        replica.write(command);
         
 
         replica.once("data", (data) => {
@@ -154,12 +150,12 @@ const server = net.createServer((connection) => {
                             }, parseInt(commands[px + 2])
                         )
                     }
-                    propagateToReplicas(command);
                     if (connection.type === 'replica') {
                         console.log("connectiontypeshi")
                         connection.write("+OK\r\n");
                     } else {
                         connection.write("+OK\r\n");
+                        propagateToReplicas(command);
                     }
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
