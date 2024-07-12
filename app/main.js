@@ -150,13 +150,8 @@ const server = net.createServer((connection) => {
                             }, parseInt(commands[px + 2])
                         )
                     }
-                    if (connection.type === 'replica') {
-                        console.log("connectiontypeshi")
-                        connection.write("+OK\r\n");
-                    } else {
                         connection.write("+OK\r\n");
                         propagateToReplicas(command);
-                    }
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
                 if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
