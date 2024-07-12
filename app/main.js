@@ -150,6 +150,8 @@ const server = net.createServer((connection) => {
                     if (connection.type === 'replica') {
                         console.log("connectiontypeshi")
                         connection.write("+OK\r\n");
+                    } else {
+                        connection.write("+OK\r\n");
                     }
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
@@ -195,6 +197,7 @@ function waitCommand(howMany, time, connection){
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         setTimeout(() => {
+
             connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
         }, time);
     }
