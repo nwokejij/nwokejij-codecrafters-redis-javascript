@@ -120,7 +120,7 @@ const handleClientData = (connection) => {
         } else if (commands.includes("PING")) {
             connection.write("+PONG\r\n");
         } else if (commands.includes("SET")) {
-            handleSetCommand(commands, connection);
+            handleSetCommand(command, commands, connection);
         } else if (commands.includes("GET")) {
             handleGetCommand(commands, connection);
         } else if (commands.includes("WAIT")) {
@@ -144,7 +144,7 @@ const handleEchoCommand = (commands, connection) => {
     connection.write(commands.slice(index + 1).join("\r\n"));
 };
 
-const handleSetCommand = (commands, connection) => {
+const handleSetCommand = (command, commands, connection) => {
     let index = commands.indexOf("SET");
     dictionary[commands[index + 2]] = dictionary[commands[index + 4]];
     if (commands.includes("px")) {
