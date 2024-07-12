@@ -102,33 +102,33 @@ console.log("Logs from your program will appear here!");
 const dictionary = {}
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
-    connection.on('data', handleClientData(connection));
+    connection.on('data', (data) => {
+        handleData(connection, data);
+    });
 });
 
-const handleClientData = (connection) => {
-    return (data) => {
-        const command = data.toString();
-        let commands = command.slice(3).split('\r\n');
-        commands.pop();
-        console.log("Commands", commands);
-        if (commands.includes("INFO")) {
-            handleInfoCommand(connection);
-        } else if (commands.includes("REPLCONF")) {
-            connection.write("+OK\r\n");
-        } else if (commands.includes("ECHO")) {
-            handleEchoCommand(commands, connection);
-        } else if (commands.includes("PING")) {
-            connection.write("+PONG\r\n");
-        } else if (commands.includes("SET")) {
-            handleSetCommand(command, commands, connection);
-        } else if (commands.includes("GET")) {
-            handleGetCommand(commands, connection);
-        } else if (commands.includes("WAIT")) {
-            handleWaitCommand(commands, connection);
-        } else if (commands.includes("PSYNC")) {
-            handlePsyncCommand(connection);
-        }
-    };
+const handleData = (connection, data) => {
+    const command = data.toString();
+    let commands = command.slice(3).split('\r\n');
+    commands.pop();
+    console.log("Commands", commands);
+    if (commands.includes("INFO")) {
+        handleInfoCommand(connection);
+    } else if (commands.includes("REPLCONF")) {
+        connection.write("+OK\r\n");
+    } else if (commands.includes("ECHO")) {
+        handleEchoCommand(commands, connection);
+    } else if (commands.includes("PING")) {
+        connection.write("+PONG\r\n");
+    } else if (commands.includes("SET")) {
+        handleSetCommand(command, commands, connection);
+    } else if (commands.includes("GET")) {
+        handleGetCommand(commands, connection);
+    } else if (commands.includes("WAIT")) {
+        handleWaitCommand(commands, connection);
+    } else if (commands.includes("PSYNC")) {
+        handlePsyncCommand(connection);
+    }
 };
 
 const handleInfoCommand = (connection) => {
@@ -153,8 +153,7 @@ const handleSetCommand = (command, commands, connection) => {
             delete dictionary[commands[index + 2]];
         }, parseInt(commands[px + 2]));
     }
-    propagateToReplicas(command);
-    connection.write("+OK\r\n");
+    propagateToReplicas(command, connection);
 };
 
 const handleGetCommand = (commands, connection) => {
@@ -194,7 +193,7 @@ const handlePsyncCommand = (connection) => {
     numOfReplicas += 1;
 };
 
-const propagateToReplicas = (command) => {
+const propagateToReplicas = (command, originalConnection) => {
     if (replicas.length === 0) {
         return;
     }
@@ -209,6 +208,7 @@ const propagateToReplicas = (command) => {
         });
     });
     propagatedCommands += 1;
+    originalConnection.write("+OK\r\n"); // Send OK response to the original client
 };
 
 const waitCommand = (howMany, time, connection) => {
@@ -221,7 +221,6 @@ const waitCommand = (howMany, time, connection) => {
         }, time);
     }
 };
-
 const getBulkString = (str) => {
     if (str === null) {
         return '$-1\r\n';
