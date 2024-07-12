@@ -13,6 +13,7 @@ const handleHandshake = (port) => {
       client.on("data", async (data) => {
         try {
         dat = await readData(data);
+        console.log("This is the data", dat);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
         console.log("Commands",commands);
@@ -95,15 +96,22 @@ if (isSlave != -1) {
 } else {
     masterPort = PORT;
 }
-
+let flag = false;
 const propagateToReplicas = (command) => {
     if (replicas.length == 0){
         return
     }
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
-        replica.write(command);
-        replica.on("data", (data) => {
+        if (!flag){
+            replica.write(command);
+            flag = true;
+        } else {
+            replica.write(":3\r\n");
+        }
+        
+
+        replica.once("data", (data) => {
             const commands = data.toString().split('\r\n');
             if (commands.includes("ACK")){
                 numOfAcks += 1;
