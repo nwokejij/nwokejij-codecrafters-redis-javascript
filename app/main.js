@@ -162,6 +162,7 @@ const server = net.createServer((connection) => {
                                 anotherPromise(dat).then((response) => {
                                     console.log("Entered another promise", response);
                                     connection.write(response);
+                                    console.log("End of another promise");
                                 })
                             }
                             )
