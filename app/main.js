@@ -161,7 +161,6 @@ const server = net.createServer((connection) => {
                                 connection.write(dat);
                             }
                             )
-                            connection.write("+OK\r\n");
                         } else {
                             connection.write("+OK\r\n");
                         }
