@@ -154,11 +154,15 @@ const server = net.createServer((connection) => {
                             }, parseInt(commands[px + 2])
                         )
                     }
-                        // connection.write("+OK\r\n");
+                    if (flag){
+                        connection.write(":3\r\n");
+                    }
+                        connection.write("+OK\r\n");
                         if (commands.includes("baz")){
                             flag = true;
                             console.log("flag", flag);
                         }
+                        
                         propagateToReplicas(command);
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
