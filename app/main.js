@@ -158,7 +158,9 @@ const server = net.createServer((connection) => {
                             console.log("Hello there");
                             flag = true;
                             myPromise(commands).then((dat) => {
-                                connection.write(dat);
+                                anotherPromise(dat).then((response) => {
+                                    connection.write(response);
+                                })
                             }
                             )
                         } else {
@@ -250,7 +252,17 @@ const dictionary = {};
 function myPromise(data){
     return new Promise((resolve, reject) => {
         if (data.includes("baz")){
-            resolve("+O");
+            resolve("+OK\r\n");
+        } else{
+            reject()
+        }
+
+    })
+}
+function anotherPromise(data){
+    return new Promise((resolve, reject) => {
+        if (data == "+OK\r\n"){
+            resolve("*3\r\n" + getBulkString("SET") + getBulkString("baz") + getBulkString("789"));
         } else{
             reject()
         }
