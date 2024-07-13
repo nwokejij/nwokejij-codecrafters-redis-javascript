@@ -149,6 +149,8 @@ const server = net.createServer((connection) => {
                         if (commands.includes("baz")){
                             repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                             connection.write("+OK\r\n");
+                            repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
+                            connection.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                             
                         } else {
                             connection.write("+OK\r\n");
