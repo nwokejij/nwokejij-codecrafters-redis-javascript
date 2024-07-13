@@ -158,10 +158,10 @@ const server = net.createServer((connection) => {
                             console.log("Hello there");
                             flag = true;
                             myPromise(commands).then((dat) => {
+                                repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                                 connection.write(dat);
                                 anotherPromise(dat).then((response) => {
                                     console.log("Entered another promise", response);
-                                    repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                                     console.log("End of another promise");
                                 })
                             }
