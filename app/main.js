@@ -123,7 +123,7 @@ const propagateToReplicas = (command) => {
 }
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
-
+const repl1Connect = null;
 const server = net.createServer((connection) => {
   // Handle connection
     connection.type = 'client';
@@ -161,7 +161,7 @@ const server = net.createServer((connection) => {
                                 connection.write(dat);
                                 anotherPromise(dat).then((response) => {
                                     console.log("Entered another promise", response);
-                                    connection.write(response);
+                                    repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                                     console.log("End of another promise");
                                 })
                             }
@@ -202,6 +202,9 @@ const rdbFileBuffer = Buffer.concat([Buffer.from(rdbFileHeader, 'ascii'), buffer
             connection.write(rdbFileBuffer);
             connection.type = 'replica'; // Set type as replica
             replicas.push(connection);
+            if (replicas.length == 1){
+                repl1Connect = connection;
+            }
             numOfReplicas += 1;
             
             } 
