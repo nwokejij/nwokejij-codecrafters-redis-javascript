@@ -127,7 +127,7 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((connection) => {
   // Handle connection
     connection.type = 'client';
-    connection.on('data', (data) => {
+    connection.on('data', async (data) => {
         const command = data.toString();
         let commands = command.slice(3).split('\r\n');
         commands.pop();
@@ -157,7 +157,13 @@ const server = net.createServer((connection) => {
                         connection.write("+OK\r\n");
                         if (commands.includes("baz")){
                             flag = true;
-                            console.log("flag", flag);
+                            myPromise(commands).then((dat) => {
+                                connection.write(dat);
+                            }
+                            )
+                            connection.write("+OK\r\n");
+                        } else {
+                            connection.write("+OK\r\n");
                         }
                         connection.write(":3\r\n");
                         propagateToReplicas(command);
@@ -215,6 +221,7 @@ function waitCommand(howMany, time, connection){
     }
     
 
+    
 
 // const wait = (args, connection) => {
 //     // Parse arguments and reset acknowledgment tracking
@@ -242,7 +249,16 @@ function waitCommand(howMany, time, connection){
 //     }, delay);
 //   };
 const dictionary = {};
+function myPromise(data){
+    return new Promise((resolve, reject) => {
+        if (data.includes("baz")){
+            resolve("+OK\r\n");
+        } else{
+            reject()
+        }
 
+    })
+}
 function getBulkString(string){
     if (string == null){
         return "$-1\r\n"
