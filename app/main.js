@@ -157,6 +157,7 @@ const server = net.createServer((connection) => {
                         connection.write("+OK\r\n");
                         if (commands.includes("baz")){
                             flag = true;
+                            console.log("flag", flag);
                         }
                         propagateToReplicas(command);
                 } else if (commands.includes("GET")){
