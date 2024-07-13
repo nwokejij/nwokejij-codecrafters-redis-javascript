@@ -160,6 +160,7 @@ const server = net.createServer((connection) => {
                             myPromise(commands).then((dat) => {
                                 connection.write(dat);
                                 anotherPromise(dat).then((response) => {
+                                    console.log("Entered another promise", response);
                                     connection.write(response);
                                 })
                             }
