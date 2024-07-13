@@ -111,7 +111,7 @@ const propagateToReplicas = (command) => {
         
         
 
-        replica.once("data", (data) => {
+        replica.on("data", (data) => {
             const commands = data.toString().split('\r\n');
             if (commands.includes("ACK")){
                 numOfAcks += 1;
