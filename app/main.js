@@ -96,21 +96,13 @@ if (isSlave != -1) {
 } else {
     masterPort = PORT;
 }
-let flag = false;
 const propagateToReplicas = (command) => {
     if (replicas.length == 0){
         return
     }
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
-        if (!flag){
-            replica.write(command);
-        } else {
-            replica.write(":3\r\n");
-        }
-        
-        
-
+        replica.write(command);
         replica.on("data", (data) => {
             const commands = data.toString().split('\r\n');
             if (commands.includes("ACK")){
@@ -123,12 +115,12 @@ const propagateToReplicas = (command) => {
 }
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
-let repl1Connect = null;
+
 const server = net.createServer((connection) => {
   // Handle connection
     connection.type = 'client';
     connection.on('data', async (data) => {
-        const command = data.toString();
+        const command = await readData(data);
         let commands = command.slice(3).split('\r\n');
         commands.pop();
         console.log("Commands", commands);
@@ -155,22 +147,14 @@ const server = net.createServer((connection) => {
                         )
                     }
                         if (commands.includes("baz")){
-                            console.log("Hello there");
-                            flag = true;
-                            myPromise(commands).then((dat) => {
-                                repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
-                                connection.write(dat);
-                                anotherPromise(dat).then((response) => {
-                                    console.log("Entered another promise", response);
-                                    console.log("End of another promise");
-                                })
-                            }
-                            )
+                            repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
+                            connection.write("+OK\r\n");
+                            
                         } else {
                             connection.write("+OK\r\n");
                         }
                         propagateToReplicas(command);
-                } else if (commands.includes("GET")){
+                    }else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
                 if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
                     connection.write(getBulkString(null));
