@@ -165,7 +165,6 @@ const server = net.createServer((connection) => {
                         } else {
                             connection.write("+OK\r\n");
                         }
-                        connection.write(":3\r\n");
                         propagateToReplicas(command);
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
