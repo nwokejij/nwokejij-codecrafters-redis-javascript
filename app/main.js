@@ -250,7 +250,7 @@ const dictionary = {};
 function myPromise(data){
     return new Promise((resolve, reject) => {
         if (data.includes("baz")){
-            resolve("+OK");
+            resolve("+O");
         } else{
             reject()
         }
