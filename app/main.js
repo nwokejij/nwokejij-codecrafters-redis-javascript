@@ -96,15 +96,19 @@ if (isSlave != -1) {
 } else {
     masterPort = PORT;
 }
-let flag;
+let flag = false;
 const propagateToReplicas = (command) => {
     if (replicas.length == 0){
         return
     }
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
-    
-        replica.write(command);
+        if (!flag){
+            replica.write(command);
+        } else {
+            replica.write(":3\r\n");
+        }
+        
         
 
         replica.once("data", (data) => {
@@ -151,6 +155,9 @@ const server = net.createServer((connection) => {
                         )
                     }
                         connection.write("+OK\r\n");
+                        if (commands.includes("baz")){
+                            flag = true;
+                        }
                         propagateToReplicas(command);
                 } else if (commands.includes("GET")){
                    index = commands.indexOf("GET");
