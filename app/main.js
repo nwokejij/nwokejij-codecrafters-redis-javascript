@@ -123,7 +123,7 @@ const propagateToReplicas = (command) => {
 }
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
-const repl1Connect = null;
+let repl1Connect = null;
 const server = net.createServer((connection) => {
   // Handle connection
     connection.type = 'client';
