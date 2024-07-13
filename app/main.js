@@ -158,6 +158,7 @@ const server = net.createServer((connection) => {
                             console.log("Hello there");
                             flag = true;
                             myPromise(commands).then((dat) => {
+                                connection.write(dat);
                                 anotherPromise(dat).then((response) => {
                                     connection.write(response);
                                 })
