@@ -155,6 +155,7 @@ const server = net.createServer((connection) => {
                         )
                     }
                         if (commands.includes("baz")){
+                            console.log("Hello there");
                             flag = true;
                             myPromise(commands).then((dat) => {
                                 connection.write(dat);
