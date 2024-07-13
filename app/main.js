@@ -154,7 +154,6 @@ const server = net.createServer((connection) => {
                             }, parseInt(commands[px + 2])
                         )
                     }
-                        connection.write("+OK\r\n");
                         if (commands.includes("baz")){
                             flag = true;
                             myPromise(commands).then((dat) => {
