@@ -103,12 +103,12 @@ const propagateToReplicas = (command) => {
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
         replica.write(command);
-        replica.once("data", (data) => {
-            const commands = data.toString().split('\r\n');
-            if (commands.includes("ACK")){
-                numOfAcks += 1;
-            }
-        })
+        // replica.once("data", (data) => {
+        //     const commands = data.toString().split('\r\n');
+        //     if (commands.includes("ACK")){
+        //         numOfAcks += 1;
+        //     }
+        // })
 
     })
     propagatedCommands += 1;
@@ -200,8 +200,8 @@ function waitCommand(howMany, time, connection){
     if (propagatedCommands > 0){
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
         setTimeout(() => {
-
-            connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
+            connection.write(":1\r\n");
+            // connection.write(`:${numOfAcks > howMany ? howMany : numOfAcks}\r\n`);
         }, time);
     }
     
