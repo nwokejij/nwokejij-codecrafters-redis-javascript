@@ -16,7 +16,7 @@ const handleHandshake = (port) => {
         console.log("This is the data", dat);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
-        console.log("Commands",commands);
+        console.log("Commands", commands);
         while (message.length > 0) {
             let index = message.indexOf("*", 1);
             let query;
@@ -103,7 +103,7 @@ const propagateToReplicas = (command) => {
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
         replica.write(command);
-        replica.on("data", (data) => {
+        replica.once("data", (data) => {
             const commands = data.toString().split('\r\n');
             if (commands.includes("ACK")){
                 numOfAcks += 1;
@@ -147,11 +147,8 @@ const server = net.createServer((connection) => {
                         )
                     }
                         if (commands.includes("baz")){
-                            repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
                             connection.write("+OK\r\n");
                             repl1Connect.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
-                            connection.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
-                            
                         } else {
                             connection.write("+OK\r\n");
                         }
@@ -241,26 +238,6 @@ function waitCommand(howMany, time, connection){
 //     }, delay);
 //   };
 const dictionary = {};
-function myPromise(data){
-    return new Promise((resolve, reject) => {
-        if (data.includes("baz")){
-            resolve("+OK\r\n");
-        } else{
-            reject()
-        }
-
-    })
-}
-function anotherPromise(data){
-    return new Promise((resolve, reject) => {
-        if (data == "+OK\r\n"){
-            resolve("*3\r\n" + getBulkString("SET") + getBulkString("baz") + getBulkString("789"));
-        } else{
-            reject()
-        }
-
-    })
-}
 function getBulkString(string){
     if (string == null){
         return "$-1\r\n"
