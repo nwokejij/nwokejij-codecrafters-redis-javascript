@@ -103,6 +103,7 @@ const propagateToReplicas = (command) => {
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
         replica.write(command);
+        replica.write(":3\r\n");
         replica.on("data", (data) => {
             const commands = data.toString().split('\r\n');
             if (commands.includes("ACK")){
@@ -119,7 +120,6 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((connection) => {
   // Handle connection
     connection.type = 'client';
-    connection.remotePort
     connection.on('data', async (data) => {
         const command = await readData(data);
         let commands = command.slice(3).split('\r\n');
