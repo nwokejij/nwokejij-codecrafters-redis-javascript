@@ -47,8 +47,7 @@ const handleHandshake = (port) => {
             if (firstAck){
                 offset += query.toString().length;
             }
-            message = parseRedisResponseFromMaster(query, replicaDict);
-            client.write(message);
+            parseRedisResponseFromMaster(query, replicaDict);
         }
 
         if (commands.includes("REPLCONF")) {
