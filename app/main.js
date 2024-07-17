@@ -248,35 +248,35 @@ console.log("Logs from your program will appear here!");
 
 //     return `\$${string.length}\r\n${string}\r\n`
 // }
-// function parseRedisResponseFromMaster(data, replicaDict){
-//     console.log("Data received to Client", data);
-//     const type = data.charAt(0);
-//     switch(type) {
-//         case '+':
-//         case '*': // Array
-//             delimiter = data.indexOf('\r\n');
-//             bulkStrings = data.slice(delimiter+2); 
-//             stringArray = bulkStrings.split('\r\n');
-//             stringArrayLen = stringArray.length;
-//             noNewLine = [];
-//             for (let i = 0; i < stringArrayLen; i++){
-//                 if (stringArray[i] == "SET"){
-//                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
-//                     if (i + 6 < stringArrayLen){
-//                         if (stringArray[i+6] == "px"){
-//                             setTimeout(() => {
-//                                 delete replicaDict[stringArray[i + 2]];
-//                                 }, parseInt(stringArray[i + 8])
-//                             )
-//                         }
-//                     }
-//                 } else {
-//                     noNewLine.push(stringArray[i]);
-//                 }
-//                 }
-//     }
-// }
-// })
+function parseRedisResponseFromMaster(data, replicaDict){
+    console.log("Data received to Client", data);
+    const type = data.charAt(0);
+    switch(type) {
+        case '+':
+        case '*': // Array
+            delimiter = data.indexOf('\r\n');
+            bulkStrings = data.slice(delimiter+2); 
+            stringArray = bulkStrings.split('\r\n');
+            stringArrayLen = stringArray.length;
+            noNewLine = [];
+            for (let i = 0; i < stringArrayLen; i++){
+                if (stringArray[i] == "SET"){
+                    replicaDict[stringArray[i+2]] = stringArray[i + 4];
+                    if (i + 6 < stringArrayLen){
+                        if (stringArray[i+6] == "px"){
+                            setTimeout(() => {
+                                delete replicaDict[stringArray[i + 2]];
+                                }, parseInt(stringArray[i + 8])
+                            )
+                        }
+                    }
+                } else {
+                    noNewLine.push(stringArray[i]);
+                }
+                }
+    }
+}
+
 // server.listen(PORT, "127.0.0.1");
 // const net = require('net');
 
