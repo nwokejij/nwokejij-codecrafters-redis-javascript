@@ -384,12 +384,12 @@ const propagateToReplicas = (command) => {
     propagatedCommands += 1;
 };
 
-const getBulkString = (str) => {
-    if (str === null) {
-        return '$-1\r\n';
+function getBulkString(string){
+    if (string == null){
+        return "$-1\r\n"
     }
-    return `$${str.length}\r\n${str}\r\n`;
-};
+    return `\$${string.length}\r\n${string}\r\n`
+}
 
 const waitCommand = (howMany, time, connection) => {
     numOfAcks = 0;
