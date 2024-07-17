@@ -318,6 +318,7 @@ const handleData = (data, connection) => {
         dictionary[commands[index + 2]] = dictionary[commands[index + 4]];
         if (commands.includes("px")) {
             let px = commands.indexOf("px");
+            console.log("Hello", dictionary[commands[index + 2]], commands[px + 2]);
             setTimeout(() => {
                 delete dictionary[commands[index + 2]];
             }, parseInt(commands[px + 2]));
