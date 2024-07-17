@@ -316,7 +316,7 @@ const handleData = (data, connection) => {
     } else if (commands.includes("SET")) {
         let index = commands.indexOf("SET");
         console.log("This is the index of SET", index);
-        console.log("This is is in the commands list after index", commands[index], commands[index +1], commands[index + 2], commands[index + 3]);
+        console.log("This is is in the commands list after index", commands[index], commands[index +1], commands[index + 2], commands[index + 3], commands[index + 4]);
         dictionary[commands[index + 2]] = dictionary[commands[index + 4]];
         console.log(dictionary);
         if (commands.includes("px")) {
