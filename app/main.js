@@ -297,7 +297,7 @@ const server = net.createServer((connection) => {
 const handleData = (data, connection) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
-    commands.pop();
+    // commands.pop();
     console.log("Commands", commands);
     
     if (commands.includes("INFO")) {
@@ -310,7 +310,7 @@ const handleData = (data, connection) => {
         connection.write("+OK\r\n");
     } else if (commands.includes("ECHO")) {
         let index = commands.indexOf("ECHO");
-        connection.write(commands.slice(index + 1).join("\r\n") += "\r\n");
+        connection.write(commands.slice(index + 1).join("\r\n"));
     } else if (commands.includes("PING")) {
         connection.write("+PONG\r\n");
     } else if (commands.includes("SET")) {
