@@ -405,6 +405,5 @@ const waitCommand = (howMany, time, connection) => {
     }
 };
 
-server.listen(6379, () => {
-    console.log('Server listening on port 6379');
-});
+server.listen(PORT);
+
