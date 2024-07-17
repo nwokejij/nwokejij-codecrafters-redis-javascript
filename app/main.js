@@ -286,6 +286,7 @@ let propagatedCommands = 0;
 let numOfAcks = 0;
 const dictionary = {};
 const replicaDict = {};
+let handshakes = 0;
 
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
@@ -357,6 +358,7 @@ const handleData = (data, connection) => {
         connection.write(rdbFileBuffer);
         connection.type = 'replica'; // Set type as replica
         replicas.push(connection);
+        handshakes += 1;
         numOfReplicas += 1;
     }
 };
@@ -393,7 +395,7 @@ const getBulkString = (str) => {
 const waitCommand = (howMany, time, connection) => {
     numOfAcks = 0;
     if (propagatedCommands == 0){
-        connection.write(`:${numOfAcks}\r\n`);
+        connection.write(`:${handshakes}\r\n`);
     }
     if (propagatedCommands > 0) {
         propagateToReplicas("*3\r\n" + getBulkString("REPLCONF") + getBulkString("GETACK") + getBulkString("*"));
