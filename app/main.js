@@ -80,6 +80,16 @@ async function readData(data){
 }
 const portIndex = process.argv.indexOf("--port");
 const isSlave = process.argv.indexOf("--replicaof");
+const dir = process.argv.indexOf("--dir");
+const dbfilename = process.argv.indexOf("--dbfilename");
+const config = {}
+if (dir != -1){
+    config["dir"] = process.argv[dr + 1];
+
+}
+if (dbfilename != -1){
+    config["dbfilename"] = process.argv[dbfilename + 1];
+}
 const PORT = portIndex != -1 ? process.argv[portIndex + 1] : 6379;
 let masterPort = 0;
 
@@ -105,10 +115,17 @@ let handshakes = 0;
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
-        const command = data.toString();
+    const command = data.toString();
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
-    
+    if (commands.includes("CONFIG")){
+        if (commands.includes("dir")){
+            connection.write("*2\r\n" + getBulkString("dir") + getBulkString(config["dir"]));
+        }
+        if (commands.includes("dbfilename")){
+            connection.write("*2\r\n" + getBulkString("dbfilename") + getBulkString(config["dbfilename"]));
+        }
+    } else
     if (commands.includes("INFO")) {
         if (isSlave != -1) {
             connection.write(getBulkString("role:slave"));
@@ -249,6 +266,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
                 }
     }
 }
+
 
 server.listen(PORT, "127.0.0.1");
 
