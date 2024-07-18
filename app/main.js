@@ -1,3 +1,5 @@
+const net = require('net');
+const replicaDict = {};
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
@@ -92,12 +94,12 @@ if (isSlave != -1) {
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
-const net = require('net');
+
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
 const dictionary = {};
-const replicaDict = {};
+
 let handshakes = 0;
 
 const server = net.createServer((connection) => {
