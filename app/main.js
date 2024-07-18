@@ -84,7 +84,7 @@ const dir = process.argv.indexOf("--dir");
 const dbfilename = process.argv.indexOf("--dbfilename");
 const config = {}
 if (dir != -1){
-    config["dir"] = process.argv[dr + 1];
+    config["dir"] = process.argv[dir + 1];
 
 }
 if (dbfilename != -1){
