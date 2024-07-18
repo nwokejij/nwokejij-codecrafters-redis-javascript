@@ -118,7 +118,15 @@ const server = net.createServer((connection) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
-    if (commands.includes("CONFIG")){
+    if (commands.includes("KEYS")){
+        let file = config["dbfilename"];
+        if (file.length == 0){
+           // don't know what to do when this happens
+        } else {
+            console.log("RDBFile", config["dbfilename"]);
+        }
+
+    } else if (commands.includes("CONFIG")){
         if (commands.includes("dir")){
             connection.write("*2\r\n" + getBulkString("dir") + getBulkString(config["dir"]));
         }
