@@ -1,6 +1,9 @@
 const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
+var rdb = require('rdb-parser');
+console.log("Error or not", rdb.types);
+
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
