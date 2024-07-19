@@ -89,7 +89,6 @@ const dbfilename = process.argv.indexOf("--dbfilename");
 const config = {}
 if (dir != -1){
     config["dir"] = process.argv[dir + 1];
-
 }
 if (dbfilename != -1){
     config["dbfilename"] = process.argv[dbfilename + 1];
@@ -115,7 +114,7 @@ let numOfAcks = 0;
 const dictionary = {};
 
 let handshakes = 0;
-
+const pythonScriptPath = path.join(__dirname, "../redis-rdb-tools/rdb-tools/parser.py" );
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
@@ -125,9 +124,12 @@ const server = net.createServer((connection) => {
     if (commands.includes("KEYS")){
         let file = config["dbfilename"];
         let direc = config["dir"] + file;
-        const rdbFilePath = path.join(process.cwd(), file);
-        const pythonScriptPath = path.join(process.cwd(), "C:\Users\Jonathan Nwokeji\codecrafters-redis-javascript\redis-rdb-tools\rdbtools\read_rdb.py");
-        
+        const rdbFilePath = path.join(__dirname, direc);
+        readRdbFile(rdbFilePath, (data) => {
+            console.log("Have we reached this block");
+            console.log("Parsed RDB data", data);
+        })
+
         if (file.length == 0){
            // don't know what to do when this happens
         } else {
@@ -285,6 +287,20 @@ function parseRedisResponseFromMaster(data, replicaDict){
     }
 }
 
+function readRdbFile(rdbFilePath, callback) {
+    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return;
+        }
+        callback(stdout);
+    });
+}
 
 server.listen(PORT, "127.0.0.1");
 
