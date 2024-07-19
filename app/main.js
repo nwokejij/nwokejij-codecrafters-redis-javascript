@@ -124,7 +124,7 @@ const server = net.createServer((connection) => {
     if (commands.includes("KEYS")){
         let file = config["dbfilename"];
         let direc = config["dir"] + file;
-        const rdbFilePath = direc;
+        const rdbFilePath = "/app/" + direc;
         readRdbFile(rdbFilePath, (data) => {
             console.log("Have we reached this block");
             console.log("Parsed RDB data", data);
@@ -133,8 +133,6 @@ const server = net.createServer((connection) => {
         if (file.length == 0){
            // don't know what to do when this happens
         } else {
-        
-            console.log("RDBFile", typeof config["dbfilename"]);
             console.log("Yes", rdbFilePath, pythonScriptPath);
         }
 
