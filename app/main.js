@@ -121,10 +121,11 @@ const server = net.createServer((connection) => {
     console.log("Commands", commands);
     if (commands.includes("KEYS")){
         let file = config["dbfilename"];
+        let direc = config["dir"] + file;
         if (file.length == 0){
            // don't know what to do when this happens
         } else {
-            fs.readFile(file, (err, data) => {
+            fs.readFile(direc, (err, data) => {
                 if (err){
                     console.error(`Error reading file ${err.message}`)
                     return;
