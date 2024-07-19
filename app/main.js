@@ -123,7 +123,7 @@ const server = net.createServer((connection) => {
         if (file.length == 0){
            // don't know what to do when this happens
         } else {
-            console.log("RDBFile", config["dbfilename"]);
+            console.log("RDBFile", typeof config["dbfilename"]);
         }
 
     } else if (commands.includes("CONFIG")){
