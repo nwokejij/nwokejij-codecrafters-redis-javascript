@@ -1,8 +1,9 @@
 const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
-var rdb = require('rdb-parser');
-console.log("Error or not", rdb.types);
+const { exec } = require('child-process');
+const path = require('path');
+console.log("Error or not", );
 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
@@ -125,18 +126,13 @@ const server = net.createServer((connection) => {
     if (commands.includes("KEYS")){
         let file = config["dbfilename"];
         let direc = config["dir"] + file;
+        const rdbFilePath = path.join(process.cwd(), file);
+        const pythonScriptPath = path.join(process.cwd(), "C:\Users\Jonathan Nwokeji\codecrafters-redis-javascript\redis-rdb-tools\rdbtools\read_rdb.py");
+        console.log(rdbFilePath, pythonScriptPath);
         if (file.length == 0){
            // don't know what to do when this happens
         } else {
-            fs.readFile(direc, (err, data) => {
-                if (err){
-                    console.error(`Error reading file ${err.message}`)
-                    return;
-                } 
-
-                console.log("We made it here", config["dbfilename"]);
-
-            })
+        
             console.log("RDBFile", typeof config["dbfilename"]);
         }
 
