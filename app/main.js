@@ -1,7 +1,7 @@
 const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
-const { exec } = require('child-process');
+const { exec } = require('child_process');
 const path = require('path');
 console.log("Error or not", );
 
