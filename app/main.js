@@ -124,7 +124,7 @@ const server = net.createServer((connection) => {
         if (file.length == 0){
            // don't know what to do when this happens
         } else {
-            fs.readFile(config["dbfilename"], (err, data) => {
+            fs.readFile(file, (err, data) => {
                 if (err){
                     console.error(`Error reading file ${err.message}`)
                     return;
