@@ -124,7 +124,7 @@ const server = net.createServer((connection) => {
     if (commands.includes("KEYS")){
         let file = config["dbfilename"];
         let direc = config["dir"] + file;
-        const rdbFilePath = path.join(__dirname, direc);
+        const rdbFilePath = direc;
         readRdbFile(rdbFilePath, (data) => {
             console.log("Have we reached this block");
             console.log("Parsed RDB data", data);
