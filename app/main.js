@@ -114,7 +114,7 @@ let numOfAcks = 0;
 const dictionary = {};
 
 let handshakes = 0;
-const pythonScriptPath = path.join(__dirname, "../redis-rdb-tools/rdb-tools/parser.py" );
+const pythonScript = path.join(__dirname, 'redis-rdb-tools', 'rdbtools', 'read_rdb.py');
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
@@ -125,13 +125,8 @@ const server = net.createServer((connection) => {
         try {
         
         let file = config["dbfilename"];
-        let direc = config["dir"] + "/" + file;
-        let filePath = path.join(__dirname, file);
-        let direcPath = path.join(__dirname, direc)
-        let python_process = spawner("python", [filePath, direcPath]);
-        python_process.stdout.on('data', (data) => {
-            console.log("This is the data", data);
-        })
+        let rdbPath = path.join(config["dir"], file);
+        readRdbFile(rdbPath, )
     } catch (error){
         console.error(error.message)
     }
@@ -304,5 +299,24 @@ function parseRedisResponseFromMaster(data, replicaDict){
 //     });
 // }
 
+function readRdbFile(rdbFilePath, callback) {
+    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return;
+        }
+        callback(stdout);
+    });
+}
+
+// Read and output the key-value from the RDB file
+readRdbFile(rdbFilePath, (data) => {
+    console.log('Parsed RDB Data:', data);
+});
 server.listen(PORT, "127.0.0.1");
 
