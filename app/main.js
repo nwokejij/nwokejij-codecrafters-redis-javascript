@@ -69,21 +69,6 @@ const handleHandshake = (port) => {
 
             })
           }
-          function readRdbFile(rdbFilePath, callback) {
-            const command = `py-3 ${pythonScriptPath} ${rdbFilePath}`;
-            // exec(command, (error, stdout, stderr) => {
-            //     if (error) {
-            //         console.log("Command", command);
-            //         console.error(`Error: ${error.message}`);
-            //         return;
-            //     }
-            //     if (stderr) {
-            //         console.error(`stderr: ${stderr}`);
-            //         return;
-            //     }
-            //     callback(stdout);
-            // });
-        }
 async function readData(data){
 
     return new Promise((resolve, reject) => {
@@ -302,7 +287,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
 }
 
 function readRdbFile(rdbFilePath, callback) {
-    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
+    const command = `python3 ${pythonScriptPath} ${rdbFilePath}`;
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
