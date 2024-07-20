@@ -70,19 +70,19 @@ const handleHandshake = (port) => {
             })
           }
           function readRdbFile(rdbFilePath, callback) {
-            const command = ` ${pythonScriptPath} ${rdbFilePath}`;
-            exec(command, (error, stdout, stderr) => {
-                if (error) {
-                    console.log("Command", command);
-                    console.error(`Error: ${error.message}`);
-                    return;
-                }
-                if (stderr) {
-                    console.error(`stderr: ${stderr}`);
-                    return;
-                }
-                callback(stdout);
-            });
+            const command = `py-3 ${pythonScriptPath} ${rdbFilePath}`;
+            // exec(command, (error, stdout, stderr) => {
+            //     if (error) {
+            //         console.log("Command", command);
+            //         console.error(`Error: ${error.message}`);
+            //         return;
+            //     }
+            //     if (stderr) {
+            //         console.error(`stderr: ${stderr}`);
+            //         return;
+            //     }
+            //     callback(stdout);
+            // });
         }
 async function readData(data){
 
