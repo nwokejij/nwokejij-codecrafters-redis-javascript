@@ -127,7 +127,7 @@ const server = net.createServer((connection) => {
         
         let file = config["dbfilename"];
         let rdbPath = path.join(config["dir"], file);
-        const python_path = spawner('python', ['./example.py', rdbPath]);
+        const python_path = spawner('python', ['./example.py', "Hello"]);
         python_process.stdout.on((data) => {
             console.log("Data received from python file", data.toString());
         })
