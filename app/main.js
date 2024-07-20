@@ -301,7 +301,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
 }
 
 function readRdbFile(rdbFilePath, callback) {
-    const command = `C:\AppData\Local\Microsoft\WindowsApps\python3.exe ${pythonScriptPath} ${rdbFilePath}`;
+    const command = `C:/Users/Jonathan Nwokeji/AppData/Local/Microsoft/WindowsApps/python3.exe ${pythonScriptPath} ${rdbFilePath}`;
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
