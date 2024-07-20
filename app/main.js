@@ -3,7 +3,7 @@ const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
 const { exec } = require('child_process');
-const spawner = require('child_process').spawn();
+const spawner = require('child_process').spawn("python");
 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
