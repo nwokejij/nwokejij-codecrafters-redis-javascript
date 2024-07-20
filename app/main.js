@@ -124,7 +124,7 @@ const server = net.createServer((connection) => {
     if (commands.includes("KEYS")){
         try {
         let file = config["dbfilename"];
-        let direc = config["dir"] + file;
+        let direc = config["dir"] + "/" + file;
         let python_process = spawner("python", ['../redis-rdb-tools/rdb-tools/read_rdb.py', direc]);
         python_process.stdout.on('data', (data) => {
             console.log("This is the data", )
