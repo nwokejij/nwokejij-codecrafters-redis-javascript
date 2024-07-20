@@ -1,7 +1,7 @@
 const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
-const { exec } = require('child_process');
+const spawner = require('child_process').spawn;
 const path = require('path');
 
 const handleHandshake = (port) => {
@@ -122,19 +122,20 @@ const server = net.createServer((connection) => {
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
     if (commands.includes("KEYS")){
+        try {
         let file = config["dbfilename"];
         let direc = config["dir"] + file;
-        const rdbFilePath = "/app/" + direc;
-        readRdbFile(rdbFilePath, (data) => {
-            console.log("Have we reached this block");
-            console.log("Parsed RDB data", data);
+        let python_process = spawner("python", ['../redis-rdb-tools/rdb-tools/read_rdb.py', direc]);
+        python_process.stdout.on('data', (data) => {
+            console.log("This is the data", )
         })
-
-        if (file.length == 0){
-           // don't know what to do when this happens
-        } else {
-            console.log("Yes", rdbFilePath, pythonScriptPath);
-        }
+    } catch (error){
+        console.error(error.message)
+    }
+        // readRdbFile(rdbFilePath, (data) => {
+        //     console.log("Have we reached this block");
+        //     console.log("Parsed RDB data", data);
+        // })
 
     } else if (commands.includes("CONFIG")){
         if (commands.includes("dir")){
@@ -285,20 +286,20 @@ function parseRedisResponseFromMaster(data, replicaDict){
     }
 }
 
-function readRdbFile(rdbFilePath, callback) {
-    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return;
-        }
-        callback(stdout);
-    });
-}
+// function readRdbFile(rdbFilePath, callback) {
+//     const command = `python ${pythonScriptPath} ${rdbFilePath}`;
+//     exec(command, (error, stdout, stderr) => {
+//         if (error) {
+//             console.error(`Error: ${error.message}`);
+//             return;
+//         }
+//         if (stderr) {
+//             console.error(`stderr: ${stderr}`);
+//             return;
+//         }
+//         callback(stdout);
+//     });
+// }
 
 server.listen(PORT, "127.0.0.1");
 
