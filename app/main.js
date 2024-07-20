@@ -70,7 +70,7 @@ const handleHandshake = (port) => {
             })
           }
           function readRdbFile(rdbFilePath, callback) {
-            const command = `python ${pythonScriptPath} ${rdbFilePath}`;
+            const command = `python3 ${pythonScriptPath} ${rdbFilePath}`;
             exec(command, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error: ${error.message}`);
