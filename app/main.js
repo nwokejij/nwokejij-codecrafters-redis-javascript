@@ -287,7 +287,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
 }
 
 function readRdbFile(rdbFilePath, callback) {
-    const command = `python3 ${pythonScriptPath} ${rdbFilePath}`;
+    const command = `py-3 ${pythonScriptPath} ${rdbFilePath}`;
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
