@@ -101,6 +101,7 @@ const isSlave = process.argv.indexOf("--replicaof");
 const dir = process.argv.indexOf("--dir");
 const dbfilename = process.argv.indexOf("--dbfilename");
 const config = {}
+console.log("Dirname", __dirname);
 if (dir != -1){
     config["dir"] = process.argv[dir + 1];
 }
