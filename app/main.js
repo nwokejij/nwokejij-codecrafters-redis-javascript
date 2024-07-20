@@ -144,7 +144,7 @@ const server = net.createServer((connection) => {
             console.log('Parsed RDB Data:', data);
         });
     } catch (error){
-        console.error(error.message)
+        console.error(error.message);
     }
         // readRdbFile(rdbFilePath, (data) => {
         //     console.log("Have we reached this block");
