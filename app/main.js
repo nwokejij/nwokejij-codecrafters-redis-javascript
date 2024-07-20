@@ -127,8 +127,9 @@ const server = net.createServer((connection) => {
         let rdbPath = path.join(config["dir"], file);
         let rdbFileBuffer = fs.readFileSync(rdbPath);
         // console.log("Buffer Read", rdbFileBuffer);
-        for (let i = 0; i < 2; i++){
+        for (let i = 0; i < 10; i++){
             console.log("Buffer char", rdbFileBuffer[i]);
+            console.log("Buffer String", rdbFileBuffer[i]);
         }
     } catch (error){
         console.error(error.message);
