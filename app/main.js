@@ -2,8 +2,6 @@ const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
-const { exec } = require('child_process');
-const spawner = require('child_process').spawn("python");
 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
@@ -127,14 +125,8 @@ const server = net.createServer((connection) => {
         
         let file = config["dbfilename"];
         let rdbPath = path.join(config["dir"], file);
-        const python_path = spawner('python', ['./example.py', "Hello"]);
-        python_process.stdout.on((data) => {
-            console.log("Data received from python file", data.toString());
-        })
-
-        // readRdbFile(rdbPath, (data) => {
-        //     console.log('Parsed RDB Data:', data);
-        // });
+        let rdbFileBuffer = fs.readFileSync(rdbPath);
+        console.log("Buffer Read", rdbFileBuffer);
     } catch (error){
         console.error(error.message);
     }
