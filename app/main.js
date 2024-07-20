@@ -70,7 +70,7 @@ const handleHandshake = (port) => {
             })
           }
           function readRdbFile(rdbFilePath, callback) {
-            const command = `python3 ${pythonScriptPath} ${rdbFilePath}`;
+            const command = `py -3 ${pythonScriptPath} ${rdbFilePath}`;
             exec(command, (error, stdout, stderr) => {
                 if (error) {
                     console.log("Command", command);
@@ -101,7 +101,7 @@ const isSlave = process.argv.indexOf("--replicaof");
 const dir = process.argv.indexOf("--dir");
 const dbfilename = process.argv.indexOf("--dbfilename");
 const config = {}
-console.log("Dirname", __dirname);
+
 if (dir != -1){
     config["dir"] = process.argv[dir + 1];
 }
