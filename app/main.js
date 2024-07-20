@@ -3,6 +3,7 @@ const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
 const { exec } = require('child_process');
+const spawner = require('child_process').spawn();
 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
@@ -126,9 +127,14 @@ const server = net.createServer((connection) => {
         
         let file = config["dbfilename"];
         let rdbPath = path.join(config["dir"], file);
-        readRdbFile(rdbPath, (data) => {
-            console.log('Parsed RDB Data:', data);
-        });
+        const python_path = spawner('python', ['./example.py', rdbPath]);
+        python_process.stdout.on((data) => {
+            console.log("Data received from python file", data.toString());
+        })
+
+        // readRdbFile(rdbPath, (data) => {
+        //     console.log('Parsed RDB Data:', data);
+        // });
     } catch (error){
         console.error(error.message);
     }
@@ -287,7 +293,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
 }
 
 function readRdbFile(rdbFilePath, callback) {
-    const command = `py-3 ${pythonScriptPath} ${rdbFilePath}`;
+    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`);
