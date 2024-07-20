@@ -127,8 +127,7 @@ let numOfAcks = 0;
 const dictionary = {};
 
 let handshakes = 0;
-console.log("d", __dirname);
-const pythonScriptPath = path.join("/app", 'redis-rdb-tools', 'rdbtools', 'read_rdb.py');
+const pythonScriptPath = path.join("../", 'redis-rdb-tools', 'rdbtools', 'read_rdb.py');
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
@@ -139,7 +138,7 @@ const server = net.createServer((connection) => {
         try {
         
         let file = config["dbfilename"];
-        let rdbPath = path.join(config["dir"], file);
+        let rdbPath = path.join(__dirname, config["dir"], file);
         readRdbFile(rdbPath, (data) => {
             console.log('Parsed RDB Data:', data);
         });
