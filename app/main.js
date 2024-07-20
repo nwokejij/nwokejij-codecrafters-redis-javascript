@@ -69,7 +69,20 @@ const handleHandshake = (port) => {
 
             })
           }
-
+          function readRdbFile(rdbFilePath, callback) {
+            const command = `python ${pythonScriptPath} ${rdbFilePath}`;
+            exec(command, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.error(`stderr: ${stderr}`);
+                    return;
+                }
+                callback(stdout);
+            });
+        }
 async function readData(data){
 
     return new Promise((resolve, reject) => {
@@ -126,7 +139,9 @@ const server = net.createServer((connection) => {
         
         let file = config["dbfilename"];
         let rdbPath = path.join(config["dir"], file);
-        readRdbFile(rdbPath, )
+        readRdbFile(rdbPath, (data) => {
+            console.log('Parsed RDB Data:', data);
+        });
     } catch (error){
         console.error(error.message)
     }
@@ -299,24 +314,9 @@ function parseRedisResponseFromMaster(data, replicaDict){
 //     });
 // }
 
-function readRdbFile(rdbFilePath, callback) {
-    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return;
-        }
-        callback(stdout);
-    });
-}
+
 
 // Read and output the key-value from the RDB file
-readRdbFile(rdbFilePath, (data) => {
-    console.log('Parsed RDB Data:', data);
-});
+
 server.listen(PORT, "127.0.0.1");
 
