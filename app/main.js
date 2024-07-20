@@ -300,20 +300,20 @@ function parseRedisResponseFromMaster(data, replicaDict){
     }
 }
 
-// function readRdbFile(rdbFilePath, callback) {
-//     const command = `python ${pythonScriptPath} ${rdbFilePath}`;
-//     exec(command, (error, stdout, stderr) => {
-//         if (error) {
-//             console.error(`Error: ${error.message}`);
-//             return;
-//         }
-//         if (stderr) {
-//             console.error(`stderr: ${stderr}`);
-//             return;
-//         }
-//         callback(stdout);
-//     });
-// }
+function readRdbFile(rdbFilePath, callback) {
+    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return;
+        }
+        callback(stdout);
+    });
+}
 
 
 
