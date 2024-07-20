@@ -128,8 +128,10 @@ const server = net.createServer((connection) => {
         let rdbFileBuffer = fs.readFileSync(rdbPath);
         // console.log("Buffer Read", rdbFileBuffer);
         for (let i = 0; i < 10; i++){
-            console.log("Buffer char", rdbFileBuffer[i]);
-            console.log("Buffer String", rdbFileBuffer[i]);
+            byte =  rdbFileBuffer[i];
+            console.log("Buffer char", byte);
+            buff = Buffer.from([byte]);
+            console.log("Buffer String", buff);
         }
     } catch (error){
         console.error(error.message);
