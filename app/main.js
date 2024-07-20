@@ -1,8 +1,8 @@
 const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
-const spawner = require('child_process').spawn;
 const path = require('path');
+const { exec } = require('child_process');
 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
