@@ -128,7 +128,7 @@ const dictionary = {};
 
 let handshakes = 0;
 console.log("d", __dirname);
-const pythonScriptPath = path.join(__dirname, 'redis-rdb-tools', 'rdbtools', 'read_rdb.py');
+const pythonScriptPath = path.join("/app", 'redis-rdb-tools', 'rdbtools', 'read_rdb.py');
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
