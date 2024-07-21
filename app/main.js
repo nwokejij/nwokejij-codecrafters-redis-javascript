@@ -106,12 +106,13 @@ if (isSlave != -1) {
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
+start = null;
 
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
 const dictionary = {};
-
+let length = -1;
 let handshakes = 0;
 const pythonScriptPath = path.join("../", 'redis-rdb-tools', 'rdbtools', 'read_rdb.py');
 const server = net.createServer((connection) => {
@@ -127,15 +128,27 @@ const server = net.createServer((connection) => {
         let rdbPath = path.join(config["dir"], file);
         let rdbFileBuffer = fs.readFileSync(rdbPath);
         // console.log("Buffer Read", rdbFileBuffer);
-        for (let i = 0; i < 50; i++){
-            byte =  rdbFileBuffer[i];
-            if (byte == "254"){
-                console.log("Hello");
-            }
-            console.log("Buffer char", byte);
-            buff = Buffer.from([byte]);
-            console.log("Buffer String", buff);
-        }
+        const readStream = fs.createReadStream(rdbPath, { encoding: 'utf-8'});
+        readStream.on('data', (chunk) => {
+            console.log('Received chunk of data:', chunk);
+        });
+        // for (let i = 0; i < 50; i++){
+        //     if (i == go && length > 0){
+
+        //     }
+                
+        //     byte =  rdbFileBuffer[i];
+        //     if (byte == "251"){
+        //         let start = i;
+        //         let go = start + 4;
+        //         let length = parseInt(rdbFileBuffer[go].toString('utf-8'), 10);
+        //         console.log(length);
+
+        //     }
+        //     console.log("Buffer char", byte);
+        //     buff = Buffer.from([byte]);
+        //     console.log("Buffer String", buff);
+        // }
     } catch (error){
         console.error(error.message);
     }
