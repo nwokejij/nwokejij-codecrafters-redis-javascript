@@ -105,16 +105,11 @@ if (isSlave != -1) {
 }
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
-
-start = null;
-
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
 const dictionary = {};
-let length = -1;
 let handshakes = 0;
-const pythonScriptPath = path.join("../", 'redis-rdb-tools', 'rdbtools', 'read_rdb.py');
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
@@ -123,39 +118,29 @@ const server = net.createServer((connection) => {
     console.log("Commands", commands);
     if (commands.includes("KEYS")){
         try {
-        
         let file = config["dbfilename"];
         let rdbPath = path.join(config["dir"], file);
         let rdbFileBuffer = fs.readFileSync(rdbPath);
         let key = ""
-        keyBufferArray = []
+        keyBufferArray = [];
         for (let i = 0; i < 90; i++){
             byte =  rdbFileBuffer[i];
-            if (byte == "251"){
+            if (byte == "251"){ // FB hashtable size information
                 let start = i;
                 let go = start + 4;
                 console.log(rdbFileBuffer[go]);
                 let length = parseInt(rdbFileBuffer[go].toString(10), 10);
                 for (let i = go + 1; i < go + length + 1; i++){
                     keyBufferArray.push(rdbFileBuffer[i]);
-                    
                 }
                 let buf = Buffer.from(keyBufferArray);
                 key = buf.toString('ascii');
                 connection.write("*1\r\n" + getBulkString(key));
-                console.log("Key", key)
-                console.log("Length", length);
-
             }
         }
     } catch (error){
         console.error(error.message);
     }
-        // readRdbFile(rdbFilePath, (data) => {
-        //     console.log("Have we reached this block");
-        //     console.log("Parsed RDB data", data);
-        // })
-
     } else if (commands.includes("CONFIG")){
         if (commands.includes("dir")){
             connection.write("*2\r\n" + getBulkString("dir") + getBulkString(config["dir"]));
@@ -304,23 +289,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
                 }
     }
 }
-
-function readRdbFile(rdbFilePath, callback) {
-    const command = `python ${pythonScriptPath} ${rdbFilePath}`;
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return;
-        }
-        callback(stdout);
-    });
-}
-
-
 
 // Read and output the key-value from the RDB file
 
