@@ -142,7 +142,7 @@ const server = net.createServer((connection) => {
                 }
                 let buf = Buffer.from(keyBufferArray);
                 key = buf.toString('ascii');
-                connection.write(key);
+                connection.write(getBulkString(key));
                 console.log("Key", key)
                 console.log("Length", length);
 
