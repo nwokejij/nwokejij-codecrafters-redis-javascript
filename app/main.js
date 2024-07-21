@@ -127,6 +127,7 @@ const server = net.createServer((connection) => {
         let file = config["dbfilename"];
         let rdbPath = path.join(config["dir"], file);
         let rdbFileBuffer = fs.readFileSync(rdbPath);
+        let key = ""
         for (let i = 0; i < 90; i++){
             byte =  rdbFileBuffer[i];
             if (byte == "251"){
@@ -134,7 +135,11 @@ const server = net.createServer((connection) => {
                 let go = start + 4;
                 console.log(rdbFileBuffer[go]);
                 let length = parseInt(rdbFileBuffer[go].toString(10), 10);
-                console.log(length);
+                for (let i = go + 1; i < go + length + 1; i++){
+                    key += rdbFileBuffer[i].toString('ascii')
+                }
+                console.log("Key", key)
+                console.log("Length", length);
 
             }
         }
