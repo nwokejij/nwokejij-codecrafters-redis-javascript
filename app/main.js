@@ -126,7 +126,7 @@ function readRDBFile(dir, dbfile){
             for (let i = go + 1; i < go + keyLength + 1; i++){
                 keyBufferArray.push(rdbFileBuffer[i]);
             }
-            let valueLength = go + keyLength + 1;
+            let valueLength = parseInt(rdbFileBuffer[go + keyLength + 1].toString(10), 10);
             for (let i = valueLength + 1; i < valueLength + valueLength + 1; i++){
                 valueBufferArray.push(rdbFileBuffer[i]);
             }
@@ -136,6 +136,8 @@ function readRDBFile(dir, dbfile){
             let valBuf = Buffer.from(valueBufferArray);
             val = valBuf.toString('ascii');
             dictionary[key] = val;
+            console.log("Key", key);
+            console.log("Value", val);
             break;
         }
 
