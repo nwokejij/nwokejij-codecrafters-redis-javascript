@@ -129,6 +129,9 @@ const server = net.createServer((connection) => {
         // console.log("Buffer Read", rdbFileBuffer);
         for (let i = 0; i < 10; i++){
             byte =  rdbFileBuffer[i];
+            if (byte == "82"){
+                console.log("Hello");
+            }
             console.log("Buffer char", byte);
             buff = Buffer.from([byte]);
             console.log("Buffer String", buff);
