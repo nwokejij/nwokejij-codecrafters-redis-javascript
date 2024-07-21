@@ -127,6 +127,7 @@ function readRDBFile(dir, dbfile){
                 keyBufferArray.push(rdbFileBuffer[i]);
             }
             let valueLength = parseInt(rdbFileBuffer[go + keyLength + 1].toString(10), 10);
+            console.log("ValueLength", valueLength);
             for (let i = valueLength + 1; i < valueLength + valueLength + 1; i++){
                 valueBufferArray.push(rdbFileBuffer[i]);
             }
