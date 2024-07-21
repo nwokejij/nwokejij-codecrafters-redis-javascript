@@ -137,7 +137,7 @@ const server = net.createServer((connection) => {
                 console.log(rdbFileBuffer[go]);
                 let length = parseInt(rdbFileBuffer[go].toString(10), 10);
                 for (let i = go + 1; i < go + length + 1; i++){
-                    keyBufferArray.append(rdbFileBuffer[i]);
+                    keyBufferArray.push(rdbFileBuffer[i]);
                     
                 }
                 let buf = Buffer.from(keyBufferArray);
