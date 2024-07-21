@@ -121,7 +121,6 @@ function readRDBFile(dir, dbfile){
         if (byte == "251"){ // FB hashtable size information
             let start = i;
             let go = start + 4;
-            console.log(rdbFileBuffer[go]);
             let keyLength = parseInt(rdbFileBuffer[go].toString(10), 10);
             for (let i = go + 1; i < go + keyLength + 1; i++){
                 keyBufferArray.push(rdbFileBuffer[i]);
@@ -130,7 +129,6 @@ function readRDBFile(dir, dbfile){
             valStart = go + keyLength + 2;
             console.log("ValueLength", valueLength);
             for (let i = valStart; i < valStart + valueLength; i++){
-                console.log("Indiv Buffer", rdbFileBuffer[i]);
                 valueBufferArray.push(rdbFileBuffer[i]);
             }
             
