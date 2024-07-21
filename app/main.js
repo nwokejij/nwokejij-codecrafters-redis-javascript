@@ -132,7 +132,7 @@ const server = net.createServer((connection) => {
             if (byte == "251"){
                 let start = i;
                 let go = start + 4;
-                let length = parseInt(rdbFileBuffer[go].toString('utf-8'), 10);
+                let length = parseInt(rdbFileBuffer[go].toString(10), 10);
                 console.log(length);
 
             }
