@@ -136,7 +136,7 @@ const server = net.createServer((connection) => {
                 console.log(rdbFileBuffer[go]);
                 let length = parseInt(rdbFileBuffer[go].toString(10), 10);
                 for (let i = go + 1; i < go + length + 1; i++){
-                    key += rdbFileBuffer[i].toString('ascii')
+                    key += rdbFileBuffer[i].toString(10);
                 }
                 console.log("Key", key)
                 console.log("Length", length);
