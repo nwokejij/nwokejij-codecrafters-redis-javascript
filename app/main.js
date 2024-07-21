@@ -104,6 +104,44 @@ if (isSlave != -1) {
     masterPort = PORT;
 }
 // You can use print statements as follows for debugging, they'll be visible when running tests.
+function readRDBFile(dir, dbfile){
+    if (!dir || !dbfile){
+        return;
+    }
+    let file = dbfile;
+    let rdbPath = path.join(dir, file);
+    let rdbFileBuffer = fs.readFileSync(rdbPath);
+    keyBufferArray = [];
+    valueBufferArray = [];
+    let key = ""
+    let val = ""
+
+    for (let i = 0; i < 90; i++){
+        byte =  rdbFileBuffer[i];
+        if (byte == "251"){ // FB hashtable size information
+            let start = i;
+            let go = start + 4;
+            console.log(rdbFileBuffer[go]);
+            let keyLength = parseInt(rdbFileBuffer[go].toString(10), 10);
+            for (let i = go + 1; i < go + keyLength + 1; i++){
+                keyBufferArray.push(rdbFileBuffer[i]);
+            }
+            let valueLength = go + keyLength + 1;
+            for (let i = valueLength + 1; i < valueLength + valueLength + 1; i++){
+                valueBufferArray.push(rdbFileBuffer[i]);
+            }
+            
+            let keyBuf = Buffer.from(keyBufferArray);
+            key = keyBuf.toString('ascii');
+            let valBuf = Buffer.from(valueBufferArray);
+            val = valBuf.toString('ascii');
+            dictionary[key] = val;
+            break;
+        }
+
+    }
+    return [key, val];
+}
 console.log("Logs from your program will appear here!");
 const replicas = [];
 let propagatedCommands = 0;
@@ -118,26 +156,8 @@ const server = net.createServer((connection) => {
     console.log("Commands", commands);
     if (commands.includes("KEYS")){
         try {
-        let file = config["dbfilename"];
-        let rdbPath = path.join(config["dir"], file);
-        let rdbFileBuffer = fs.readFileSync(rdbPath);
-        let key = ""
-        keyBufferArray = [];
-        for (let i = 0; i < 90; i++){
-            byte =  rdbFileBuffer[i];
-            if (byte == "251"){ // FB hashtable size information
-                let start = i;
-                let go = start + 4;
-                console.log(rdbFileBuffer[go]);
-                let length = parseInt(rdbFileBuffer[go].toString(10), 10);
-                for (let i = go + 1; i < go + length + 1; i++){
-                    keyBufferArray.push(rdbFileBuffer[i]);
-                }
-                let buf = Buffer.from(keyBufferArray);
-                key = buf.toString('ascii');
-                connection.write("*1\r\n" + getBulkString(key));
-            }
-        }
+        key = readRDBFile(config["dir"], config["dbfilename"])[0];
+        connection.write("*1\r\n" + getBulkString(key));
     } catch (error){
         console.error(error.message);
     }
@@ -165,7 +185,6 @@ const server = net.createServer((connection) => {
     } else if (commands.includes("SET")) {
         let index = commands.indexOf("SET");
         console.log("This is the index of SET", index);
-        console.log("This is is in the commands list after index", commands[index], commands[index +1], commands[index + 2], commands[index + 3], commands[index + 4]);
         dictionary[commands[index + 2]] = commands[index + 4];
         console.log(dictionary);
         if (commands.includes("px")) {
@@ -181,6 +200,7 @@ const server = net.createServer((connection) => {
         }
     } else if (commands.includes("GET")) {
         let index = commands.indexOf("GET");
+        readRDBFile(config["dir"], config["dbfilename"]);
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
             connection.write(getBulkString(null));
         } else if (commands[index + 2] in replicaDict) {
