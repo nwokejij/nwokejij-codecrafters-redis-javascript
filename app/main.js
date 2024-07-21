@@ -127,28 +127,21 @@ const server = net.createServer((connection) => {
         let file = config["dbfilename"];
         let rdbPath = path.join(config["dir"], file);
         let rdbFileBuffer = fs.readFileSync(rdbPath);
-        // console.log("Buffer Read", rdbFileBuffer);
-        const readStream = fs.createReadStream(rdbPath, { encoding: 'utf-8'});
-        readStream.on('data', (chunk) => {
-            console.log('Received chunk of data:', chunk);
-        });
-        // for (let i = 0; i < 50; i++){
-        //     if (i == go && length > 0){
+        console.log("Buffer Read", rdbFileBuffer);
+        for (let i = 0; i < 90; i++){
+            if (i == go && length > 0){
 
-        //     }
+            }
                 
-        //     byte =  rdbFileBuffer[i];
-        //     if (byte == "251"){
-        //         let start = i;
-        //         let go = start + 4;
-        //         let length = parseInt(rdbFileBuffer[go].toString('utf-8'), 10);
-        //         console.log(length);
+            byte =  rdbFileBuffer[i];
+            if (byte == "251"){
+                let start = i;
+                let go = start + 4;
+                let length = parseInt(rdbFileBuffer[go].toString('utf-8'), 10);
+                console.log(length);
 
-        //     }
-        //     console.log("Buffer char", byte);
-        //     buff = Buffer.from([byte]);
-        //     console.log("Buffer String", buff);
-        // }
+            }
+        }
     } catch (error){
         console.error(error.message);
     }
