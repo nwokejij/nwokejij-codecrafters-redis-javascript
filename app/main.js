@@ -105,6 +105,7 @@ if (isSlave != -1) {
 } else {
     masterPort = PORT;
 }
+let listOfRBKeys = [];
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 function readRDBFile(dir, dbfile){
     if (!dir || !dbfile){
@@ -117,7 +118,6 @@ function readRDBFile(dir, dbfile){
     valueBufferArray = [];
     let key = ""
     let val = ""
-    let listOfKeys = [];
     for (let i = 0; i < 90; i++){
         byte =  rdbFileBuffer[i];
         if (byte == "251"){ // FB hashtable size information
@@ -138,19 +138,19 @@ function readRDBFile(dir, dbfile){
                 
                 let keyBuf = Buffer.from(keyBufferArray);
                 key = keyBuf.toString('ascii');
-                listOfKeys.push(key);
+                listOfRBKeys.push(key);
                 keyBufferArray = []; // reset the key Buffer Array for the next key
                 let valBuf = Buffer.from(valueBufferArray);
                 val = valBuf.toString('ascii');
                 dictionary[key] = val;
-                valBufferArray = [] // reset the value Buffer Array for the next value
+                valueBufferArray = []; // reset the value Buffer Array for the next value
                 console.log("Key", key);
                 console.log("Value", val);
                 go = valStart + valueLength + 1;
                 noOfPairs -= 1
             }
             console.log("Here is the list of keys\n")
-            for (let key of listOfKeys){
+            for (let key of listOfRBKeys){
                 console.log(key + "\n");
             }
             break;
@@ -174,8 +174,7 @@ const server = net.createServer((connection) => {
     if (commands.includes("KEYS")){
         try {
         readRDBFile(config["dir"], config["dbfilename"]);
-        key = dbKeyVal[0];
-        connection.write("*1\r\n" + getBulkString(key));
+        connection.write(getBulkArray(listOfRBKeys));
     } catch (error){
         console.error(error.message);
     }
@@ -283,6 +282,17 @@ function getBulkString(string){
         return "$-1\r\n"
     }
     return `\$${string.length}\r\n${string}\r\n`
+}
+
+function getBulkArray(array){
+    if (array == null){
+        return "$-1\r\n"
+    }
+    let bulkResponse = `${array.length}\r\n`
+    for (let element of array){
+        bulkResponse += getBulkString(element);
+    }
+    return bulkResponse
 }
 
 const waitCommand = (howMany, time, connection) => {
