@@ -138,7 +138,7 @@ function readRDBFile(dir, dbfile){
                 
                 let keyBuf = Buffer.from(keyBufferArray);
                 key = keyBuf.toString('ascii');
-                listOfKeys.append(key);
+                listOfKeys.push(key);
                 keyBufferArray = []; // reset the key Buffer Array for the next key
                 let valBuf = Buffer.from(valueBufferArray);
                 val = valBuf.toString('ascii');
