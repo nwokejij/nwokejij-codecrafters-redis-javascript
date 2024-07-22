@@ -146,7 +146,7 @@ function readRDBFile(dir, dbfile){
                 valBufferArray = [] // reset the value Buffer Array for the next value
                 console.log("Key", key);
                 console.log("Value", val);
-                let go = valStart + valueLength + 1;
+                go = valStart + valueLength + 1;
                 noOfPairs -= 1
             }
             console.log("Here is the list of keys\n")
