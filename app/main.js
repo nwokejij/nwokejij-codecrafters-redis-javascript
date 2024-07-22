@@ -129,23 +129,23 @@ function readRDBFile(dir, dbfile){
                     keyBufferArray.push(rdbFileBuffer[i]); // push each Key character Buffer to keyBufferArray
                 }
                 let valueLength = parseInt(rdbFileBuffer[go + keyLength + 1].toString(10), 10);
-                valStart = go + keyLength + 2;
                 console.log("ValueLength", valueLength);
+                valStart = go + keyLength + 2;
+                
                 for (let i = valStart; i < valStart + valueLength; i++){
                     valueBufferArray.push(rdbFileBuffer[i]);
                 }
                 
-                let keyBuf = Buffer.from(keyBufferArray);
-                key = keyBuf.toString('ascii'); // from Character Buffers to String
+                 
+                key = Buffer.from(keyBufferArray).toString('ascii'); // from Character Buffers to String
                 listOfRBKeys.push(key); // push key to list of all RB file keys
                 keyBufferArray = []; // reset the key Buffer Array for the next key
-                let valBuf = Buffer.from(valueBufferArray); // from Character Buffers to String
-                val = valBuf.toString('ascii');
-                dictionary[key] = val;
+                val = Buffer.from(valueBufferArray).toString('ascii'); // from Character Buffers to String
                 valueBufferArray = []; // reset the value Buffer Array for the next value
-                console.log("Key", key);
-                console.log("Value", val);
-                go = valStart + valueLength + 1; // reset go to next index of string encoding
+                dictionary[key] = val;
+                console.log("Key\n", key);
+                console.log("Value\n", val);
+                go = valStart + valueLength; // reset go to next index of string encoding
                 if (rdbFileBuffer[go] == "252" || rdbFileBuffer[go] == "253"){ // key has an expiry
                     expiryBuffer = []
                     let milliSeconds = false;
@@ -162,6 +162,7 @@ function readRDBFile(dir, dbfile){
                         
                     }
                     expiry = parseInt(expiryBuffer.reverse().join(""), 10);
+                    console.log("Expiry", expiry);
                     if (milliSeconds){
                         setTimeout(() => {
                             delete dictionary[key]
@@ -173,8 +174,8 @@ function readRDBFile(dir, dbfile){
                         }, 1000 * (expiry - Date.now()))
                         go += 6
                     }
-
-
+                } else{
+                    go += 1
                 }
                 noOfPairs -= 1
             }
