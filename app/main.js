@@ -122,7 +122,7 @@ function readRDBFile(dir, dbfile){
         byte =  rdbFileBuffer[i];
         if (byte == "251"){ // FB hashtable size information
             let start = i;
-            let noOfPairs = parseInt(rdbFileBuffer[start + 1].toString(10), 10) + 1;
+            let noOfPairs = parseInt(rdbFileBuffer[start + 1].toString(10), 10);
             console.log("Number of Key-Value Pairs", noOfPairs);
             let go = start + 4; // position of the size length of first key
             while (noOfPairs > 0){
