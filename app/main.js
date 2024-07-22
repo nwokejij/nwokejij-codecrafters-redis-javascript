@@ -146,6 +146,36 @@ function readRDBFile(dir, dbfile){
                 console.log("Key", key);
                 console.log("Value", val);
                 go = valStart + valueLength + 1; // reset go to next index of string encoding
+                if (rdbFileBuffer[go] == "252" || rdbFileBuffer[go] == "253"){ // key has an expiry
+                    expiryBuffer = []
+                    let milliSeconds = false;
+                    if (rdbFileBuffer[go] == "252"){ // FC
+                        milliSeconds = true;
+                        for (let i = go + 1; i < go + 9; i += 1){
+                            expiryBuffer.push(rdbFileBuffer[i])
+                        }
+                        
+                    } else{ // FD
+                        for (let i = go + 1; i < go + 5; i += 1){
+                            expiryBuffer.push(rdbFileBuffer[i])
+                        }
+                        
+                    }
+                    expiry = parseInt(expiryBuffer.reverse().join(""), 10);
+                    if (milliSeconds){
+                        setTimeout(() => {
+                            delete dictionary[key]
+                        }, expiry - Date.now())
+                        go += 10
+                    } else{
+                        setTimeout(() => {
+                            delete dictionary[key]
+                        }, 1000 * (expiry - Date.now()))
+                        go += 6
+                    }
+
+
+                }
                 noOfPairs -= 1
             }
             console.log("Here is the list of keys\n")
