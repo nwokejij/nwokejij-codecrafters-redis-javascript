@@ -85,6 +85,8 @@ const isSlave = process.argv.indexOf("--replicaof");
 const dir = process.argv.indexOf("--dir");
 const dbfilename = process.argv.indexOf("--dbfilename");
 const config = {}
+let dbKeys;
+let dbKeyVal;
 
 if (dir != -1){
     config["dir"] = process.argv[dir + 1];
@@ -115,35 +117,47 @@ function readRDBFile(dir, dbfile){
     valueBufferArray = [];
     let key = ""
     let val = ""
-
+    let listOfKeys = [];
     for (let i = 0; i < 90; i++){
         byte =  rdbFileBuffer[i];
         if (byte == "251"){ // FB hashtable size information
             let start = i;
-            let go = start + 4;
-            let keyLength = parseInt(rdbFileBuffer[go].toString(10), 10);
-            for (let i = go + 1; i < go + keyLength + 1; i++){
-                keyBufferArray.push(rdbFileBuffer[i]);
+            let noOfPairs = parseInt(rdbFileBuffer[start + 1].toString(10), 10) + 1;
+            let go = start + 4; // position of the size length of first key
+            while (noOfPairs > 0){
+                let keyLength = parseInt(rdbFileBuffer[go].toString(10), 10);
+                for (let i = go + 1; i < go + keyLength + 1; i++){
+                    keyBufferArray.push(rdbFileBuffer[i]);
+                }
+                let valueLength = parseInt(rdbFileBuffer[go + keyLength + 1].toString(10), 10);
+                valStart = go + keyLength + 2;
+                console.log("ValueLength", valueLength);
+                for (let i = valStart; i < valStart + valueLength; i++){
+                    valueBufferArray.push(rdbFileBuffer[i]);
+                }
+                
+                let keyBuf = Buffer.from(keyBufferArray);
+                key = keyBuf.toString('ascii');
+                listOfKeys.append(key);
+                keyBufferArray = []; // reset the key Buffer Array for the next key
+                let valBuf = Buffer.from(valueBufferArray);
+                val = valBuf.toString('ascii');
+                dictionary[key] = val;
+                valBufferArray = [] // reset the value Buffer Array for the next value
+                console.log("Key", key);
+                console.log("Value", val);
+                let go = valStart + valueLength + 1;
+                noOfPairs -= 1
             }
-            let valueLength = parseInt(rdbFileBuffer[go + keyLength + 1].toString(10), 10);
-            valStart = go + keyLength + 2;
-            console.log("ValueLength", valueLength);
-            for (let i = valStart; i < valStart + valueLength; i++){
-                valueBufferArray.push(rdbFileBuffer[i]);
+            console.log("Here is the list of keys\n")
+            for (let key of listOfKeys){
+                console.log(key + "\n");
             }
-            
-            let keyBuf = Buffer.from(keyBufferArray);
-            key = keyBuf.toString('ascii');
-            let valBuf = Buffer.from(valueBufferArray);
-            val = valBuf.toString('ascii');
-            dictionary[key] = val;
-            console.log("Key", key);
-            console.log("Value", val);
             break;
         }
 
     }
-    return [key, val];
+    dbKeyVal = [key, val];
 }
 console.log("Logs from your program will appear here!");
 const replicas = [];
@@ -159,7 +173,8 @@ const server = net.createServer((connection) => {
     console.log("Commands", commands);
     if (commands.includes("KEYS")){
         try {
-        key = readRDBFile(config["dir"], config["dbfilename"])[0];
+        readRDBFile(config["dir"], config["dbfilename"]);
+        key = dbKeyVal[0];
         connection.write("*1\r\n" + getBulkString(key));
     } catch (error){
         console.error(error.message);
