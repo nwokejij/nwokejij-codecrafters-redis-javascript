@@ -120,10 +120,10 @@ function readRDBFile(dir, dbfile){
         byte =  rdbFileBuffer[i];
         if (byte == "251"){ // ASCII for FB: hashtable size information
             let start = i;
-            console.log("Next Buffer", rdbBuffer[start + 1])
-            console.log("\nNumber of Hashes", rdbBuffer[start + 2])
-            console.log("\nNext Buffer", rdbBuffer[start + 3])
-            console.log("\nNext Buffer", rdbBuffer[start + 4])
+            console.log("Next Buffer", rdbFileBuffer[start + 1])
+            console.log("\nNumber of Hashes", rdbFileBuffer[start + 2])
+            console.log("\nNext Buffer", rdbFileBuffer[start + 3])
+            console.log("\nNext Buffer", rdbFileBuffer[start + 4])
             let noOfPairs = parseInt(rdbFileBuffer[start + 1].toString(10), 10); // number of key-value pairs
             console.log("Number of Key-Value Pairs", noOfPairs);
             let go = start + 4; // position of the size length for each key
