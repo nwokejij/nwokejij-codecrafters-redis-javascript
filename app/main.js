@@ -289,7 +289,7 @@ function getBulkArray(array){
     if (array == null){
         return "$-1\r\n"
     }
-    let bulkResponse = `${array.length}\r\n`
+    let bulkResponse = `*${array.length}\r\n`
     for (let element of array){
         bulkResponse += getBulkString(element);
     }
