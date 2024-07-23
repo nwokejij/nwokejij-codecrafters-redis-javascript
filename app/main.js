@@ -116,11 +116,15 @@ function readRDBFile(dir, dbfile){
     valueBufferArray = []; // stores each Buffer/character of value string
     let key = ""
     let val = ""
+    let bufferArray = [];
     for (let i = 0; i < 90; i++){
         byte =  rdbFileBuffer[i];
+        bufferArray.push(byte)
         console.log("Byte", byte, "\n");
         if (byte == "251"){ // ASCII for FB: hashtable size information
             let start = i;
+            buffer = Buffer.from(bufferArray).toString('ascii');
+            console.log("What we had so far", buffer);
             console.log("Next Buffer", rdbFileBuffer[start + 1])
             console.log("\nNumber of Hashes", rdbFileBuffer[start + 2])
             console.log("\nNext Buffer", rdbFileBuffer[start + 3])
