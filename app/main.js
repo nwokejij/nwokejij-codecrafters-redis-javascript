@@ -123,8 +123,14 @@ function readRDBFile(dir, dbfile){
         // console.log("Byte", byte, "\n");
         if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
             let start = i;
-            for (let j = start; j < rdbFileBuffer.length; j++){
+            for (let j = start + 1; j < rdbFileBuffer.length; j++){
                 console.log("Byte after FB", rdbFileBuffer[j]);
+                bufferArray.push(rdbFileBuffer[j]);
+                if (rdbFileBuffer[j] == "255"){
+                    buffer = Buffer.from(bufferArray).toString('ascii')
+                    console.log("Buffer message", buffer);
+                    break;
+                }
             }
             // buffer = Buffer.from(bufferArray).toString('ascii');
             // console.log("What we had so far", buffer);
