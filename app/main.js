@@ -121,7 +121,7 @@ function readRDBFile(dir, dbfile){
         // byte =  rdbFileBuffer[i];
         // bufferArray.push(byte)
         // console.log("Byte", byte, "\n");
-        if (byte == "251"){ // ASCII for FB: hashtable size information
+        if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
             let start = i;
             for (let j = start; j < rdbFileBuffer.length; j++){
                 console.log("Byte after FB", rdbFileBuffer[j]);
