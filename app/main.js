@@ -188,6 +188,7 @@ function readRDBFile(dir, dbfile){
                             }, 1000 * (expiry - Date.now()))
                         }
                 }
+                noOfPairs -= 1;
 
             }
             break;
