@@ -106,7 +106,7 @@ if (isSlave != -1) {
 }
 let listOfRBKeys = [];
 let isRead = false;
-const CURRENT_YEAR = Math.round(Date.now() / 1000*60*60*24*365);
+const CURRENT_YEAR = 2024;
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 function readRDBFile(dir, dbfile){
     if (!dir || !dbfile || isRead){
