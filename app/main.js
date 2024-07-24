@@ -120,6 +120,7 @@ function readRDBFile(dir, dbfile){
     let key = ""
     let val = ""
     let hasExpiry = false;
+    let year = 2024;
     let isFC = false;
     for (let i = 0; i < rdbFileBuffer.length; i++){
         if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
@@ -160,7 +161,7 @@ function readRDBFile(dir, dbfile){
                     let date = new Date(expiryInSeconds);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
-                    let year = readableDate.split(',')[0].split('/')[2]
+                    year = readableDate.split(',')[0].split('/')[2]
                     console.log("year", year);
                 }
                 currentBuffer += 1
