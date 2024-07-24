@@ -175,12 +175,14 @@ function readRDBFile(dir, dbfile){
                     if (isFC){
                             let expiration = expiry - Date.now();
                             setTimeout(() => {
+                                console.log("This has been executed")
                                 delete dictionary[key]
                             }, expiration)
                             console.log("Expiration in FC", expiration);
                         } else{
                             let expiration = expiry - Date.now();
                             setTimeout(() => {
+                                console.log("This has been executed")
                                 delete dictionary[key]
                             }, 1000 * (expiration))
                             console.log("Expiration in FD", expiration);
