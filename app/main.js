@@ -152,7 +152,7 @@ function readRDBFile(dir, dbfile){
                     let exp = expiryBuffer.reverse().join("");
                     console.log("Joined Expiry", exp);
                     expiry = parseInt(exp, 16);
-                    let date = Date(expiry);
+                    let date = new Date(expiry);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
                 }
