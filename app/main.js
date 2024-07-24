@@ -104,9 +104,10 @@ if (isSlave != -1) {
     masterPort = PORT;
 }
 let listOfRBKeys = [];
+let isRead = false;
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 function readRDBFile(dir, dbfile){
-    if (!dir || !dbfile){
+    if (!dir || !dbfile || isRead){
         return;
     }
     let file = dbfile;
@@ -116,11 +117,7 @@ function readRDBFile(dir, dbfile){
     valueBufferArray = []; // stores each Buffer/character of value string
     let key = ""
     let val = ""
-    let bufferArray = [];
     for (let i = 0; i < rdbFileBuffer.length; i++){
-        byte =  rdbFileBuffer[i];
-        bufferArray.push(byte)
-        console.log("Byte", byte, "\n");
         if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
             let start = i;
             let noOfPairs = parseInt(rdbFileBuffer[start+ 1].toString(10), 10);
@@ -155,14 +152,11 @@ function readRDBFile(dir, dbfile){
                 }
                 currentBuffer += 1
                 let keyLength = parseInt(rdbFileBuffer[currentBuffer].toString(10), 10); // length of key string
-                console.log("KeyLength", keyLength)
                 for (let i = currentBuffer + 1; i < currentBuffer + keyLength + 1; i++){
                     keyBufferArray.push(rdbFileBuffer[i]); // push each Key character Buffer to keyBufferArray
                 }
                 currentBuffer += keyLength + 1;
-                console.log("keyBufferArray", keyBufferArray);
                 let valueLength = parseInt(rdbFileBuffer[currentBuffer].toString(10), 10);
-                console.log("ValueLength", valueLength);
                 valStart = currentBuffer + 1;
                 
                 for (let i = valStart; i < valStart + valueLength; i++){
@@ -179,13 +173,17 @@ function readRDBFile(dir, dbfile){
                 console.log("Value\n", val);
                 if (hasExpiry){
                     if (isFC){
+                            let expiration = expiry - Date.now();
                             setTimeout(() => {
                                 delete dictionary[key]
-                            }, expiry - Date.now())
+                            }, expiration)
+                            console.log("Expiration in FC", expiration);
                         } else{
+                            let expiration = expiry - Date.now();
                             setTimeout(() => {
                                 delete dictionary[key]
-                            }, 1000 * (expiry - Date.now()))
+                            }, 1000 * (expiration))
+                            console.log("Expiration in FD", expiration);
                         }
                 }
                 noOfPairs -= 1;
@@ -211,6 +209,7 @@ const server = net.createServer((connection) => {
     if (commands.includes("KEYS")){
         try {
         readRDBFile(config["dir"], config["dbfilename"]);
+        isRead = true;
         connection.write(getBulkArray(listOfRBKeys));
     } catch (error){
         console.error(error.message);
@@ -255,6 +254,7 @@ const server = net.createServer((connection) => {
     } else if (commands.includes("GET")) {
         let index = commands.indexOf("GET");
         readRDBFile(config["dir"], config["dbfilename"]);
+        isRead = true;
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
             connection.write(getBulkString(null));
         } else if (commands[index + 2] in replicaDict) {
