@@ -123,87 +123,70 @@ function readRDBFile(dir, dbfile){
         // console.log("Byte", byte, "\n");
         if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
             let start = i;
-            for (let j = start + 1; j < rdbFileBuffer.length; j++){
-                console.log("Byte after FB", rdbFileBuffer[j]);
-                bufferArray.push(rdbFileBuffer[j]);
-                if (rdbFileBuffer[j] == "255"){
-                    buffer = Buffer.from(bufferArray).toString('ascii')
-                    console.log("Buffer message", buffer);
-                    break;
+            let noOfPairs = parseInt(rdbFileBuffer[start+ 1].toString(10), 10);
+            let noOfHashes = parseInt(rdbFileBuffer[start + 2].toString(10), 10);
+            let currentBuffer = start + 2;
+            while (noOfPairs > 0){
+                let hasExpiry = false;
+                let isFC = false;
+                if (rdbFileBuffer[currentBuffer] == "252" || rdbFileBuffer[currentBuffer] == "253"){ // ASCII for FC and FD
+                    hasExpiry = true;
+                    expiryBuffer = []
+                    if (rdbFileBuffer[currentBuffer] == "252"){ // FC
+                        isFC = true;
+                        for (let i = currentBuffer + 1; i < currentBuffer + 9; i += 1){
+                            expiryBuffer.push(rdbFileBuffer[i])
+                        }
+                        currentBuffer += 9
+                        
+                    } else{ // FD
+                        for (let i = currentBuffer + 1; i < currentBuffer + 5; i += 1){
+                            expiryBuffer.push(rdbFileBuffer[i])
+                        }
+                        currentBuffer += 6
+                        
+                    }
+                    noOfHashes -= 1
+                    expiry = parseInt(expiryBuffer.reverse().join(""), 10);
+                    console.log("Expiry", expiry);
                 }
+                currentBuffer += 1
+                let keyLength = parseInt(rdbFileBuffer[currentBuffer].toString(10), 10); // length of key string
+                console.log("KeyLength", keyLength)
+                for (let i = currentBuffer + 1; i < currentBuffer + keyLength + 1; i++){
+                    keyBufferArray.push(rdbFileBuffer[i]); // push each Key character Buffer to keyBufferArray
+                }
+                currentBuffer += keyLength + 1;
+                console.log("keyBufferArray", keyBufferArray);
+                let valueLength = parseInt(rdbFileBuffer[currentBuffer].toString(10), 10);
+                console.log("ValueLength", valueLength);
+                valStart = currentBuffer + 1;
+                
+                for (let i = valStart; i < valStart + valueLength; i++){
+                    valueBufferArray.push(rdbFileBuffer[i]);
+                }
+                currentBuffer += valueLength + 1
+                key = Buffer.from(keyBufferArray).toString('ascii'); // from Character Buffers to String
+                listOfRBKeys.push(key); // push key to list of all RB file keys
+                keyBufferArray = []; // reset the key Buffer Array for the next key
+                val = Buffer.from(valueBufferArray).toString('ascii'); // from Character Buffers to String
+                valueBufferArray = []; // reset the value Buffer Array for the next value
+                dictionary[key] = val;
+                console.log("Key\n", key);
+                console.log("Value\n", val);
+                if (hasExpiry){
+                    if (isFC){
+                            setTimeout(() => {
+                                delete dictionary[key]
+                            }, expiry - Date.now())
+                        } else{
+                            setTimeout(() => {
+                                delete dictionary[key]
+                            }, 1000 * (expiry - Date.now()))
+                        }
+                }
+
             }
-            // buffer = Buffer.from(bufferArray).toString('ascii');
-            // console.log("What we had so far", buffer);
-            // console.log("Next Buffer", rdbFileBuffer[start + 1])
-            // console.log("\nNumber of Hashes", rdbFileBuffer[start + 2])
-            // console.log("\nNext Buffer", rdbFileBuffer[start + 3])
-            // console.log("\nNext Buffer", rdbFileBuffer[start + 4])
-            // let noOfPairs = parseInt(rdbFileBuffer[start + 1].toString(10), 10); // number of key-value pairs
-            // console.log("Number of Key-Value Pairs", noOfPairs);
-            // let go = start + 4; // position of the size length for each key
-            
-            // while (noOfPairs > 0){
-            //     let keyLength = parseInt(rdbFileBuffer[go].toString(10), 10); // length of key string
-            //     console.log("KeyLength", keyLength)
-            //     for (let i = go + 1; i < go + keyLength + 1; i++){
-            //         keyBufferArray.push(rdbFileBuffer[i]); // push each Key character Buffer to keyBufferArray
-            //     }
-            //     console.log("keyBufferArray", keyBufferArray);
-            //     let valueLength = parseInt(rdbFileBuffer[go + keyLength + 1].toString(10), 10);
-            //     console.log("ValueLength", valueLength);
-            //     valStart = go + keyLength + 2;
-                
-            //     for (let i = valStart; i < valStart + valueLength; i++){
-            //         valueBufferArray.push(rdbFileBuffer[i]);
-            //     }
-                
-                 
-            //     key = Buffer.from(keyBufferArray).toString('ascii'); // from Character Buffers to String
-            //     listOfRBKeys.push(key); // push key to list of all RB file keys
-            //     keyBufferArray = []; // reset the key Buffer Array for the next key
-            //     val = Buffer.from(valueBufferArray).toString('ascii'); // from Character Buffers to String
-            //     valueBufferArray = []; // reset the value Buffer Array for the next value
-            //     dictionary[key] = val;
-            //     console.log("Key\n", key);
-            //     console.log("Value\n", val);
-            //     go = valStart + valueLength; // reset go to next index of string encoding
-            //     if (rdbFileBuffer[go] == "252" || rdbFileBuffer[go] == "253"){ // key has an expiry
-            //         expiryBuffer = []
-            //         let milliSeconds = false;
-            //         if (rdbFileBuffer[go] == "252"){ // FC
-            //             milliSeconds = true;
-            //             for (let i = go + 1; i < go + 9; i += 1){
-            //                 expiryBuffer.push(rdbFileBuffer[i])
-            //             }
-                        
-            //         } else{ // FD
-            //             for (let i = go + 1; i < go + 5; i += 1){
-            //                 expiryBuffer.push(rdbFileBuffer[i])
-            //             }
-                        
-            //         }
-            //         expiry = parseInt(expiryBuffer.reverse().join(""), 10);
-            //         console.log("Expiry", expiry);
-            //         if (milliSeconds){
-            //             setTimeout(() => {
-            //                 delete dictionary[key]
-            //             }, expiry - Date.now())
-            //             go += 10
-            //         } else{
-            //             setTimeout(() => {
-            //                 delete dictionary[key]
-            //             }, 1000 * (expiry - Date.now()))
-            //             go += 6
-            //         }
-            //     } else{
-            //         go += 1
-            //     }
-            //     noOfPairs -= 1
-            // }
-            // console.log("Here is the list of keys\n")
-            // for (let key of listOfRBKeys){
-            //     console.log(key + "\n");
-            // }
             break;
         }
 
