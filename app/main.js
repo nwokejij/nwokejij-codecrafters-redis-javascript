@@ -106,6 +106,7 @@ if (isSlave != -1) {
 }
 let listOfRBKeys = [];
 let isRead = false;
+const CURRENT_YEAR = Math.round(Date.now() / 1000*60*60*24*365);
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 function readRDBFile(dir, dbfile){
     if (!dir || !dbfile || isRead){
@@ -153,11 +154,14 @@ function readRDBFile(dir, dbfile){
                     let exp = expiryBuffer.reverse().join("");
                     console.log("Joined Expiry", exp);
                     expiry = parseInt(exp, 16);
+                    console.log("Expiry", expiry);
                     expiryInSeconds = Math.floor(expiry / 1000);
                     console.log("Expiry In Seconds", expiryInSeconds);
                     let date = new Date(expiryInSeconds);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
+                    let year = readableDate.split(',')[0].split('/')[2]
+                    console.log("year", year);
                 }
                 currentBuffer += 1
                 let keyLength = parseInt(rdbFileBuffer[currentBuffer].toString(10), 10); // length of key string
@@ -182,18 +186,19 @@ function readRDBFile(dir, dbfile){
                 console.log("Value\n", val);
                 if (hasExpiry){
                     if (isFC){
-                        console.log("Current Epoch Time", Math.floor(Date.now() / 1000))
+                        
+                        console.log("Current Year", CURRENT_YEAR)
                             setTimeout(() => {
                                 console.log(`${key}`, "has been executed")
                                 delete dictionary[key]
                                 console.log("Should be null", dictionary[key])
-                            }, expiryInSeconds - Math.floor(Date.now() / 1000))
+                            }, year - CURRENT_YEAR)
                         } else{
                             setTimeout(() => {
                                 console.log(`${key}`, "has been executed")
                                 delete dictionary[key]
                                 console.log("Should be null", dictionary[key])
-                            }, 1000 * (expiryInSeconds - Math.floor(Date.now() / 1000)));
+                            }, year - CURRENT_YEAR);
                             
                         }
                 }
