@@ -135,12 +135,14 @@ function readRDBFile(dir, dbfile){
                     if (rdbFileBuffer[currentBuffer] == "252"){ // FC
                         isFC = true;
                         for (let i = currentBuffer + 1; i < currentBuffer + 9; i += 1){
+                            console.log("Current Byte", rdbFileBuffer[i]);
                             expiryBuffer.push(rdbFileBuffer[i])
                         }
                         currentBuffer += 9
                         
                     } else{ // FD
                         for (let i = currentBuffer + 1; i < currentBuffer + 5; i += 1){
+                            console.log("Current Byte", rdbFileBuffer[i]);
                             expiryBuffer.push(rdbFileBuffer[i])
                         }
                         currentBuffer += 6
@@ -173,15 +175,16 @@ function readRDBFile(dir, dbfile){
                 console.log("Value\n", val);
                 if (hasExpiry){
                     if (isFC){
+                        console.log("Current Epoch Time", Date.now())
                             setTimeout(() => {
                                 console.log("This has been executed")
                                 delete dictionary[key]
-                            }, expiry)
+                            }, expiry - Date.now())
                         } else{
                             setTimeout(() => {
                                 console.log("This has been executed")
                                 delete dictionary[key]
-                            }, 1000 * (expiry))
+                            }, 1000 * (expiry- Date.now()));
                             
                         }
                 }
