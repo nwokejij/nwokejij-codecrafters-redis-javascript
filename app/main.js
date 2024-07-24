@@ -2,7 +2,7 @@ const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
-const moment = require('moment');
+const moment = require('../node_modules/moment/moment');
 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
