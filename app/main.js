@@ -153,7 +153,7 @@ function readRDBFile(dir, dbfile){
                     noOfHashes -= 1
                     let exp = expiryBuffer.reverse().join("");
                     console.log("Joined Expiry", exp);
-                    expiry = parseInt(exp, 10);
+                    expiry = parseInt(exp, 16);
 
                     console.log("Expiry", expiry);
                 }
