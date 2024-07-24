@@ -182,18 +182,18 @@ function readRDBFile(dir, dbfile){
                 console.log("Value\n", val);
                 if (hasExpiry){
                     if (isFC){
-                        console.log("Current Epoch Time", Math.floor(Date.now()))
+                        console.log("Current Epoch Time", Math.floor(Date.now() / 1000))
                             setTimeout(() => {
                                 console.log(`${key}`, "has been executed")
                                 delete dictionary[key]
                                 console.log("Should be null", dictionary[key])
-                            }, expiry - Math.floor(Date.now()))
+                            }, expiry - Math.floor(Date.now() / 1000))
                         } else{
                             setTimeout(() => {
                                 console.log(`${key}`, "has been executed")
                                 delete dictionary[key]
                                 console.log("Should be null", dictionary[key])
-                            }, 1000 * (expiry- Math.floor(Date.now())));
+                            }, 1000 * (expiry- Math.floor(Date.now() / 1000)));
                             
                         }
                 }
