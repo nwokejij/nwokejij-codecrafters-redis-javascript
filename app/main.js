@@ -2,7 +2,7 @@ const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
-const moment = require('../node_modules/moment/moment');
+
 
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
@@ -155,7 +155,8 @@ function readRDBFile(dir, dbfile){
                     expiry = parseInt(exp, 16);
                     console.log("Expiry", expiry);
                     expiryInSeconds = Math.floor(expiry / 1000);
-                    let readableDate = moment.unix(expiryInSeconds).format('L')
+                    let date = new Date(expiry);
+                    let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
                 }
                 currentBuffer += 1
