@@ -117,6 +117,8 @@ function readRDBFile(dir, dbfile){
     valueBufferArray = []; // stores each Buffer/character of value string
     let key = ""
     let val = ""
+    let hasExpiry = false;
+    let isFC = false;
     for (let i = 0; i < rdbFileBuffer.length; i++){
         if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
             let start = i;
@@ -126,8 +128,8 @@ function readRDBFile(dir, dbfile){
             console.log("noOfHashes", noOfHashes);
             let currentBuffer = start + 3;
             while (noOfPairs > 0){
-                let hasExpiry = false;
-                let isFC = false;
+                hasExpiry = false;
+                isFC = false;
                 console.log("First Buffer", rdbFileBuffer[currentBuffer])
                 if (rdbFileBuffer[currentBuffer] == "252" || rdbFileBuffer[currentBuffer] == "253"){ // ASCII for FC and FD
                     hasExpiry = true;
