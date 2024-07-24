@@ -118,17 +118,20 @@ function readRDBFile(dir, dbfile){
     let val = ""
     let bufferArray = [];
     for (let i = 0; i < rdbFileBuffer.length; i++){
-        // byte =  rdbFileBuffer[i];
-        // bufferArray.push(byte)
-        // console.log("Byte", byte, "\n");
+        byte =  rdbFileBuffer[i];
+        bufferArray.push(byte)
+        console.log("Byte", byte, "\n");
         if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
             let start = i;
             let noOfPairs = parseInt(rdbFileBuffer[start+ 1].toString(10), 10);
+            console.log("noOfPairs", noOfPairs);
             let noOfHashes = parseInt(rdbFileBuffer[start + 2].toString(10), 10);
-            let currentBuffer = start + 2;
+            console.log("noOfHashes", noOfHashes);
+            let currentBuffer = start + 3;
             while (noOfPairs > 0){
                 let hasExpiry = false;
                 let isFC = false;
+                console.log("First Buffer", rdbFileBuffer[currentBuffer])
                 if (rdbFileBuffer[currentBuffer] == "252" || rdbFileBuffer[currentBuffer] == "253"){ // ASCII for FC and FD
                     hasExpiry = true;
                     expiryBuffer = []
@@ -371,7 +374,6 @@ function parseRedisResponseFromMaster(data, replicaDict){
     }
 }
 
-// Read and output the key-value from the RDB file
 
 server.listen(PORT, "127.0.0.1");
 
