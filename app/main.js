@@ -137,16 +137,12 @@ function readRDBFile(dir, dbfile){
                     if (rdbFileBuffer[currentBuffer] == "252"){ // FC
                         isFC = true;
                         for (let i = currentBuffer + 1; i < currentBuffer + 9; i += 1){
-                            console.log("Current Byte", rdbFileBuffer[i]);
-                            console.log("Current Byte in Hex", rdbFileBuffer[i].toString(16));
                             expiryBuffer.push(rdbFileBuffer[i].toString(16))
                         }
                         currentBuffer += 9
                         
                     } else{ // FD
                         for (let i = currentBuffer + 1; i < currentBuffer + 5; i += 1){
-                            console.log("Current Byte", rdbFileBuffer[i]);
-                            console.log("Current Byte in Hex", rdbFileBuffer[i].toString(16));
                             expiryBuffer.push(rdbFileBuffer[i].toString(16))
                         }
                         currentBuffer += 6
@@ -156,8 +152,9 @@ function readRDBFile(dir, dbfile){
                     let exp = expiryBuffer.reverse().join("");
                     console.log("Joined Expiry", exp);
                     expiry = parseInt(exp, 16);
-
-                    console.log("Expiry", expiry);
+                    let date = Date(expiry);
+                    let readableDate = date.toLocaleString();
+                    console.log("readableDate", readableDate);
                 }
                 currentBuffer += 1
                 let keyLength = parseInt(rdbFileBuffer[currentBuffer].toString(10), 10); // length of key string
