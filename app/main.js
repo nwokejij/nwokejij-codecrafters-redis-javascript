@@ -173,19 +173,16 @@ function readRDBFile(dir, dbfile){
                 console.log("Value\n", val);
                 if (hasExpiry){
                     if (isFC){
-                            let expiration = expiry - Date.now();
                             setTimeout(() => {
                                 console.log("This has been executed")
                                 delete dictionary[key]
-                            }, expiration)
-                            console.log("Expiration in FC", expiration);
+                            }, expiry)
                         } else{
-                            let expiration = expiry - Date.now();
                             setTimeout(() => {
                                 console.log("This has been executed")
                                 delete dictionary[key]
-                            }, 1000 * (expiration))
-                            console.log("Expiration in FD", expiration);
+                            }, 1000 * (expiry))
+                            
                         }
                 }
                 noOfPairs -= 1;
