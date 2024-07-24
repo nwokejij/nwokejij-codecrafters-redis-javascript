@@ -155,7 +155,7 @@ function readRDBFile(dir, dbfile){
                     expiry = parseInt(exp, 16);
                     console.log("Expiry", expiry);
                     expiryInSeconds = Math.floor(expiry / 1000);
-                    let date = new Date(expiry);
+                    let date = new Date(expiryInSeconds);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
                 }
