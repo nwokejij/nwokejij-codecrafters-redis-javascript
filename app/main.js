@@ -153,8 +153,8 @@ function readRDBFile(dir, dbfile){
                     let exp = expiryBuffer.reverse().join("");
                     console.log("Joined Expiry", exp);
                     expiry = parseInt(exp, 16);
-                    console.log("Expiry", expiry);
                     expiryInSeconds = Math.floor(expiry / 1000);
+                    console.log("Expiry In Seconds", expiryInSeconds);
                     let date = new Date(expiryInSeconds);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
@@ -187,13 +187,13 @@ function readRDBFile(dir, dbfile){
                                 console.log(`${key}`, "has been executed")
                                 delete dictionary[key]
                                 console.log("Should be null", dictionary[key])
-                            }, expiry - Math.floor(Date.now() / 1000))
+                            }, expiryInSeconds - Math.floor(Date.now() / 1000))
                         } else{
                             setTimeout(() => {
                                 console.log(`${key}`, "has been executed")
                                 delete dictionary[key]
                                 console.log("Should be null", dictionary[key])
-                            }, 1000 * (expiry- Math.floor(Date.now() / 1000)));
+                            }, 1000 * (expiryInSeconds - Math.floor(Date.now() / 1000)));
                             
                         }
                 }
