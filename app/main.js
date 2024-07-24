@@ -136,20 +136,22 @@ function readRDBFile(dir, dbfile){
                         isFC = true;
                         for (let i = currentBuffer + 1; i < currentBuffer + 9; i += 1){
                             console.log("Current Byte", rdbFileBuffer[i]);
-                            expiryBuffer.push(rdbFileBuffer[i])
+                            console.log("Current Byte in Hex", rdbFileBuffer[i].toString(16));
+                            expiryBuffer.push(rdbFileBuffer[i].toString(16))
                         }
                         currentBuffer += 9
                         
                     } else{ // FD
                         for (let i = currentBuffer + 1; i < currentBuffer + 5; i += 1){
                             console.log("Current Byte", rdbFileBuffer[i]);
-                            expiryBuffer.push(rdbFileBuffer[i])
+                            console.log("Current Byte in Hex", rdbFileBuffer[i].toString(16));
+                            expiryBuffer.push(rdbFileBuffer[i].toString(16))
                         }
                         currentBuffer += 6
                         
                     }
                     noOfHashes -= 1
-                    let exp = expiryBuffer.reverse().join("")
+                    let exp = expiryBuffer.reverse().join("");
                     console.log("Joined Expiry", exp);
                     expiry = parseInt(exp, 10);
 
