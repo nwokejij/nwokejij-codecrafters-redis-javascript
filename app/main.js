@@ -149,7 +149,9 @@ function readRDBFile(dir, dbfile){
                         
                     }
                     noOfHashes -= 1
+                    console.log("Reverse Expiry", expiryBuffer.reverse());
                     expiry = parseInt(expiryBuffer.reverse().join(""), 10);
+
                     console.log("Expiry", expiry);
                 }
                 currentBuffer += 1
