@@ -107,6 +107,9 @@ if (isSlave != -1) {
 let listOfRBKeys = [];
 let isRead = false;
 const CURRENT_YEAR = 2024;
+const FC = "252";
+const FB = "251";
+const FD = "253";
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 function readRDBFile(dir, dbfile){
     if (!dir || !dbfile || isRead){
@@ -123,32 +126,32 @@ function readRDBFile(dir, dbfile){
     let year = 2024;
     let isFC = false;
     for (let i = 0; i < rdbFileBuffer.length; i++){
-        if (rdbFileBuffer[i]== "251"){ // ASCII for FB: hashtable size information
+        if (rdbFileBuffer[i]== FB){ // ASCII for FB: hashtable size information
             let start = i;
             let noOfPairs = parseInt(rdbFileBuffer[start+ 1].toString(10), 10);
             console.log("noOfPairs", noOfPairs);
             let noOfHashes = parseInt(rdbFileBuffer[start + 2].toString(10), 10);
             console.log("noOfHashes", noOfHashes);
-            let currentBuffer = start + 3;
+            let currentBuffer = start + 3; // moving on to the Expiry  and Key-Value Section
             while (noOfPairs > 0){
                 hasExpiry = false;
                 isFC = false;
                 console.log("First Buffer", rdbFileBuffer[currentBuffer])
-                if (rdbFileBuffer[currentBuffer] == "252" || rdbFileBuffer[currentBuffer] == "253"){ // ASCII for FC and FD
+                if (rdbFileBuffer[currentBuffer] == FC || rdbFileBuffer[currentBuffer] == FD){ // ASCII for FC and FD
                     hasExpiry = true;
                     expiryBuffer = []
-                    if (rdbFileBuffer[currentBuffer] == "252"){ // FC
+                    if (rdbFileBuffer[currentBuffer] == FC){ // FC
                         isFC = true;
                         for (let i = currentBuffer + 1; i < currentBuffer + 9; i += 1){
                             console.log("Orig Buffer", rdbFileBuffer[i]);
                             hexBuffer = rdbFileBuffer[i].toString(16);
                             hexBufferLength = hexBuffer.length;
                             if (hexBufferLength < 2){
-                                hexBuffer = "0" + hexBuffer;
+                                hexBuffer = "0" + hexBuffer; // need to pad with 0 for single digit numbers for accurate epoch conversion
                             }
                             expiryBuffer.push(hexBuffer)
                         }
-                        currentBuffer += 9
+                        currentBuffer += 9 // move to the Key-Value Section
                         
                     } else{ // FD
                         for (let i = currentBuffer + 1; i < currentBuffer + 5; i += 1){
@@ -156,23 +159,19 @@ function readRDBFile(dir, dbfile){
                             console.log("Hex Buffer", rdbFileBuffer[i].toString(16));
                             expiryBuffer.push(rdbFileBuffer[i].toString(16))
                         }
-                        currentBuffer += 6
+                        currentBuffer += 6 // moving to the Key-Value Section
                         
                     }
-                    noOfHashes -= 1
                     let exp = expiryBuffer.reverse().join("");
                     console.log("Joined Expiry", exp);
                     expiry = parseInt(exp, 16);
                     console.log("Expiry", expiry);
-                    // expiryInSeconds = Math.floor(expiry / 1000);
-                    // console.log("Expiry In Seconds", expiryInSeconds);
                     let date = new Date(expiry);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
-                    year = readableDate.split(',')[0].split('/')[2]
-                    console.log("year", year);
+                    year = readableDate.split(',')[0].split('/')[2] // extracting the year
                 }
-                currentBuffer += 1
+                currentBuffer += 1 // skipping the String Encoded Value 00
                 let keyLength = parseInt(rdbFileBuffer[currentBuffer].toString(10), 10); // length of key string
                 for (let i = currentBuffer + 1; i < currentBuffer + keyLength + 1; i++){
                     keyBufferArray.push(rdbFileBuffer[i]); // push each Key character Buffer to keyBufferArray
@@ -182,7 +181,7 @@ function readRDBFile(dir, dbfile){
                 valStart = currentBuffer + 1;
                 
                 for (let i = valStart; i < valStart + valueLength; i++){
-                    valueBufferArray.push(rdbFileBuffer[i]);
+                    valueBufferArray.push(rdbFileBuffer[i]); 
                 }
                 currentBuffer += valueLength + 1
                 key = Buffer.from(keyBufferArray).toString('ascii'); // from Character Buffers to String
