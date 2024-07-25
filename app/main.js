@@ -186,17 +186,12 @@ function readRDBFile(dir, dbfile){
                 console.log("Key\n", key);
                 console.log("Value\n", val);
                 if (hasExpiry){
-                    console.log("Key", key);
-                    console.log("Value", val);
                     if (isFC){
-                        console.log("Key in FC", key);
-                        console.log("Value in FC", val);
                         if (year > CURRENT_YEAR){
+                            console.log("Key to be deleted",  key)
                             delete dictionary[key]
                         }
-                        } else{
-                            
-                        }
+                        } 
                 }
                 noOfPairs -= 1;
 
