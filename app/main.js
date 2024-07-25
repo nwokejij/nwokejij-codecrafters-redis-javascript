@@ -156,9 +156,9 @@ function readRDBFile(dir, dbfile){
                     console.log("Joined Expiry", exp);
                     expiry = parseInt(exp, 16);
                     console.log("Expiry", expiry);
-                    expiryInSeconds = Math.floor(expiry / 1000);
-                    console.log("Expiry In Seconds", expiryInSeconds);
-                    let date = new Date(expiryInSeconds);
+                    // expiryInSeconds = Math.floor(expiry / 1000);
+                    // console.log("Expiry In Seconds", expiryInSeconds);
+                    let date = new Date(expiry);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
                     year = readableDate.split(',')[0].split('/')[2]
