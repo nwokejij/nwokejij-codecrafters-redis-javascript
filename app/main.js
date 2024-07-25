@@ -3,6 +3,7 @@ const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
 
+
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
@@ -157,8 +158,8 @@ function readRDBFile(dir, dbfile){
                     console.log("Expiry", expiry);
                     // expiryInSeconds = Math.floor(expiry / 1000);
                     // console.log("Expiry In Seconds", expiryInSeconds);
-                    let dates = new Date(expiry);
-                    let readableDate = dates.toLocaleString();
+                    let date = new Date(expiry);
+                    let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
                     year = readableDate.split(',')[0].split('/')[2]
                     console.log("year", year);
@@ -185,9 +186,19 @@ function readRDBFile(dir, dbfile){
                 console.log("Key\n", key);
                 console.log("Value\n", val);
                 if (hasExpiry){
-                    if (year < CURRENT_YEAR){
-                        delete dictionary[key]
-                    }
+                    if (isFC){
+                        
+                            setTimeout(() => {
+                                console.log(`${key}`, "has been executed")
+                                delete dictionary[key]
+                                console.log("Should be null", dictionary[key])
+                            }, year - CURRENT_YEAR)
+                        } else{
+                            setTimeout(() => {
+                                console.log(`${key}`, "has been executed")
+                                delete dictionary[key]
+                                console.log("Should be null", dictionary[key])
+                            }, year - CURRENT_YEAR);
                             
                         }
                 }
@@ -198,6 +209,7 @@ function readRDBFile(dir, dbfile){
         }
 
     }
+}
 console.log("Logs from your program will appear here!");
 const replicas = [];
 let propagatedCommands = 0;
