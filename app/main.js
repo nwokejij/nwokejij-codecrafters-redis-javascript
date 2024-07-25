@@ -191,17 +191,10 @@ function readRDBFile(dir, dbfile){
                     if (isFC){
                         console.log("Key in FC", key);
                         console.log("Value in FC", val);
-                            setTimeout(() => {
-                                console.log(`${key}`, "has been executed")
-                                delete dictionary[key]
-                                console.log("Should be null", dictionary[key])
-                            }, year - CURRENT_YEAR)
+                        if (year > CURRENT_YEAR){
+                            delete dictionary[key]
+                        }
                         } else{
-                            setTimeout(() => {
-                                console.log(`${key}`, "has been executed")
-                                delete dictionary[key]
-                                console.log("Should be null", dictionary[key])
-                            }, year - CURRENT_YEAR);
                             
                         }
                 }
