@@ -141,7 +141,7 @@ function readRDBFile(dir, dbfile){
                         isFC = true;
                         for (let i = currentBuffer + 1; i < currentBuffer + 9; i += 1){
                             console.log("Orig Buffer", rdbFileBuffer[i]);
-                            console.log("Orig Buffer Length", rdbFileBuffer[i].toPrecision(2));
+                            console.log("Orig Buffer Length", rdbFileBuffer[i].length);
                             console.log("Hex Buffer", rdbFileBuffer[i].toString(16));
                             expiryBuffer.push(rdbFileBuffer[i].toString(16))
                         }
