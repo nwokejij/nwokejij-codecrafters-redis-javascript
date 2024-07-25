@@ -2,7 +2,6 @@ const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
-const moment = require('moment');
 
 
 const handleHandshake = (port) => {
