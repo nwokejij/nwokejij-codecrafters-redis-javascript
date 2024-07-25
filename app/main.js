@@ -158,7 +158,7 @@ function readRDBFile(dir, dbfile){
                     console.log("Expiry", expiry);
                     // expiryInSeconds = Math.floor(expiry / 1000);
                     // console.log("Expiry In Seconds", expiryInSeconds);
-                    let date = new Date(expiry * 1000);
+                    let date = new Date(expiry);
                     let readableDate = date.toLocaleString();
                     console.log("readableDate", readableDate);
                     year = readableDate.split(',')[0].split('/')[2]
@@ -186,8 +186,11 @@ function readRDBFile(dir, dbfile){
                 console.log("Key\n", key);
                 console.log("Value\n", val);
                 if (hasExpiry){
+                    console.log("Key", key);
+                    console.log("Value", val);
                     if (isFC){
-                        
+                        console.log("Key in FC", key);
+                        console.log("Value in FC", val);
                             setTimeout(() => {
                                 console.log(`${key}`, "has been executed")
                                 delete dictionary[key]
