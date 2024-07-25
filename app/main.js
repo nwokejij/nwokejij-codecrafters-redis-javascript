@@ -3,7 +3,6 @@ const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
 
-console.log("Dirname", process.cwd())
 const handleHandshake = (port) => {
     const client = net.createConnection({ host: "localhost", port: port }, async () => {
       console.log("connected to master", "Port: ", port);
