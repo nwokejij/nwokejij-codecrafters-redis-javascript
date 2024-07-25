@@ -2,6 +2,7 @@ const net = require('net');
 const fs = require('fs');
 const replicaDict = {};
 const path = require('path');
+const moment = require('moment');
 
 
 const handleHandshake = (port) => {
@@ -146,6 +147,8 @@ function readRDBFile(dir, dbfile){
                         
                     } else{ // FD
                         for (let i = currentBuffer + 1; i < currentBuffer + 5; i += 1){
+                            console.log("Orig Buffer", rdbFileBuffer[i]);
+                            console.log("Hex Buffer", rdbFileBuffer[i].toString(16));
                             expiryBuffer.push(rdbFileBuffer[i].toString(16))
                         }
                         currentBuffer += 6
@@ -187,7 +190,7 @@ function readRDBFile(dir, dbfile){
                 console.log("Value\n", val);
                 if (hasExpiry){
                     if (isFC){
-                        if (year > CURRENT_YEAR){
+                        if (year < CURRENT_YEAR){
                             console.log("Key to be deleted",  key)
                             delete dictionary[key]
                         }
