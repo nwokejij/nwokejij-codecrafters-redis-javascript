@@ -222,7 +222,7 @@ let propagatedCommands = 0;
 let numOfAcks = 0;
 const dictionary = {};
 let handshakes = 0;
-const streams = [];
+const streams = {};
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
@@ -236,7 +236,7 @@ const server = net.createServer((connection) => {
         temp = commands[cmd + 8];
         humid = commands[cmd + 12];
         let stream = new Stream(stream_key, stream_id, temp, humid);
-        streams.push(stream);
+        streams[stream_key] = stream;
         connection.write(getBulkString(stream_id));
     }
     else if (commands.includes("TYPE")){
