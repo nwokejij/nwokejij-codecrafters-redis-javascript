@@ -223,6 +223,7 @@ let numOfAcks = 0;
 const dictionary = {};
 let handshakes = 0;
 const streams = {};
+let prevStreamID = null;
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
@@ -230,14 +231,30 @@ const server = net.createServer((connection) => {
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
     if (commands.includes("XADD")){
+        // milli time >= last milli time
         cmd = commands.indexOf("XADD");
-        stream_key = commands[cmd + 2];
         stream_id = commands[cmd + 4];
-        temp = commands[cmd + 8];
-        humid = commands[cmd + 12];
-        let stream = new Stream(stream_key, stream_id, temp, humid);
-        streams[stream_key] = stream;
-        connection.write(getBulkString(stream_id));
+        if (stream_id == "0-0"){
+            connection.write("-ERR The ID specified in XADD must be greater than 0-0\r\n");
+        } else {
+            let milliSeconds = stream_id.split("-")[0];
+            let version = stream_id.split("-")[1];
+            
+            if ((prevStreamID) && ((milliSeconds < prevStreamID.split("-")[0]) || ((milliSeconds == prevStreamID.split("-")[0]) && (version <= prevStreamID.split("-")[1])))){
+                connection.write("-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n");
+            } else {
+            stream_key = commands[cmd + 2];
+            temp = commands[cmd + 8];
+            humid = commands[cmd + 12];
+            let stream = new Stream(stream_key, stream_id, temp, humid);
+            streams[stream_key] = stream;
+            prevStreamID = stream_id
+            connection.write(getBulkString(stream_id));
+            }
+        
+        }
+        
+        
     }
     else if (commands.includes("TYPE")){
 
