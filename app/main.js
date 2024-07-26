@@ -231,7 +231,6 @@ const server = net.createServer((connection) => {
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
     if (commands.includes("XADD")){
-        // milli time >= last milli time
         cmd = commands.indexOf("XADD");
         stream_id = commands[cmd + 4];
         if (stream_id == "0-0"){
@@ -239,7 +238,6 @@ const server = net.createServer((connection) => {
         } else {
             let milliSeconds = stream_id.split("-")[0];
             let version = stream_id.split("-")[1];
-            
             if ((prevStreamID) && ((milliSeconds < prevStreamID.split("-")[0]) || ((milliSeconds == prevStreamID.split("-")[0]) && (version <= prevStreamID.split("-")[1])))){
                 connection.write("-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n");
             } else {
