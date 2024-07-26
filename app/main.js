@@ -220,6 +220,17 @@ const server = net.createServer((connection) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
+    if (commands.includes("TYPE")){
+
+        let type = commands.indexOf("TYPE");
+        let key = commands[type + 2];
+        if (!(key in dictionary)){
+            connection.write("+none\r\n")
+        } else{
+            let typeValue = typeof dictionary[key];
+            connection.write(`+${typeValue}\r\n`)
+        }
+    }
     if (commands.includes("KEYS")){
         try {
         readRDBFile(config["dir"], config["dbfilename"]);
