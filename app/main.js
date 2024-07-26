@@ -236,9 +236,11 @@ const server = net.createServer((connection) => {
         stream_id = commands[cmd + 4];
         let milliseconds = stream_id.split("-")[0];
         let version = stream_id.split("-")[1];
+        let auto = false;
         if (milliseconds == "0" && version == "0"){
             connection.write("-ERR The ID specified in XADD must be greater than 0-0\r\n");
         } else if (version == "*"){
+            auto = true;
             if (milliseconds in timeToVersion){
                 let newVersion = parseInt(timeToVersion[milliseconds], 10) + 1
                 version = newVersion.toString();
@@ -259,7 +261,13 @@ const server = net.createServer((connection) => {
             let stream = new Stream(stream_key, stream_id, temp, humid);
             streams[stream_key] = stream;
             prevStreamID = stream_id
-            connection.write(getBulkString(stream_id));
+            if (auto){
+                let auto_reply = `${milliseconds}-${version}`
+                connection.write(getBulkString(auto_reply))
+            } else {
+                connection.write(getBulkString(stream_id));
+            }
+            
             }
     else if (commands.includes("TYPE")){
 
