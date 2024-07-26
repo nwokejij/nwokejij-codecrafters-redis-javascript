@@ -224,6 +224,7 @@ const dictionary = {};
 let handshakes = 0;
 const streams = {};
 let prevStreamID = null;
+let timeToVersion = {}
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
@@ -233,14 +234,25 @@ const server = net.createServer((connection) => {
     if (commands.includes("XADD")){
         cmd = commands.indexOf("XADD");
         stream_id = commands[cmd + 4];
-        if (stream_id == "0-0"){
+        let milliseconds = stream_id.split("-")[0];
+        let version = stream_id.split("-")[1];
+        if (milliseconds == "0" && version == "0"){
             connection.write("-ERR The ID specified in XADD must be greater than 0-0\r\n");
-        } else {
-            let milliSeconds = stream_id.split("-")[0];
-            let version = stream_id.split("-")[1];
-            if ((prevStreamID) && ((milliSeconds < prevStreamID.split("-")[0]) || ((milliSeconds == prevStreamID.split("-")[0]) && (version <= prevStreamID.split("-")[1])))){
-                connection.write("-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n");
+        } else if (version == "*"){
+            if (milliseconds in timeToVersion){
+                let newVersion = parseInt(timeToVersion[milliseconds], 10) + 1
+                version = newVersion.toString();
             } else {
+                if (milliseconds == "0"){
+                    version = "1"
+                } else {
+                    version = "0"
+                }
+            }
+        } else if ((prevStreamID) && ((milliseconds < prevStreamID.split("-")[0]) || ((milliseconds == prevStreamID.split("-")[0]) && (version <= prevStreamID.split("-")[1])))){
+                connection.write("-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n");
+            } 
+            timeToVersion[milliseconds] = version;
             stream_key = commands[cmd + 2];
             temp = commands[cmd + 8];
             humid = commands[cmd + 12];
@@ -249,11 +261,6 @@ const server = net.createServer((connection) => {
             prevStreamID = stream_id
             connection.write(getBulkString(stream_id));
             }
-        
-        }
-        
-        
-    }
     else if (commands.includes("TYPE")){
 
         let type = commands.indexOf("TYPE");
