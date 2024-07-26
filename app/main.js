@@ -237,6 +237,7 @@ const server = net.createServer((connection) => {
         humid = commands[cmd + 12];
         let stream = new Stream(stream_key, stream_id, temp, humid);
         streams.push(stream);
+        connection.write(getBulkString(stream_id));
     }
     else if (commands.includes("TYPE")){
 
