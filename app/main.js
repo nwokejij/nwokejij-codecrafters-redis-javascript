@@ -209,29 +209,50 @@ function readRDBFile(dir, dbfile){
     }
 }
 console.log("Logs from your program will appear here!");
+class Stream {
+    constructor(key, id, temp, humid){
+        this.key = key;
+        this.id = id;
+        this.temp = temp;
+        this.humid = humid;
+    }
+}
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
 const dictionary = {};
 let handshakes = 0;
+const streams = [];
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', (data) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
-    if (commands.includes("TYPE")){
+    if (commands.includes("XADD")){
+        cmd = commands.indexOf("XADD");
+        stream_key = commands[cmd + 2];
+        stream_id = commands[cmd + 4];
+        temp = commands[cmd + 8];
+        humid = commands[cmd + 12];
+        let stream = new Stream(stream_key, stream_id, temp, humid);
+        streams.append(stream);
+    }
+    else if (commands.includes("TYPE")){
 
         let type = commands.indexOf("TYPE");
         let key = commands[type + 2];
-        if (!(key in dictionary)){
+        if (!(key in dictionary) && !(key in streams)){
             connection.write("+none\r\n")
         } else{
+            if (key in streams){
+                connection.write("+stream\r\n")
+            }
             let typeValue = typeof dictionary[key];
             connection.write(`+${typeValue}\r\n`)
         }
     }
-    if (commands.includes("KEYS")){
+    else if (commands.includes("KEYS")){
         try {
         readRDBFile(config["dir"], config["dbfilename"]);
         isRead = true;
