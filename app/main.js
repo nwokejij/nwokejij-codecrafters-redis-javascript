@@ -210,11 +210,10 @@ function readRDBFile(dir, dbfile){
 }
 console.log("Logs from your program will appear here!");
 class Stream {
-    constructor(key, id, temp, humid){
+    constructor(key, id){
         this.key = key;
         this.id = id;
-        this.temp = temp;
-        this.humid = humid;
+        this.pairs = [];
     }
 }
 const replicas = [];
@@ -222,7 +221,8 @@ let propagatedCommands = 0;
 let numOfAcks = 0;
 const dictionary = {};
 let handshakes = 0;
-const streams = {};
+const streamKey = {};
+const streamArray = [];
 let prevStreamID = null;
 let timeToVersion = {}
 const server = net.createServer((connection) => {
@@ -231,7 +231,24 @@ const server = net.createServer((connection) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
     console.log("Commands", commands);
-    if (commands.includes("XADD")){
+    if (commands.includes("XRANGE")){
+        index = commands.indexOf("XRANGE");
+        left_bound = parseInt(commands[index + 2], 10);
+        right_bound = parseInt(commands[index + 4], 10);
+        // format 
+        // array containning arrays, where each array contains two elements, the id, and an array of the properties associated with that id (excluding the stream key)
+        let withinRange = []
+        for (let stream of streamArray){
+            parsed_stream_id = parseInt(stream.id, 10);
+            if (( parsed_stream_id >= left_bound) && (parsed_stream_id <= right_bound)){
+
+                withinRange.push([parsed_stream_id, stream.pairs.join(",")])
+                console.log("withinRange", withinRange);
+            }
+        }
+        connection.write(getBulkArray(withinRange));
+    }
+    else if (commands.includes("XADD")){
         cmd = commands.indexOf("XADD");
         stream_id = commands[cmd + 4];
         if (stream_id == "*"){
@@ -262,10 +279,20 @@ const server = net.createServer((connection) => {
                 } 
                 timeToVersion[milliseconds] = version;
                 stream_key = commands[cmd + 2];
-                temp = commands[cmd + 8];
-                humid = commands[cmd + 12];
-                let stream = new Stream(stream_key, stream_id, temp, humid);
-                streams[stream_key] = stream;
+               
+                // *3 stream_key *length id *length *key1 *length *val1
+                let stream = new Stream(stream_key, stream_id);
+                keyCounter = cmd + 4; // id of stream
+                while (keyCounter < commands.length - 1){
+                    let keyVal = [];
+                    keyCounter += 2
+                    keyVal.push(commands[keyCounter])
+                    keyCounter += 2;
+                    keyVal.push(commands[keyCounter])
+                    stream.pairs.push(keyVal);
+                }
+                streamKey[stream_key] = stream;
+                streamArray.push(stream);
                 prevStreamID = stream_id
                 if (auto){
                     let auto_reply = `${milliseconds}-${version}`
@@ -283,10 +310,10 @@ const server = net.createServer((connection) => {
 
         let type = commands.indexOf("TYPE");
         let key = commands[type + 2];
-        if (!(key in dictionary) && !(key in streams)){
+        if (!(key in dictionary) && !(key in streamKey)){
             connection.write("+none\r\n")
         } else{
-            if (key in streams){
+            if (key in streamKey){
                 connection.write("+stream\r\n")
             }
             let typeValue = typeof dictionary[key];
@@ -414,7 +441,11 @@ function getBulkArray(array){
     }
     let bulkResponse = `*${array.length}\r\n`
     for (let element of array){
-        bulkResponse += getBulkString(element);
+        if (Array.isArray(element)){
+            bulkResponse += getBulkArray(element);
+        } else{
+            bulkResponse += getBulkString(element);
+        }
     }
     return bulkResponse
 }
