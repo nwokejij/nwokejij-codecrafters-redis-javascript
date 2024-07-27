@@ -264,6 +264,7 @@ const server = net.createServer((connection) => {
             if (auto){
                 let auto_reply = `${milliseconds}-${version}`
                 connection.write(getBulkString(auto_reply))
+                auto = false;
             } else {
                 connection.write(getBulkString(stream_id));
             }
