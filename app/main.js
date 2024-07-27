@@ -248,7 +248,7 @@ const server = net.createServer((connection) => {
         }
         connection.write(getBulkArray(withinRange));
     }
-    else if (commands.includes("XADD")){
+    else if (commands.includes("XADD") || commands.includes("xadd")){
         console.log("First Entry point");
         cmd = commands.indexOf("XADD");
         stream_id = commands[cmd + 4];
