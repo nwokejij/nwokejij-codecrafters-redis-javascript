@@ -234,12 +234,17 @@ const server = net.createServer((connection) => {
     if (commands.includes("XADD")){
         cmd = commands.indexOf("XADD");
         stream_id = commands[cmd + 4];
+        if (stream_id == "*"){
+            date = Date.now().toString() + "-0";
+            connection.write(getBulkString(date));
+        } else {
         let milliseconds = stream_id.split("-")[0];
         let version = stream_id.split("-")[1];
         let auto = false;
+        
         if (milliseconds == "0" && version == "0"){
             connection.write("-ERR The ID specified in XADD must be greater than 0-0\r\n");
-        } else if ((prevStreamID) && ((milliseconds < prevStreamID.split("-")[0]) || ((milliseconds == prevStreamID.split("-")[0]) && (version != "*" && version <= prevStreamID.split("-")[1])))){
+        } else if ((prevStreamID) && ((milliseconds != "*") && (milliseconds < prevStreamID.split("-")[0]) || ((milliseconds == prevStreamID.split("-")[0]) && (version != "*" && version <= prevStreamID.split("-")[1])))){
                 connection.write("-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n");
             } else {
                 if (version == "*"){
@@ -270,6 +275,7 @@ const server = net.createServer((connection) => {
                     connection.write(getBulkString(stream_id));
                 }
             } 
+        }
             
             
             }
