@@ -239,35 +239,38 @@ const server = net.createServer((connection) => {
         let auto = false;
         if (milliseconds == "0" && version == "0"){
             connection.write("-ERR The ID specified in XADD must be greater than 0-0\r\n");
-        } else if (version == "*"){
-            auto = true;
-            if (milliseconds in timeToVersion){
-                let newVersion = parseInt(timeToVersion[milliseconds], 10) + 1
-                version = newVersion.toString();
-            } else {
-                if (milliseconds == "0"){
-                    version = "1"
-                } else {
-                    version = "0"
-                }
-            }
-        } else if ((prevStreamID) && ((milliseconds < prevStreamID.split("-")[0]) || ((milliseconds == prevStreamID.split("-")[0]) && (version <= prevStreamID.split("-")[1])))){
+        } else if ((prevStreamID) && ((milliseconds < prevStreamID.split("-")[0]) || ((milliseconds == prevStreamID.split("-")[0]) && (version != "*" && version <= prevStreamID.split("-")[1])))){
                 connection.write("-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n");
-            } 
-            timeToVersion[milliseconds] = version;
-            stream_key = commands[cmd + 2];
-            temp = commands[cmd + 8];
-            humid = commands[cmd + 12];
-            let stream = new Stream(stream_key, stream_id, temp, humid);
-            streams[stream_key] = stream;
-            prevStreamID = stream_id
-            if (auto){
-                let auto_reply = `${milliseconds}-${version}`
-                connection.write(getBulkString(auto_reply))
-                auto = false;
             } else {
-                connection.write(getBulkString(stream_id));
-            }
+                if (version == "*"){
+                    auto = true;
+                    if (milliseconds in timeToVersion){
+                        let newVersion = parseInt(timeToVersion[milliseconds], 10) + 1
+                        version = newVersion.toString();
+                    } else {
+                        if (milliseconds == "0"){
+                            version = "1"
+                        } else {
+                            version = "0"
+                        }
+                    }
+                } 
+                timeToVersion[milliseconds] = version;
+                stream_key = commands[cmd + 2];
+                temp = commands[cmd + 8];
+                humid = commands[cmd + 12];
+                let stream = new Stream(stream_key, stream_id, temp, humid);
+                streams[stream_key] = stream;
+                prevStreamID = stream_id
+                if (auto){
+                    let auto_reply = `${milliseconds}-${version}`
+                    connection.write(getBulkString(auto_reply));
+                    auto = false;
+                } else {
+                    connection.write(getBulkString(stream_id));
+                }
+            } 
+            
             
             }
     else if (commands.includes("TYPE")){
