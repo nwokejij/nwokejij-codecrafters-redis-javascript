@@ -18,6 +18,7 @@ const handleHandshake = (port) => {
         console.log("This is the data", dat);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
+        commands.map(str => str.toLowerCase());
         console.log("Commands",commands);
         while (message.length > 0) {
             let index = message.indexOf("*", 1);
@@ -30,29 +31,29 @@ const handleHandshake = (port) => {
              message = message.substring(index);
             }
             commands = Buffer.from(query).toString().split("\r\n");
-          if (commands[0] == "+PONG") {
+          if (commands[0] == "+pong") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
           } 
-          if (commands[0] == "+OK") {
+          if (commands[0] == "+ok") {
             if (repl1 == false) {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
           } 
-          if (commands.includes("PING") ){
+          if (commands.includes("ping") ){
             if (firstAck){
                 offset += 14;
             }
             
         }
-        if (commands.includes("SET") || commands.includes("GET")) {
+        if (commands.includes("set") || commands.includes("get")) {
             if (firstAck){
                 offset += query.toString().length;
             }
             parseRedisResponseFromMaster(query, replicaDict);
         }
 
-        if (commands.includes("REPLCONF")) {
+        if (commands.includes("replconf")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
             offset += 37;
@@ -230,9 +231,11 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
+    commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
-    if (commands.includes("XRANGE")){
-        index = commands.indexOf("XRANGE");
+    if (commands.includes("xrange")){
+        
+        index = commands.indexOf("xrange");
         left_bound = parseInt(commands[index + 2], 10);
         right_bound = parseInt(commands[index + 4], 10);
         // format 
@@ -248,9 +251,10 @@ const server = net.createServer((connection) => {
         }
         connection.write(getBulkArray(withinRange));
     }
-    else if (commands.includes("XADD") || commands.includes("xadd")){
+    else if (commands.includes("xadd")){
+        let cmd = commands.indexOf("xadd");
         console.log("First Entry point");
-        cmd = commands.indexOf("XADD");
+        
         stream_id = commands[cmd + 4];
         if (stream_id == "*"){
             date = Date.now().toString() + "-0";
@@ -311,9 +315,9 @@ const server = net.createServer((connection) => {
             
             
             }
-    else if (commands.includes("TYPE")){
+    else if (commands.includes("type")){
 
-        let type = commands.indexOf("TYPE");
+        let type = commands.indexOf("type");
         let key = commands[type + 2];
         if (!(key in dictionary) && !(key in streamKey)){
             connection.write("+none\r\n")
@@ -325,7 +329,7 @@ const server = net.createServer((connection) => {
             connection.write(`+${typeValue}\r\n`)
         }
     }
-    else if (commands.includes("KEYS")){
+    else if (commands.includes("keys")){
         try {
         readRDBFile(config["dir"], config["dbfilename"]);
         isRead = true;
@@ -333,7 +337,7 @@ const server = net.createServer((connection) => {
     } catch (error){
         console.error(error.message);
     }
-    } else if (commands.includes("CONFIG")){
+    } else if (commands.includes("config")){
         if (commands.includes("dir")){
             connection.write("*2\r\n" + getBulkString("dir") + getBulkString(config["dir"]));
         }
@@ -341,21 +345,21 @@ const server = net.createServer((connection) => {
             connection.write("*2\r\n" + getBulkString("dbfilename") + getBulkString(config["dbfilename"]));
         }
     } else
-    if (commands.includes("INFO")) {
+    if (commands.includes("info")) {
         if (isSlave != -1) {
             connection.write(getBulkString("role:slave"));
         } else {
             connection.write(getBulkString("role:master\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:0"));
         }
-    } else if (commands.includes("REPLCONF")) {
+    } else if (commands.includes("replconf")) {
         connection.write("+OK\r\n");
-    } else if (commands.includes("ECHO")) {
-        let index = commands.indexOf("ECHO");
+    } else if (commands.includes("echo")) {
+        let index = commands.indexOf("echo");
         connection.write(commands.slice(index + 1).join("\r\n"));
-    } else if (commands.includes("PING")) {
+    } else if (commands.includes("ping")) {
         connection.write("+PONG\r\n");
-    } else if (commands.includes("SET")) {
-        let index = commands.indexOf("SET");
+    } else if (commands.includes("set")) {
+        let index = commands.indexOf("set");
         console.log("This is the index of SET", index);
         dictionary[commands[index + 2]] = commands[index + 4];
         console.log(dictionary);
@@ -370,8 +374,8 @@ const server = net.createServer((connection) => {
         if (connection.type === 'client') {
             connection.write("+OK\r\n");
         }
-    } else if (commands.includes("GET")) {
-        let index = commands.indexOf("GET");
+    } else if (commands.includes("get")) {
+        let index = commands.indexOf("get");
         readRDBFile(config["dir"], config["dbfilename"]);
         isRead = true;
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
@@ -381,13 +385,13 @@ const server = net.createServer((connection) => {
         } else {
             connection.write(getBulkString(dictionary[commands[index + 2]]));
         }
-    } else if (commands.includes("WAIT")) {
-        let index = commands.indexOf("WAIT");
+    } else if (commands.includes("wait")) {
+        let index = commands.indexOf("wait");
         let noOfReps = parseInt(commands[index + 2]);
         let time = parseInt(commands[index + 4]);
         waitCommand(noOfReps, time, connection);
     }
-    if (commands.includes("PSYNC")) {
+    if (commands.includes("psync")) {
         connection.write("+FULLRESYNC 8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb 0\r\n");
         const hex = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
         const buffer = Buffer.from(hex, 'hex');
@@ -425,7 +429,7 @@ const propagateToReplicas = (command) => {
         // Add new 'data' event handler
         replica.once("data", (data) => {
             const commands = data.toString().split('\r\n');
-            if (commands.includes("ACK")) {
+            if (commands.includes("ack")) {
                 numOfAcks += 1;
             }
         });
@@ -481,7 +485,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
             stringArrayLen = stringArray.length;
             noNewLine = [];
             for (let i = 0; i < stringArrayLen; i++){
-                if (stringArray[i] == "SET"){
+                if (stringArray[i] == "set"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
