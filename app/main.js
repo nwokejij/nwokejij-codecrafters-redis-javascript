@@ -249,6 +249,7 @@ const server = net.createServer((connection) => {
         connection.write(getBulkArray(withinRange));
     }
     else if (commands.includes("XADD")){
+        console.log("First Entry point");
         cmd = commands.indexOf("XADD");
         stream_id = commands[cmd + 4];
         if (stream_id == "*"){
@@ -277,6 +278,7 @@ const server = net.createServer((connection) => {
                         }
                     }
                 } 
+                console.log("Second Entry point")
                 timeToVersion[milliseconds] = version;
                 stream_key = commands[cmd + 2];
                
@@ -291,14 +293,17 @@ const server = net.createServer((connection) => {
                     keyVal.push(commands[keyCounter])
                     stream.pairs.push(keyVal);
                 }
+                console.log("Third entry point")
                 streamKey[stream_key] = stream;
                 streamArray.push(stream);
                 prevStreamID = stream_id
+                console.log("Fourth entry point")
                 if (auto){
                     let auto_reply = `${milliseconds}-${version}`
                     connection.write(getBulkString(auto_reply));
                     auto = false;
                 } else {
+                    console.log("Fifth Entry Point")
                     connection.write(getBulkString(stream_id));
                 }
             } 
