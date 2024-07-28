@@ -369,6 +369,7 @@ const server = net.createServer((connection) => {
                     console.log("Entered this block")
                     streamKey[stream] = []
                 }
+                console.log("StreamKey", streamKey);
                 streamKey[stream_key].push(stream);
                 streamArray.push(stream);
                 prevStreamID = stream_id
