@@ -18,7 +18,6 @@ const handleHandshake = (port) => {
         console.log("This is the data", dat);
         let message = Buffer.from(dat).toString();
         let commands = message.split("\r\n");
-        commands.map(str => str.toLowerCase());
         console.log("Commands",commands);
         while (message.length > 0) {
             let index = message.indexOf("*", 1);
@@ -231,12 +230,9 @@ const server = net.createServer((connection) => {
     connection.on('data', (data) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
-    console.log("Commands before lowercase", commands);
-    commands.pop();
+    commands.pop(); // remove last empty spot
     for (let i = 1; i < commands.length; i+= 2){
-        console.log("before", commands[i]);
         commands[i] = commands[i].toLowerCase();
-        console.log("after", commands[i])
     }
     // commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
@@ -265,7 +261,6 @@ const server = net.createServer((connection) => {
             if (time == leftBoundTime){
                 if (containsVersionLeft){
                     leftBoundVersion = parseInt(leftBound.split("-")[1], 10);
-                    console.log("leftBoundVersion", leftBoundVersion);
                     if (version < leftBoundVersion){
                         shouldInclude = false;
                     } else {
@@ -278,7 +273,6 @@ const server = net.createServer((connection) => {
             if(time == rightBoundTime){
                 if (containsVersionRight){
                     rightBoundVersion = parseInt(rightBound.split("-")[1], 10); //
-                    console.log("rightBoundVersion", rightBoundVersion);
                     if (shouldInclude && version > rightBoundVersion){
                         shouldInclude = false;
                     } 
@@ -340,8 +334,6 @@ const server = net.createServer((connection) => {
                 }
                 timeToVersion[milliseconds].push(version);
                 stream_key = commands[cmd + 2];
-               
-                // *3 stream_key *length id *length *key1 *length *val1
                 let stream = new Stream(stream_key, stream_id);
                 keyCounter = cmd + 4; // id of stream
                 while (keyCounter < commands.length - 1){
