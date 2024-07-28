@@ -287,7 +287,7 @@ const server = net.createServer((connection) => {
             console.log("ShouldInclude", shouldInclude);
 
             if (shouldInclude){
-                withinRange.push([stream.id, [stream.pairs.join(",")]]);
+                withinRange.push([stream.id, [stream.pairs.join(",").split(",")]]);
             }
 
             }
