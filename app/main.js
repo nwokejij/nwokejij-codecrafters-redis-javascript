@@ -250,8 +250,10 @@ const server = net.createServer((connection) => {
         for (let stream of streamArray){
             console.log("Second Entry point")
             parsed_stream_id = stream.id.split("-")
-            let time = parsed_stream_id[0];
+            let time = parseInt(parsed_stream_id[0], 10);
+            console.log("time", time);
             let version = parseInt(parsed_stream_id[1], 10);
+            console.log("version", version);
             if (time == left_bound_time){
                 if (containsVersionLeft){
                     leftBoundVersion = parseInt(left_bound.split("-")[1], 10);
@@ -281,7 +283,7 @@ const server = net.createServer((connection) => {
             } else if (time > right_bound_time){
                 shouldInclude = false;
             }
-            
+
             if (shouldInclude){
                 withinRange.push([stream.id, stream.pairs.join(",")]);
             }
