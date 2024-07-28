@@ -410,7 +410,7 @@ const server = net.createServer((connection) => {
         connection.write("+OK\r\n");
     } else if (commands.includes("echo")) {
         let index = commands.indexOf("echo");
-        connection.write(commands.slice(index + 1).join("\r\n"));
+        connection.write(getBulkString(commands[index+2]));
     } else if (commands.includes("ping")) {
         connection.write("+PONG\r\n");
     } else if (commands.includes("set")) {
