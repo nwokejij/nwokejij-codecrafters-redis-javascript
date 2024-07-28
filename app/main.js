@@ -237,8 +237,10 @@ const server = net.createServer((connection) => {
         console.log("First Entry point")
         index = commands.indexOf("xrange");
         leftBound = commands[index + 2].toString();
+        console.log("This is the leftBound", leftBound);
         leftBoundTime = parseInt(leftBound.split("-")[0], 10);
         rightBound = commands[index + 4].toString();
+        console.log("This is the right bound", rightBound);
         rightBoundTime = parseInt(rightBound.split("-")[0], 10);
         console.log("LeftBoundTime", leftBoundTime);
         console.log("RightBoundTime", rightBoundTime);
