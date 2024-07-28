@@ -484,7 +484,8 @@ const propagateToReplicas = (command) => {
         // Add new 'data' event handler
         replica.once("data", (data) => {
             const commands = data.toString().split('\r\n');
-            if (commands.includes("ack")) {
+            console.log("Command inside replica", commands);
+            if (commands.includes("ACK")) {
                 numOfAcks += 1;
             }
         });
