@@ -289,6 +289,7 @@ const server = net.createServer((connection) => {
             } else if (time > rightBoundTime){
                 shouldInclude = false;
             }
+            console.log("ShouldInclude", shouldInclude);
 
             if (shouldInclude){
                 withinRange.push([stream.id, stream.pairs.join(",")]);
