@@ -291,6 +291,8 @@ const server = net.createServer((connection) => {
             }
 
             }
+            console.log("WithinRange", withinRange);
+            console.log("bulkArray", getBulkArray(withinRange));
             connection.write(getBulkArray(withinRange));
         }
     else if (commands.includes("xadd")){
