@@ -31,29 +31,29 @@ const handleHandshake = (port) => {
              message = message.substring(index);
             }
             commands = Buffer.from(query).toString().split("\r\n");
-          if (commands[0] == "+pong") {
+          if (commands[0] == "+PONG") {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("listening-port")+ getBulkString(PORT));
           } 
-          if (commands[0] == "+ok") {
+          if (commands[0] == "+OK") {
             if (repl1 == false) {
               client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("capa") + getBulkString("psync2"));
               repl1 = true;
             } else client.write("*3\r\n" + getBulkString("PSYNC") + getBulkString("?")+ getBulkString("-1"));
           } 
-          if (commands.includes("ping") ){
+          if (commands.includes("PING") ){
             if (firstAck){
                 offset += 14;
             }
             
         }
-        if (commands.includes("set") || commands.includes("get")) {
+        if (commands.includes("SET") || commands.includes("GET")) {
             if (firstAck){
                 offset += query.toString().length;
             }
             parseRedisResponseFromMaster(query, replicaDict);
         }
 
-        if (commands.includes("replconf")) {
+        if (commands.includes("REPLCONF")) {
             client.write("*3\r\n" + getBulkString("REPLCONF") + getBulkString("ACK") + getBulkString(offset.toString()));
             firstAck = true;
             offset += 37;
@@ -541,7 +541,7 @@ function parseRedisResponseFromMaster(data, replicaDict){
             stringArrayLen = stringArray.length;
             noNewLine = [];
             for (let i = 0; i < stringArrayLen; i++){
-                if (stringArray[i] == "set"){
+                if (stringArray[i] == "SET"){
                     replicaDict[stringArray[i+2]] = stringArray[i + 4];
                     if (i + 6 < stringArrayLen){
                         if (stringArray[i+6] == "px"){
