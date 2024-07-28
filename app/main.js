@@ -232,7 +232,10 @@ const server = net.createServer((connection) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
     console.log("Commands before lowercase", commands);
-    commands.map(str => str.toLowerCase());
+    for (let cmd of commands){
+        cmd = cmd.toLowerCase();
+    }
+    // commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
     commands.pop();
     if (commands.includes("xrange")){
