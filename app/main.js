@@ -234,8 +234,9 @@ const server = net.createServer((connection) => {
     console.log("Commands before lowercase", commands);
     commands.pop();
     for (let i = 1; i < commands.length; i+= 2){
-        console.log("commands", commands[i]);
+        console.log("before", commands[i]);
         commands[i] = command[i].toLowerCase();
+        console.log("after", commands[i])
     }
     // commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
