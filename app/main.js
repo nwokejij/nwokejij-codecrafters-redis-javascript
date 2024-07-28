@@ -233,23 +233,23 @@ const server = net.createServer((connection) => {
     let commands = command.slice(3).split('\r\n');
     commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
+    commands.pop();
     if (commands.includes("xrange")){
-        console.log("First Entry point")
+    
         index = commands.indexOf("xrange");
         leftBound = commands[index + 4].toString();
-        console.log("This is the leftBound", leftBound);
         leftBoundTime = parseInt(leftBound.split("-")[0], 10);
         rightBound = commands[index + 6].toString();
         rightBoundTime = parseInt(rightBound.split("-")[0], 10);
         containsVersionLeft = leftBound.includes("-");
         containsVersionRight = rightBound.includes("-");
-        
+    
         // array containning arrays, where each array contains two elements, the id, and an array of the properties associated with that id (excluding the stream key)
         let withinRange = [];
-        console.log("StreamArraylength", streamArray.length);
+     
         let shouldInclude = false;
         for (let stream of streamArray){
-            console.log("Second Entry point")
+            console.log("Stream Pairs", stream.pairs);
             parsed_stream_id = stream.id.split("-")
             let time = parseInt(parsed_stream_id[0], 10);
             console.log("time", time);
@@ -345,7 +345,7 @@ const server = net.createServer((connection) => {
                     keyVal.push(commands[keyCounter])
                     stream.pairs.push(keyVal);
                 }
-                console.log("Third entry point")
+            
                 streamKey[stream_key] = stream;
                 streamArray.push(stream);
                 prevStreamID = stream_id
