@@ -236,15 +236,19 @@ const server = net.createServer((connection) => {
     if (commands.includes("xrange")){
         console.log("First Entry point")
         index = commands.indexOf("xrange");
-        left_bound = commands[index + 2]
-        left_bound_time = parseInt(left_bound.split("-")[0], 10);
-        right_bound = commands[index + 4]
-        right_bound_time = parseInt(right_bound.split("-")[0], 10);
-        containsVersionLeft = left_bound.includes("-");
-        containsVersionRight = right_bound.includes("-");
+        leftBound = commands[index + 2]
+        leftBoundTime = parseInt(leftBound.split("-")[0], 10);
+        rightBound = commands[index + 4]
+        rightBoundTime = parseInt(rightBound.split("-")[0], 10);
+        console.log("LeftBoundTime", leftBoundTime);
+        console.log("RightBoundTime", rightBoundTime);
+        containsVersionLeft = leftBound.includes("-");
+        containsVersionRight = rightBound.includes("-");
+        console.log("ContainsVersionLeft", containsVersionLeft);
+        console.log("ContainsVersionRight", containsVersionRight);
         // format 
         // array containning arrays, where each array contains two elements, the id, and an array of the properties associated with that id (excluding the stream key)
-        let withinRange = []
+        let withinRange = [];
         console.log("StreamArraylength", streamArray.length);
         let shouldInclude = false;
         for (let stream of streamArray){
@@ -254,9 +258,9 @@ const server = net.createServer((connection) => {
             console.log("time", time);
             let version = parseInt(parsed_stream_id[1], 10);
             console.log("version", version);
-            if (time == left_bound_time){
+            if (time == leftBoundTime){
                 if (containsVersionLeft){
-                    leftBoundVersion = parseInt(left_bound.split("-")[1], 10);
+                    leftBoundVersion = parseInt(leftBound.split("-")[1], 10);
                     if (version < leftBoundVersion){
                         shouldInclude = false;
                     } else {
@@ -266,9 +270,9 @@ const server = net.createServer((connection) => {
                     shouldInclude = true;
                 }
             }
-            if(time == right_bound_time){
+            if(time == rightBoundTime){
                 if (containsVersionRight){
-                    rightBoundVersion = parseInt(right_bound.split("-"), 10); //
+                    rightBoundVersion = parseInt(rightBound.split("-"), 10); //
                     if (version > rightBoundVersion){
                         shouldInclude = false;
                     } else {
@@ -278,9 +282,9 @@ const server = net.createServer((connection) => {
                     shouldInclude = true;
                 } 
             }
-            if (time > left_bound_time && time < right_bound_time){
+            if (time > leftBoundTime && time < rightBoundTime){
                 shouldInclude = true;
-            } else if (time > right_bound_time){
+            } else if (time > rightBoundTime){
                 shouldInclude = false;
             }
 
