@@ -241,6 +241,10 @@ const server = net.createServer((connection) => {
     
         index = commands.indexOf("xrange");
         leftBound = commands[index + 4].toString();
+        let fromTheStart = false;
+        if (leftBound == "-"){
+            fromTheStart = true;
+        }
         leftBoundTime = parseInt(leftBound.split("-")[0], 10);
         rightBound = commands[index + 6].toString();
         rightBoundTime = parseInt(rightBound.split("-")[0], 10);
@@ -258,7 +262,9 @@ const server = net.createServer((connection) => {
             console.log("time", time);
             let version = parseInt(parsed_stream_id[1], 10);
             console.log("version", version);
-            if (time == leftBoundTime){
+            if (fromTheStart){
+                shouldInclude = true;
+            } else if (time == leftBoundTime){
                 if (containsVersionLeft){
                     leftBoundVersion = parseInt(leftBound.split("-")[1], 10);
                     if (version < leftBoundVersion){
@@ -285,6 +291,7 @@ const server = net.createServer((connection) => {
             } else if (time > rightBoundTime){
                 shouldInclude = false;
             }
+
             console.log("ShouldInclude", shouldInclude);
 
             if (shouldInclude){
