@@ -235,7 +235,7 @@ const server = net.createServer((connection) => {
     commands.pop();
     for (let i = 1; i < commands.length; i+= 2){
         console.log("before", commands[i]);
-        commands[i] = command[i].toLowerCase();
+        commands[i] = commands[i].toLowerCase();
         console.log("after", commands[i])
     }
     // commands.map(str => str.toLowerCase());
