@@ -240,13 +240,17 @@ const server = net.createServer((connection) => {
         index = commands.indexOf("streams") + 2;
         key = commands[index];
         minID = commands[index + 2];
+    
         let collect = false;
+        if (minID == "0-0"){
+            collect = true;
+        }
         res = []
         for (let strm of streamKey[key]){
             if (collect){
                 res.push([strm.key, [[strm.id, strm.pairs.join(",").split(",")]]])
             }
-            if (strm.id == "0-0" || strm.id == minID){
+            if (strm.id == minID){
                 collect = true;
             }
         }
