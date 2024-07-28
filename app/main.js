@@ -237,9 +237,9 @@ const server = net.createServer((connection) => {
         console.log("First Entry point")
         index = commands.indexOf("xrange");
         left_bound = commands[index + 2]
-        left_bound_time = left_bound.split("-")[0];
+        left_bound_time = parseInt(left_bound.split("-")[0], 10);
         right_bound = commands[index + 4]
-        right_bound_time = right_bound.split("-")[0];
+        right_bound_time = parseInt(right_bound.split("-")[0], 10);
         containsVersionLeft = left_bound.includes("-");
         containsVersionRight = right_bound.includes("-");
         // format 
