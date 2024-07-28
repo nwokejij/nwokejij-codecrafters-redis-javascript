@@ -236,8 +236,22 @@ const server = net.createServer((connection) => {
     }
     // commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
-    
-    if (commands.includes("xrange")){
+    if (commands.includes("xread")){
+        index = commands.indexOf("streams") + 2;
+        key = commands[index];
+        minID = commands[index + 2];
+        let collect = false;
+        res = []
+        for (let strm of streamKey[key]){
+            if (collect){
+                res.push([strm.key, [[strm.id, strm.pairs.join(",").split(",")]]])
+            }
+            if (strm.id == "0-0" || strm.id == minID){
+                collect = true;
+            }
+        }
+        connection.write(getBulkArray(res));
+    } else if (commands.includes("xrange")){
     
         index = commands.indexOf("xrange");
         leftBound = commands[index + 4].toString();
@@ -351,8 +365,10 @@ const server = net.createServer((connection) => {
                     keyVal.push(commands[keyCounter])
                     stream.pairs.push(keyVal);
                 }
-            
-                streamKey[stream_key] = stream;
+                if (!(stream_key in streamKey)){
+                    streamKey[stream] = []
+                }
+                streamKey[stream_key].push(stream);
                 streamArray.push(stream);
                 prevStreamID = stream_id
                 console.log("Fourth entry point")
