@@ -274,9 +274,7 @@ const server = net.createServer((connection) => {
                     console.log("rightBoundVersion", rightBoundVersion);
                     if (shouldInclude && version > rightBoundVersion){
                         shouldInclude = false;
-                    } else {
-                        shouldInclude = true;
-                    }
+                    } 
                 } else {
                     shouldInclude = true;
                 } 
