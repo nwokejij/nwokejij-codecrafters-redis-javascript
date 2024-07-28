@@ -370,7 +370,6 @@ const server = net.createServer((connection) => {
                     stream.pairs.push(keyVal);
                 }
                 if (!(stream_key in streamKey)){
-                    console.log("Entered this block")
                     streamKey[stream_key] = [];
                 }
                 streamKey[stream_key].push(stream);
