@@ -262,7 +262,7 @@ const server = net.createServer((connection) => {
             console.log("version", version);
             if (time == leftBoundTime){
                 if (containsVersionLeft){
-                    leftBoundVersion = parseInt(leftBound.split("-")[1], 10);
+                    leftBoundVersion = parseInt(leftBound.split("-")[0], 10);
                     console.log("leftBoundVersion", leftBoundVersion);
                     if (version < leftBoundVersion){
                         shouldInclude = false;
@@ -275,7 +275,7 @@ const server = net.createServer((connection) => {
             }
             if(time == rightBoundTime){
                 if (containsVersionRight){
-                    rightBoundVersion = parseInt(rightBound.split("-"), 10); //
+                    rightBoundVersion = parseInt(rightBound.split("-")[0], 10); //
                     console.log("rightBoundVersion", rightBoundVersion);
                     if (version > rightBoundVersion){
                         shouldInclude = false;
