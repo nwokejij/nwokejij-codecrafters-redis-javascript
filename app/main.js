@@ -240,15 +240,10 @@ const server = net.createServer((connection) => {
         console.log("This is the leftBound", leftBound);
         leftBoundTime = parseInt(leftBound.split("-")[0], 10);
         rightBound = commands[index + 6].toString();
-        console.log("This is the right bound", rightBound);
         rightBoundTime = parseInt(rightBound.split("-")[0], 10);
-        console.log("LeftBoundTime", leftBoundTime);
-        console.log("RightBoundTime", rightBoundTime);
         containsVersionLeft = leftBound.includes("-");
         containsVersionRight = rightBound.includes("-");
-        console.log("ContainsVersionLeft", containsVersionLeft);
-        console.log("ContainsVersionRight", containsVersionRight);
-        // format 
+        
         // array containning arrays, where each array contains two elements, the id, and an array of the properties associated with that id (excluding the stream key)
         let withinRange = [];
         console.log("StreamArraylength", streamArray.length);
@@ -277,7 +272,7 @@ const server = net.createServer((connection) => {
                 if (containsVersionRight){
                     rightBoundVersion = parseInt(rightBound.split("-")[1], 10); //
                     console.log("rightBoundVersion", rightBoundVersion);
-                    if (version > rightBoundVersion){
+                    if (shouldInclude && version > rightBoundVersion){
                         shouldInclude = false;
                     } else {
                         shouldInclude = true;
