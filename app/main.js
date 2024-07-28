@@ -234,23 +234,61 @@ const server = net.createServer((connection) => {
     commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
     if (commands.includes("xrange")){
-        
+        console.log("First Entry point")
         index = commands.indexOf("xrange");
-        left_bound = parseInt(commands[index + 2], 10);
-        right_bound = parseInt(commands[index + 4], 10);
+        left_bound = commands[index + 2]
+        left_bound_time = left_bound.split("-")[0];
+        right_bound = commands[index + 4]
+        right_bound_time = right_bound.split("-")[0];
+        containsVersionLeft = left_bound.includes("-");
+        containsVersionRight = right_bound.includes("-");
         // format 
         // array containning arrays, where each array contains two elements, the id, and an array of the properties associated with that id (excluding the stream key)
         let withinRange = []
+        console.log("StreamArraylength", streamArray.length);
+        let shouldInclude = false;
         for (let stream of streamArray){
-            parsed_stream_id = parseInt(stream.id, 10);
-            if (( parsed_stream_id >= left_bound) && (parsed_stream_id <= right_bound)){
-
-                withinRange.push([parsed_stream_id, stream.pairs.join(",")])
-                console.log("withinRange", withinRange);
+            console.log("Second Entry point")
+            parsed_stream_id = stream.id.split("-")
+            let time = parsed_stream_id[0];
+            let version = parseInt(parsed_stream_id[1], 10);
+            if (time == left_bound_time){
+                if (containsVersionLeft){
+                    leftBoundVersion = parseInt(left_bound.split("-")[1], 10);
+                    if (version < leftBoundVersion){
+                        shouldInclude = false;
+                    } else {
+                        shouldInclude = true;
+                    }
+                } else{
+                    shouldInclude = true;
+                }
             }
+            if(time == right_bound_time){
+                if (containsVersionRight){
+                    rightBoundVersion = parseInt(right_bound.split("-"), 10); //
+                    if (version > rightBoundVersion){
+                        shouldInclude = false;
+                    } else {
+                        shouldInclude = true;
+                    }
+                } else {
+                    shouldInclude = true;
+                } 
+            }
+            if (time > left_bound_time && time < right_bound_time){
+                shouldInclude = true;
+            } else if (time > right_bound_time){
+                shouldInclude = false;
+            }
+            
+            if (shouldInclude){
+                withinRange.push([stream.id, stream.pairs.join(",")]);
+            }
+
+            }
+            connection.write(getBulkArray(withinRange));
         }
-        connection.write(getBulkArray(withinRange));
-    }
     else if (commands.includes("xadd")){
         let cmd = commands.indexOf("xadd");
         console.log("First Entry point");
@@ -272,7 +310,8 @@ const server = net.createServer((connection) => {
                 if (version == "*"){
                     auto = true;
                     if (milliseconds in timeToVersion){
-                        let newVersion = parseInt(timeToVersion[milliseconds], 10) + 1
+                        leng = timeToVersion[milliseconds].length
+                        let newVersion = parseInt(timeToVersion[milliseconds][leng - 1], 10) + 1
                         version = newVersion.toString();
                     } else {
                         if (milliseconds == "0"){
@@ -283,7 +322,10 @@ const server = net.createServer((connection) => {
                     }
                 } 
                 console.log("Second Entry point")
-                timeToVersion[milliseconds] = version;
+                if (!(milliseconds in timeToVersion)){
+                    timeToVersion[milliseconds] = []
+                }
+                timeToVersion[milliseconds].push(version);
                 stream_key = commands[cmd + 2];
                
                 // *3 stream_key *length id *length *key1 *length *val1
