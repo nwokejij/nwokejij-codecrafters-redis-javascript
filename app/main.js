@@ -237,23 +237,17 @@ const server = net.createServer((connection) => {
     // commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
     if (commands.includes("xread")){
-        index = commands.indexOf("streams") + 2;
-        key = commands[index];
-        minID = commands[index + 2];
-    
-        let collect = false;
-        if (minID == "0-0"){
-            collect = true;
+        queries = commands.slice(commands.indexOf("streams") + 1);
+        idStart = queries.length / 2;
+        collectKeys = [];
+        collectIDs = [];
+        for (let i = 1; i < idStart; i += 2){
+            collectKeys.push(queries[i]);
         }
-        res = []
-        for (let strm of streamKey[key]){
-            if (collect){
-                res.push([strm.key, [[strm.id, strm.pairs.join(",").split(",")]]])
-            }
-            if (strm.id == minID){
-                collect = true;
-            }
+        for (let j = idStart + 1; j < queries.length; j += 2){
+            collectIDs.push(queries[j])
         }
+        res = xreadStreams(collectKeys, collectIDs);
         connection.write(getBulkArray(res));
     } else if (commands.includes("xrange")){
     
@@ -486,6 +480,27 @@ const server = net.createServer((connection) => {
     });
 });
 
+
+function xreadStreams(keys, ids){
+    // loop throug the keys iteratively
+    res = [];
+    // two cases
+    for (let i = 0; i < keys.length; i += 1){
+        key = keys[i]
+        id = ids[i]
+        minTime = parseInt(id.split("-")[0], 10);
+        minVersion = parseInt(id.split("-")[1], 10);
+        for (let strm of streamKey[key]){
+           time = parseInt(strm.id.split("-")[0], 10);
+           version = parseInt(strm.id.split("-")[1], 10);
+           if (time > minTime || (time == minTime && version > minVersion)){
+            res.push([strm.key, [[strm.id, strm.pairs.join(",").split(",")]]])
+           }
+        }
+    }
+    
+    return res
+}
     
 
 
