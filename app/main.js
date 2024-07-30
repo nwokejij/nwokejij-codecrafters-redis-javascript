@@ -234,7 +234,6 @@ const server = net.createServer((connection) => {
     for (let i = 1; i < commands.length; i+= 2){
         commands[i] = commands[i].toLowerCase();
     }
-    // commands.map(str => str.toLowerCase());
     console.log("Commands", commands);
     if (commands.includes("xread")){
         queries = commands.slice(commands.indexOf("streams") + 1);
@@ -482,9 +481,9 @@ const server = net.createServer((connection) => {
 
 
 function xreadStreams(keys, ids){
-    // loop throug the keys iteratively
+    
     res = [];
-    // two cases
+    // loop throug the keys and ids iteratively
     for (let i = 0; i < keys.length; i += 1){
         key = keys[i]
         id = ids[i]
