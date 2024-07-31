@@ -225,6 +225,7 @@ const streamKey = {};
 const streamArray = [];
 let prevStreamID = null;
 let timeToVersion = {}
+let notCalled = false;
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
@@ -247,8 +248,17 @@ const server = net.createServer((connection) => {
             collectIDs.push(queries[j])
         }
         if (commands.includes("block")){
-            timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
-            res = await xreadStreams(collectKeys, collectIDs, timeIndex)
+            if (!notCalled){
+                timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
+                res = await xreadStreams(collectKeys, collectIDs, timeIndex)
+                connection.write(getBulkArray(res));
+                notCalled = true;
+            } else {
+                connection.write(getBulkString(null));
+            }
+            
+        } else {
+            res = await xreadStreams(collectKeys, collectIDs);
             connection.write(getBulkArray(res));
         }
         // if commands.includes block
@@ -491,7 +501,7 @@ async function xreadStreams(keys, ids, delay = 0){
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             res = [];
-    // loop throug the keys and ids iteratively
+    // loop through the keys and ids iteratively
     for (let i = 0; i < keys.length; i += 1){
         key = keys[i]
         id = ids[i]
