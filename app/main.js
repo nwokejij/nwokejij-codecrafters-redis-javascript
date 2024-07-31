@@ -227,7 +227,7 @@ let prevStreamID = null;
 let timeToVersion = {}
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
-    connection.on('data', (data) => {
+    connection.on('data', async (data) => {
     const command = data.toString();
     let commands = command.slice(3).split('\r\n');
     commands.pop(); // remove last empty spot
@@ -246,8 +246,16 @@ const server = net.createServer((connection) => {
         for (let j = idStart + 1; j < queries.length; j += 2){
             collectIDs.push(queries[j])
         }
-        res = xreadStreams(collectKeys, collectIDs);
-        connection.write(getBulkArray(res));
+        if (commands.includes("block")){
+            timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
+            res = await xreadStreams(collectKeys, collectIDs, timeIndex)
+            connection.write(getBulkArray(res));
+        }
+        // if commands.includes block
+        // anytime a new xadd command happens, need to call xreadStreams
+        // limited time to add 
+        // res = xreadStreams(collectKeys, collectIDs);
+        // connection.write(getBulkArray(res));
     } else if (commands.includes("xrange")){
     
         index = commands.indexOf("xrange");
@@ -326,7 +334,6 @@ const server = net.createServer((connection) => {
         let milliseconds = stream_id.split("-")[0];
         let version = stream_id.split("-")[1];
         let auto = false;
-        
         if (milliseconds == "0" && version == "0"){
             connection.write("-ERR The ID specified in XADD must be greater than 0-0\r\n");
         } else if ((prevStreamID) && ((milliseconds != "*") && (milliseconds < prevStreamID.split("-")[0]) || ((milliseconds == prevStreamID.split("-")[0]) && (version != "*" && version <= prevStreamID.split("-")[1])))){
@@ -480,9 +487,10 @@ const server = net.createServer((connection) => {
 });
 
 
-function xreadStreams(keys, ids){
-    
-    res = [];
+async function xreadStreams(keys, ids, delay = 0){
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            res = [];
     // loop throug the keys and ids iteratively
     for (let i = 0; i < keys.length; i += 1){
         key = keys[i]
@@ -497,8 +505,11 @@ function xreadStreams(keys, ids){
            }
         }
     }
-    
-    return res
+        resolve(res);
+        }, delay)
+
+
+    })
 }
     
 
