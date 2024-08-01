@@ -226,7 +226,7 @@ const streamArray = [];
 let prevStreamID = null;
 let timeToVersion = {}
 let notCalled = false;
-const server = net.createServer((connection) => {
+const server = net.createServer(async (connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
     const command = data.toString();
