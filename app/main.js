@@ -251,11 +251,16 @@ const server = net.createServer((connection) => {
             if (!notCalled){
                 timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
                 if (timeIndex == 0){
-                    awaitChange(collectKeys).then(() => {
-                        res = await xreadStreams(collectKeys, collectIDs);
-                        connection.write(getBulkArray(res));
-                    })
-                } else {
+                try{
+                        awaitChange(collectKeys).then(() => {
+                            res = await xreadStreams(collectKeys, collectIDs);
+                            connection.write(getBulkArray(res));
+                        })
+
+                } catch(e){
+                    console.error('Error:', error);
+                } 
+            }else {
                 res = await xreadStreams(collectKeys, collectIDs, timeIndex)
                 connection.write(getBulkArray(res));
                 notCalled = true;
