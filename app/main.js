@@ -226,7 +226,7 @@ const streamArray = [];
 let prevStreamID = null;
 let timeToVersion = {}
 let notCalled = false;
-const server = net.createServer(async (connection) => {
+const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
     const command = data.toString();
@@ -251,15 +251,8 @@ const server = net.createServer(async (connection) => {
             if (!notCalled){
                 timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
                 if (timeIndex == 0){
-                try{
-                        awaitChange(collectKeys).then(() => {
-                            res = await xreadStreams(collectKeys, collectIDs);
-                            connection.write(getBulkArray(res));
-                        })
-
-                } catch(e){
-                    console.error('Error:', error);
-                } 
+                    x = await awaitChange(collectKeys, collectIDs)
+                    connection.write(getBulkArray(x));
             }else {
                 res = await xreadStreams(collectKeys, collectIDs, timeIndex)
                 connection.write(getBulkArray(res));
@@ -566,14 +559,15 @@ function getBulkString(string){
     }
     return `\$${string.length}\r\n${string}\r\n`
 }
-async function awaitChange(keys){
+async function awaitChange(keys, ids){
     return new Promise((resolve, reject) => {
         blockedStreamPairs = streamKey[keys[0]].pairs;
         blockedStreamCopy = [...blockedStreamPairs];
         let intervalId = setInterval(()=> {
             if (blockedStreamCopy.length < streamKey[keys[0]].pairs.length){
                 clearInterval(intervalId);
-                resolve(intervalId);
+                res = await xreadStreams(keys, ids)
+                resolve()
             }
         }, 1000);
 
