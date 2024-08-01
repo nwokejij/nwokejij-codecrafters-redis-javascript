@@ -560,7 +560,8 @@ function getBulkString(string){
 }
 async function awaitChange(keys){
     return new Promise((resolve, reject) => {
-        let flag = false;
+        console.log("streamKey",keys[0]);
+        console.log("streamKey Pairs", streamKey[keys[0]]);
         blockedStreamPairs = streamKey[keys[0]].pairs;
         console.log("Type", typeof blockedStreamPairs);
         blockedStreamCopy = [...blockedStreamPairs];
