@@ -251,13 +251,12 @@ const server = net.createServer((connection) => {
             if (!notCalled){
                 timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
                 if (timeIndex == 0){
-                    x = await awaitChange(collectKeys, collectIDs)
-                    connection.write(getBulkArray(x));
-            }else {
+                    await awaitChange(collectKeys, collectIDs);
+                    
+            }
                 res = await xreadStreams(collectKeys, collectIDs, timeIndex)
                 connection.write(getBulkArray(res));
                 notCalled = true;
-            }
             } else {
                 connection.write(getBulkString(null));
             }
@@ -559,7 +558,7 @@ function getBulkString(string){
     }
     return `\$${string.length}\r\n${string}\r\n`
 }
-async function awaitChange(keys, ids){
+async function awaitChange(keys){
     return new Promise((resolve, reject) => {
         let flag = false;
         blockedStreamPairs = streamKey[keys[0]].pairs;
@@ -567,14 +566,10 @@ async function awaitChange(keys, ids){
         let intervalId = setInterval(()=> {
             if (blockedStreamCopy.length < streamKey[keys[0]].pairs.length){
                 clearInterval(intervalId);
-                flag = true;
+                resolve();
             }
         }, 1000);
-        if (flag){
-            res = await xreadStreams(keys, ids)
-            resolve(res)
-        }
-
+        
     })
     
     
