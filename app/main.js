@@ -561,22 +561,23 @@ function getBulkString(string){
 }
 async function awaitChange(keys, ids){
     return new Promise((resolve, reject) => {
+        let flag = false;
         blockedStreamPairs = streamKey[keys[0]].pairs;
         blockedStreamCopy = [...blockedStreamPairs];
         let intervalId = setInterval(()=> {
             if (blockedStreamCopy.length < streamKey[keys[0]].pairs.length){
                 clearInterval(intervalId);
-                try{
-                    res = await xreadStreams(keys, ids)
-                    resolve(res)
-                } catch(error){
-                    console.error(error);
-                }
-                
+                flag = true;
             }
         }, 1000);
-
-
+        if (flag){
+            try{
+                res = await xreadStreams(keys, ids)
+                resolve(res)
+            } catch(error){
+                console.error(error);
+            }
+        }
     })
     
     
