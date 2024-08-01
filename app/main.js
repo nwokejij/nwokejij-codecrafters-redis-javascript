@@ -562,6 +562,7 @@ async function awaitChange(keys){
     return new Promise((resolve, reject) => {
         console.log("streamKey",keys[0]);
         console.log("streamKey Pairs", streamKey[keys[0]]);
+        console.log("id", streamKey[keys[0]].id);
         blockedStreamPairs = streamKey[keys[0]].pairs;
         console.log("Type", blockedStreamPairs);
         blockedStreamCopy = blockedStreamPairs.slice();
