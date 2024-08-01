@@ -566,8 +566,13 @@ async function awaitChange(keys, ids){
         let intervalId = setInterval(()=> {
             if (blockedStreamCopy.length < streamKey[keys[0]].pairs.length){
                 clearInterval(intervalId);
-                res = await xreadStreams(keys, ids)
-                resolve()
+                try{
+                    res = await xreadStreams(keys, ids)
+                    resolve(res)
+                } catch(error){
+                    console.error(error);
+                }
+                
             }
         }, 1000);
 
