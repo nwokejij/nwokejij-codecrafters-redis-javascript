@@ -571,13 +571,10 @@ async function awaitChange(keys, ids){
             }
         }, 1000);
         if (flag){
-            try{
-                res = await xreadStreams(keys, ids)
-                resolve(res)
-            } catch(error){
-                console.error(error);
-            }
+            res = await xreadStreams(keys, ids)
+            resolve(res)
         }
+
     })
     
     
