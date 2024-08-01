@@ -561,14 +561,11 @@ function getBulkString(string){
 async function awaitChange(keys){
     return new Promise((resolve, reject) => {
         console.log("streamKey",keys[0]);
-        console.log("streamKey Pairs", streamKey[keys[0]]);
-        console.log("id", streamKey[keys[0]].id);
-        blockedStreamPairs = streamKey[keys[0]].pairs;
-        console.log("Type", blockedStreamPairs);
-        blockedStreamCopy = blockedStreamPairs.slice();
+        console.log("streamKey Pairs", typeof streamKey[keys[0]]);
+        blockedStreamCopy = streamKey[keys[0]].slice();
         console.log("Copy", blockedStreamCopy);
         let intervalId = setInterval(()=> {
-            if (blockedStreamCopy.length < streamKey[keys[0]].pairs.length){
+            if (blockedStreamCopy.length < streamKey[keys[0]].length){
                 clearInterval(intervalId);
                 resolve();
             }
