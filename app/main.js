@@ -250,9 +250,16 @@ const server = net.createServer((connection) => {
         if (commands.includes("block")){
             if (!notCalled){
                 timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
+                if (timeIndex == 0){
+                    awaitChange(collectKeys).then(() => {
+                        res = await xreadStreams(collectKeys, collectIDs);
+                        connection.write(getBulkArray(res));
+                    })
+                } else {
                 res = await xreadStreams(collectKeys, collectIDs, timeIndex)
                 connection.write(getBulkArray(res));
                 notCalled = true;
+            }
             } else {
                 connection.write(getBulkString(null));
             }
@@ -499,6 +506,7 @@ const server = net.createServer((connection) => {
 
 async function xreadStreams(keys, ids, delay = 0){
     return new Promise((resolve, reject) => {
+        
         setTimeout(() => {
             res = [];
     // loop through the keys and ids iteratively
@@ -553,7 +561,22 @@ function getBulkString(string){
     }
     return `\$${string.length}\r\n${string}\r\n`
 }
+async function awaitChange(keys){
+    return new Promise((resolve, reject) => {
+        blockedStreamPairs = streamKey[keys[0]].pairs;
+        blockedStreamCopy = [...blockedStreamPairs];
+        let intervalId = setInterval(()=> {
+            if (blockedStreamCopy.length < streamKey[keys[0]].pairs.length){
+                clearInterval(intervalId);
+                resolve(intervalId);
+            }
+        }, 1000);
 
+
+    })
+    
+    
+}
 function getBulkArray(array){
     if (array == null){
         return "$-1\r\n"
