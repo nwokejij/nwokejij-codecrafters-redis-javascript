@@ -563,8 +563,9 @@ async function awaitChange(keys){
         console.log("streamKey",keys[0]);
         console.log("streamKey Pairs", streamKey[keys[0]]);
         blockedStreamPairs = streamKey[keys[0]].pairs;
-        console.log("Type", typeof blockedStreamPairs);
-        blockedStreamCopy = [...blockedStreamPairs];
+        console.log("Type", blockedStreamPairs);
+        blockedStreamCopy = blockedStreamPairs.slice();
+        console.log("Copy", blockedStreamCopy);
         let intervalId = setInterval(()=> {
             if (blockedStreamCopy.length < streamKey[keys[0]].pairs.length){
                 clearInterval(intervalId);
