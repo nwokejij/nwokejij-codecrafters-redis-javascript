@@ -250,9 +250,8 @@ const server = net.createServer((connection) => {
         if (commands.includes("block")){
             if (!notCalled){
                 timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
-                if (timeIndex == 0){
+                if (timeIndex == 0 && !commands.includes('$')){
                     await awaitChange(collectKeys, collectIDs);
-                    
             }
                 res = await xreadStreams(collectKeys, collectIDs, timeIndex)
                 connection.write(getBulkArray(res));
@@ -558,12 +557,15 @@ function getBulkString(string){
     }
     return `\$${string.length}\r\n${string}\r\n`
 }
-async function awaitChange(keys){
-    return new Promise((resolve, reject) => {
+async function awaitChange(keys, money){
+    return new Promise((resolve) => {
         console.log("streamKey",keys[0]);
         console.log("streamKey Pairs", typeof streamKey[keys[0]]);
         blockedStreamCopy = streamKey[keys[0]].slice();
         console.log("Copy", blockedStreamCopy);
+        if (money){
+            setTimeout
+        }
         let intervalId = setInterval(()=> {
             if (blockedStreamCopy.length < streamKey[keys[0]].length){
                 clearInterval(intervalId);
