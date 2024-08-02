@@ -115,6 +115,7 @@ function readRDBFile(dir, dbfile){
     if (!dir || !dbfile || isRead){
         return;
     }
+    isRead = true;
     let file = dbfile;
     let rdbPath = path.join(dir, file);
     let rdbFileBuffer = fs.readFileSync(rdbPath);
@@ -437,6 +438,7 @@ const server = net.createServer((connection) => {
         try {
         readRDBFile(config["dir"], config["dbfilename"]);
         isRead = true;
+
         connection.write(getBulkArray(listOfRBKeys));
     } catch (error){
         console.error(error.message);
@@ -487,7 +489,13 @@ const server = net.createServer((connection) => {
         } else if (commands[index + 2] in replicaDict) {
             connection.write(getBulkString(replicaDict[commands[index + 2]]));
         } else {
-            connection.write(getBulkString(dictionary[commands[index + 2]]));
+            val = dictionary[commands[index + 2]]
+            if (typeof val === "number"){
+                connection.write(`:${val}\r\n`);
+            } else {
+                connection.write(getBulkString(val));
+            }
+            
         }
     } else if (commands.includes("wait")) {
         let index = commands.indexOf("wait");
