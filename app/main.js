@@ -237,7 +237,9 @@ const server = net.createServer((connection) => {
         commands[i] = commands[i].toLowerCase();
     }
     console.log("Commands", commands);
-    if (commands.includes("incr")){
+    if (commands.includes("multi")){
+        connection.write("+OK\r\n");
+    }else if (commands.includes("incr")){
         let key = commands[commands.indexOf("incr") + 2];
         if (!(key in dictionary)){
             dictionary[key] = 0;
