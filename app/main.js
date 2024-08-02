@@ -238,7 +238,9 @@ const server = net.createServer((connection) => {
     console.log("Commands", commands);
     if (commands.includes("incr")){
         let key = commands[commands.indexOf("incr") + 2];
-        dictionary[key] += 1
+        val = parseInt(dictionary[key], 10);
+        val += 1
+        dictionary[key] = val
         connection.write(`:${dictionary[key]}\r\n`);
     }else if (commands.includes("xread")){
         queries = commands.slice(commands.indexOf("streams") + 1);
