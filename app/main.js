@@ -245,6 +245,14 @@ const server = net.createServer((connection) => {
             collectKeys.push(queries[i]);
         }
         for (let j = idStart + 1; j < queries.length; j += 2){
+            if (queries[j] == '$'){
+                let lastID = streamKey[collectKeys[collectKeys.length - 1]].id
+                if (lastID){
+                    queries[j] = lastID;
+                } else{
+                    queries[j] = "0-0"
+                }
+            }
             collectIDs.push(queries[j])
         }
         if (commands.includes("block")){
@@ -508,7 +516,6 @@ async function xreadStreams(keys, ids, delay = 0){
             res = [];
     // loop through the keys and ids iteratively
     for (let i = 0; i < keys.length; i += 1){
-        console.log("when do we get her");
         key = keys[i]
         id = ids[i]
         minTime = parseInt(id.split("-")[0], 10);
@@ -517,7 +524,7 @@ async function xreadStreams(keys, ids, delay = 0){
            time = parseInt(strm.id.split("-")[0], 10);
            version = parseInt(strm.id.split("-")[1], 10);
            if (time > minTime || (time == minTime && version > minVersion)){
-            res.push([strm.key, [[strm.id, strm.pairs.join(",").split(",")]]])
+            res.push([strm.key, [[strm.id, strm.pairs.join(",").split(",")]]]);
            }
         }
     }
