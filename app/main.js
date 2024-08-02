@@ -246,6 +246,7 @@ const server = net.createServer((connection) => {
         val = parseInt(dictionary[key], 10);
         console.log("This is the value", val);
         let type = typeof val;
+        console.log("This is the type", type);
         if (isNaN(type)){
             connection.write("-ERR value is not an integer or out of range\r\n");
         } else {
