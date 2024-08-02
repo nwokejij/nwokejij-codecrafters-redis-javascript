@@ -504,6 +504,7 @@ async function xreadStreams(keys, ids, delay = 0){
     return new Promise((resolve, reject) => {
         
         setTimeout(() => {
+            console.log("when do we get her");
             res = [];
     // loop through the keys and ids iteratively
     for (let i = 0; i < keys.length; i += 1){
