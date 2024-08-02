@@ -228,6 +228,7 @@ let prevStreamID = null;
 let timeToVersion = {}
 let notCalled = false;
 let isMultiCalled = false;
+let execQueue = null;
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
@@ -242,7 +243,14 @@ const server = net.createServer((connection) => {
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         }
+        connection.write(getBulkArray(execQueue));
+        if (execQueue.length == 0){
+            execQueue = null;
+            isMultiCalled = false;
+        }
     } else if (commands.includes("multi")){
+        execQueue = [];
+        isMultiCalled = true;
         connection.write("+OK\r\n");
     }else if (commands.includes("incr")){
         let key = commands[commands.indexOf("incr") + 2];
