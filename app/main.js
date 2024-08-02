@@ -238,6 +238,9 @@ const server = net.createServer((connection) => {
     console.log("Commands", commands);
     if (commands.includes("incr")){
         let key = commands[commands.indexOf("incr") + 2];
+        if (!(key in dictionary)){
+            dictionary[key] = 0;
+        }
         val = parseInt(dictionary[key], 10) + 1;
         dictionary[key] = val
         connection.write(`:${dictionary[key]}\r\n`);
