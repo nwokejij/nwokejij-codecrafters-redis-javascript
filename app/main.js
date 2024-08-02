@@ -246,7 +246,7 @@ const server = net.createServer((connection) => {
         }
         for (let j = idStart + 1; j < queries.length; j += 2){
             if (queries[j] == '$'){
-                let lastID = streamKey[collectKeys[collectKeys.length - 1]][streamKey[collectKeys[collectKeys.length - 1]].length - 1].id
+                let lastID = streamKey[collectKeys[collectKeys.length - 1]][streamKey[collectKeys[collectKeys.length - 1]].length - 1].id // retrieving the last id of the last stream under the given key
                 console.log("lastID", lastID)
                 if (lastID){
                     queries[j] = lastID;
