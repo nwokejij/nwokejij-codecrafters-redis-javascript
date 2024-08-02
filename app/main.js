@@ -243,8 +243,8 @@ const server = net.createServer((connection) => {
             dictionary[key] = 0;
         }
         val = parseInt(dictionary[key], 10) + 1;
-        dictionary[key] = val
-        connection.write(`:${dictionary[key]}\r\n`);
+        dictionary[key] = val.toString();
+        connection.write(`:${val}\r\n`);
     }else if (commands.includes("xread")){
         queries = commands.slice(commands.indexOf("streams") + 1);
         idStart = queries.length / 2;
@@ -489,13 +489,7 @@ const server = net.createServer((connection) => {
         } else if (commands[index + 2] in replicaDict) {
             connection.write(getBulkString(replicaDict[commands[index + 2]]));
         } else {
-            val = dictionary[commands[index + 2]]
-            if (typeof val === "number"){
-                connection.write(`:${val}\r\n`);
-            } else {
-                connection.write(getBulkString(val));
-            }
-            
+            connection.write(getBulkString(val));
         }
     } else if (commands.includes("wait")) {
         let index = commands.indexOf("wait");
