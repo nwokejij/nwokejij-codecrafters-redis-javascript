@@ -247,7 +247,7 @@ const server = net.createServer((connection) => {
         console.log("This is the value", val);
         let type = typeof val;
         console.log("This is the type", type);
-        if (isNaN(type)){
+        if (isNaN(val)){
             connection.write("-ERR value is not an integer or out of range\r\n");
         } else {
         val += 1;
