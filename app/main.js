@@ -483,13 +483,12 @@ const server = net.createServer((connection) => {
     } else if (commands.includes("get")) {
         let index = commands.indexOf("get");
         readRDBFile(config["dir"], config["dbfilename"]);
-        isRead = true;
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
             connection.write(getBulkString(null));
         } else if (commands[index + 2] in replicaDict) {
             connection.write(getBulkString(replicaDict[commands[index + 2]]));
         } else {
-            connection.write(getBulkString(val));
+            connection.write(getBulkString(dictionary[commands[index + 2]]));
         }
     } else if (commands.includes("wait")) {
         let index = commands.indexOf("wait");
