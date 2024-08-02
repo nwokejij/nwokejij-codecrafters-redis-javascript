@@ -242,9 +242,13 @@ const server = net.createServer((connection) => {
         if (!(key in dictionary)){
             dictionary[key] = 0;
         }
+        if (typeof parseInt(dictionary[key], 10) !== "number"){
+            connection.write("-ERR value is not an integer or out of range\r\n");
+        } else {
         val = parseInt(dictionary[key], 10) + 1;
         dictionary[key] = val.toString();
         connection.write(`:${val}\r\n`);
+        }
     }else if (commands.includes("xread")){
         queries = commands.slice(commands.indexOf("streams") + 1);
         idStart = queries.length / 2;
