@@ -242,12 +242,13 @@ const server = net.createServer((connection) => {
     if (commands.includes("exec")){
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
-        }
+        } else {
         connection.write(getBulkArray(execQueue));
         if (execQueue.length == 0){
             execQueue = null;
             isMultiCalled = false;
         }
+    }
     } else if (commands.includes("multi")){
         execQueue = [];
         isMultiCalled = true;
