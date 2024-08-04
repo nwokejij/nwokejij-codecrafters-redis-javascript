@@ -540,7 +540,7 @@ const server = net.createServer((connection) => {
                 }
         } else {
             if (isMultiCalled){
-                execQueue.push(getBulkString(dictionary[commands[index + 2]]));
+                execQueue.push(`:${parseInt(getBulkString(dictionary[commands[index + 2]]), 10)}\r\n`);
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
