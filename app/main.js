@@ -247,11 +247,11 @@ const server = net.createServer((connection) => {
         } else {
         let count = 1;
         for (let i = 0; i < execQueue.length; i++){
-            execQueue[i] = `${count})` + execQueue[i]
+            execQueue[i] = `${count}) ` + execQueue[i]
             count += 1;
         }
         console.log("ExecQueue", getBulkArray(execQueue));
-        connection.write(":1\r\n");
+        connection.write(getBulkArray(execQueue));
         execQueue = null;
         isMultiCalled = false;
     }
