@@ -537,7 +537,7 @@ const server = net.createServer((connection) => {
         } else if (commands[index + 2] in replicaDict) {
             console.log("second block")
             if (isMultiCalled){
-                execQueue.push(replicaDict[commands[index + 2]]);
+                execQueue.push(getBulkString(replicaDict[commands[index + 2]]));
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(replicaDict[commands[index + 2]]));
@@ -545,11 +545,7 @@ const server = net.createServer((connection) => {
         } else {
             console.log("Third block");
             if (isMultiCalled){
-                if (dictionary[commands[index+2]]){
-                    execQueue.push(getBulkString(null))
-                } else {
-                    execQueue.push(dictionary[commands[index + 2]]);
-                }
+                execQueue.push(getBulkString(dictionary[commands[index + 2]]));
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
