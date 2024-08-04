@@ -546,7 +546,7 @@ const server = net.createServer((connection) => {
             console.log("Third block");
             if (isMultiCalled){
                 console.log(dictionary[commands[index + 2]])
-                execQueue.push(getBulkString(dictionary[commands[index + 2]]));
+                execQueue.push(`:${parseInt(dictionary[commands[index + 2]], 10)}\r\n`);
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
