@@ -525,6 +525,7 @@ const server = net.createServer((connection) => {
         readRDBFile(config["dir"], config["dbfilename"]);
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
             if (isMultiCalled){
+            console.log("We arrived")
             execQueue.push(getBulkString(null));
             connection.write("+QUEUED\r\n")
             } else {
@@ -540,7 +541,11 @@ const server = net.createServer((connection) => {
                 }
         } else {
             if (isMultiCalled){
-                execQueue.push(dictionary[commands[index + 2]]);
+                if (dictionary[commands[index+2]]){
+                    execQueue.push(getBulkString(null))
+                } else {
+                    execQueue.push(dictionary[commands[index + 2]]);
+                }
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
