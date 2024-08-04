@@ -250,8 +250,9 @@ const server = net.createServer((connection) => {
             execQueue[i] = `${count}) ` + execQueue[i]
             count += 1;
         }
-        console.log("ExecQueue", getBulkArray(execQueue));
-        connection.write(getBulkArray(execQueue));
+        // console.log("ExecQueue", getBulkArray(execQueue));
+        // connection.write(getBulkArray(execQueue));
+        connection.write(connection.write("OK"))
         execQueue = null;
         isMultiCalled = false;
     }
