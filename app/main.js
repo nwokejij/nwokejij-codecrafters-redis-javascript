@@ -252,7 +252,7 @@ const server = net.createServer((connection) => {
         }
         // console.log("ExecQueue", getBulkArray(execQueue));
         // connection.write(getBulkArray(execQueue));
-        connection.write(connection.write("OK"))
+        connection.write(connection.write(getBulkString("OK")))
         execQueue = null;
         isMultiCalled = false;
     }
