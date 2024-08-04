@@ -246,9 +246,9 @@ const server = net.createServer((connection) => {
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
         console.log("ExecQueue", execQueue);
-        for (let cmd of execQueue)[
-            connection.write(`:${cmd}\r\n`)
-        ]
+        for (let i = 1; i < execQueue.length; i++){
+            connection.write(`:${execQueue[i]}\r\n`);
+        }
         // connection.write(getBulkArray(execQueue));
         execQueue = null;
         isMultiCalled = false;
