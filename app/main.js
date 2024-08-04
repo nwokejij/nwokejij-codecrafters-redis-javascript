@@ -273,7 +273,7 @@ const server = net.createServer((connection) => {
         val += 1;
         dictionary[key] = val.toString();
         if (isMultiCalled){
-            execQueue.push(val);
+            execQueue.push(`:${val}\r\n`);
             connection.write("+QUEUED\r\n")
         } else {
             connection.write(`:${val}\r\n`);
