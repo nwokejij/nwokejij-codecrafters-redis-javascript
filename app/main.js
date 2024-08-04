@@ -272,7 +272,7 @@ const server = net.createServer((connection) => {
         val += 1;
         dictionary[key] = val.toString();
         if (isMultiCalled){
-            execQueue.push(`:${val}\r\n`);
+            execQueue.push(val);
             connection.write("+QUEUED\r\n")
         } else {
             connection.write(`:${val}\r\n`);
@@ -514,7 +514,7 @@ const server = net.createServer((connection) => {
         }
         propagateToReplicas(command);
         if (isMultiCalled){
-            execQueue.push("OK");
+            execQueue.push("OK\r\n");
             connection.write("+QUEUED\r\n")
         } else {
             connection.write("+OK\r\n");
@@ -533,14 +533,14 @@ const server = net.createServer((connection) => {
            
         } else if (commands[index + 2] in replicaDict) {
             if (isMultiCalled){
-                execQueue.push(getBulkString(replicaDict[commands[index + 2]]));
+                execQueue.push(replicaDict[commands[index + 2]]);
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(replicaDict[commands[index + 2]]));
                 }
         } else {
             if (isMultiCalled){
-                execQueue.push(`:${parseInt(getBulkString(dictionary[commands[index + 2]]), 10)}\r\n`);
+                execQueue.push(dictionary[commands[index + 2]]);
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
