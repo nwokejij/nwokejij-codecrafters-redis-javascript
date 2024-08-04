@@ -238,7 +238,12 @@ const server = net.createServer((connection) => {
     for (let i = 1; i < commands.length; i+= 2){
         commands[i] = commands[i].toLowerCase();
     }
+    
     console.log("Commands", commands);
+    if (isMultiCalled && !commands.includes("exec")){
+        execQueue.push(commands);
+        connection.write("+QUEUED\r\n")
+    } else {
     if (commands.includes("exec")){
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
@@ -535,6 +540,7 @@ const server = net.createServer((connection) => {
         replicas.push(connection);
         handshakes += 1;
     }
+}
     });
 });
 
