@@ -515,7 +515,7 @@ const server = net.createServer((connection) => {
         }
         propagateToReplicas(command);
         if (isMultiCalled){
-            execQueue.push("OK\r\n");
+            execQueue.push("OK");
             connection.write("+QUEUED\r\n")
         } else {
             connection.write("+OK\r\n");
