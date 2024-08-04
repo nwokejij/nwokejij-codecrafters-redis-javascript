@@ -246,34 +246,41 @@ const server = net.createServer((connection) => {
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
         connection.write(getBulkArray(execQueue));
-        if (execQueue.length == 0){
-            execQueue = null;
-            isMultiCalled = false;
-        }
+        execQueue = null;
+        isMultiCalled = false;
     }
     } else if (commands.includes("multi")){
         execQueue = [];
         isMultiCalled = true;
         connection.write("+OK\r\n");
     }else if (commands.includes("incr")){
-        if (isMultiCalled){
-            execQueue.push(commands);
-            connection.write("+QUEUED\r\n")
-        } else {
-            let key = commands[commands.indexOf("incr") + 2];
+
+        let key = commands[commands.indexOf("incr") + 2];
         if (!(key in dictionary)){
             dictionary[key] = 0;
         }
         val = parseInt(dictionary[key], 10);
+        
         if (isNaN(val)){
-            connection.write("-ERR value is not an integer or out of range\r\n");
+            if (isMultiCalled){
+                execQueue.push("-ERR value is not an integer or out of range\r\n");
+                connection.write("+QUEUED\r\n");
+            } else {
+                connection.write("-ERR value is not an integer or out of range\r\n");
+            }
         } else {
         val += 1;
         dictionary[key] = val.toString();
-        connection.write(`:${val}\r\n`);
+        if (isMultiCalled){
+            execQueue.push(`:${val}\r\n`);
+            connection.write("+QUEUED\r\n")
+        } else {
+            connection.write(`:${val}\r\n`);
         }
         
         }
+        
+        
     }else if (commands.includes("xread")){
         queries = commands.slice(commands.indexOf("streams") + 1);
         idStart = queries.length / 2;
@@ -494,10 +501,6 @@ const server = net.createServer((connection) => {
     } else if (commands.includes("ping")) {
         connection.write("+PONG\r\n");
     } else if (commands.includes("set")) {
-        if (isMultiCalled){
-            execQueue.push(commands);
-            connection.write("+QUEUED\r\n")
-        } else {
         let index = commands.indexOf("set");
         console.log("This is the index of SET", index);
         dictionary[commands[index + 2]] = commands[index + 4];
@@ -510,19 +513,38 @@ const server = net.createServer((connection) => {
             }, parseInt(commands[px + 2]));
         }
         propagateToReplicas(command);
-        if (connection.type === 'client') {
+        if (isMultiCalled){
+            execQueue.push("+OK\r\n");
+            connection.write("+QUEUED\r\n")
+        } else {
             connection.write("+OK\r\n");
         }
-    }
+        
     } else if (commands.includes("get")) {
         let index = commands.indexOf("get");
         readRDBFile(config["dir"], config["dbfilename"]);
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
-            connection.write(getBulkString(null));
+            if (isMultiCalled){
+            execQueue.push(getBulkString(null));
+            connection.write("+QUEUED\r\n")
+            } else {
+                connection.write(getBulkString(null));
+            }
+           
         } else if (commands[index + 2] in replicaDict) {
-            connection.write(getBulkString(replicaDict[commands[index + 2]]));
+            if (isMultiCalled){
+                execQueue.push(getBulkString(replicaDict[commands[index + 2]]));
+                connection.write("+QUEUED\r\n")
+                } else {
+                    connection.write(getBulkString(replicaDict[commands[index + 2]]));
+                }
         } else {
-            connection.write(getBulkString(dictionary[commands[index + 2]]));
+            if (isMultiCalled){
+                execQueue.push(getBulkString(dictionary[commands[index + 2]]));
+                connection.write("+QUEUED\r\n")
+                } else {
+                    connection.write(getBulkString(dictionary[commands[index + 2]]));
+                }
         }
     } else if (commands.includes("wait")) {
         let index = commands.indexOf("wait");
