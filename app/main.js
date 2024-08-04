@@ -240,10 +240,7 @@ const server = net.createServer((connection) => {
     }
     
     console.log("Commands", commands);
-    if (isMultiCalled && !commands.includes("exec")){
-        execQueue.push(commands);
-        connection.write("+QUEUED\r\n")
-    } else {
+    
     if (commands.includes("exec")){
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
@@ -259,7 +256,11 @@ const server = net.createServer((connection) => {
         isMultiCalled = true;
         connection.write("+OK\r\n");
     }else if (commands.includes("incr")){
-        let key = commands[commands.indexOf("incr") + 2];
+        if (isMultiCalled){
+            execQueue.push(commands);
+            connection.write("+QUEUED\r\n")
+        } else {
+            let key = commands[commands.indexOf("incr") + 2];
         if (!(key in dictionary)){
             dictionary[key] = 0;
         }
@@ -270,6 +271,8 @@ const server = net.createServer((connection) => {
         val += 1;
         dictionary[key] = val.toString();
         connection.write(`:${val}\r\n`);
+        }
+        
         }
     }else if (commands.includes("xread")){
         queries = commands.slice(commands.indexOf("streams") + 1);
@@ -491,6 +494,10 @@ const server = net.createServer((connection) => {
     } else if (commands.includes("ping")) {
         connection.write("+PONG\r\n");
     } else if (commands.includes("set")) {
+        if (isMultiCalled){
+            execQueue.push(commands);
+            connection.write("+QUEUED\r\n")
+        } else {
         let index = commands.indexOf("set");
         console.log("This is the index of SET", index);
         dictionary[commands[index + 2]] = commands[index + 4];
@@ -506,6 +513,7 @@ const server = net.createServer((connection) => {
         if (connection.type === 'client') {
             connection.write("+OK\r\n");
         }
+    }
     } else if (commands.includes("get")) {
         let index = commands.indexOf("get");
         readRDBFile(config["dir"], config["dbfilename"]);
@@ -539,7 +547,6 @@ const server = net.createServer((connection) => {
         connection.type = 'replica'; // Set type as replica
         replicas.push(connection);
         handshakes += 1;
-    }
 }
     });
 });
