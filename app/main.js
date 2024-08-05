@@ -245,13 +245,13 @@ const server = net.createServer((connection) => {
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
-        let count = 1;
-        for (let i = 0; i < execQueue.length; i++){
-            connection.write(execQueue[i]);
-        }
+    
+        // for (let i = 0; i < execQueue.length; i++){
+        //     connection.write(execQueue[i]);
+        // }
         console.log("ExecQueue", getBulkArray(execQueue));
-        // connection.write(getBulkArray(execQueue));
-        // connection.write(connection.write(getBulkArray(execQueue)))
+        connection.write(getBulkArray(execQueue));
+        connection.write(connection.write(getBulkArray(execQueue)))
         execQueue = null;
         isMultiCalled = false;
     }
