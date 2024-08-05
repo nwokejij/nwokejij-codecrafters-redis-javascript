@@ -245,7 +245,7 @@ const server = net.createServer((connection) => {
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
-        connection.write(getBulkArray(["OK"]));
+        connection.write(getBulkArray(["OK", 1, 2, 3]));
         // let cmd = `*${execQueue.length}\r\n`
         // for (let i = 0; i < execQueue.length; i++){
         //     if (typeof execQueue[i] === "string"){
