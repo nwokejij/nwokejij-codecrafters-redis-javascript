@@ -278,7 +278,7 @@ const server = net.createServer((connection) => {
         val += 1;
         dictionary[key] = val.toString();
         if (isMultiCalled){
-            execQueue.push(`:${val}\r\n`);
+            execQueue.push(`${val}`);
             connection.write("+QUEUED\r\n")
         } else {
             connection.write(`:${val}\r\n`);
@@ -551,7 +551,7 @@ const server = net.createServer((connection) => {
             console.log("Third block");
             if (isMultiCalled){
                 console.log(dictionary[commands[index + 2]])
-                execQueue.push(`:${parseInt(dictionary[commands[index + 2]], 10)}\r\n`);
+                execQueue.push(`${parseInt(dictionary[commands[index + 2]], 10)}`);
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
