@@ -246,7 +246,7 @@ const server = net.createServer((connection) => {
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
         
-        let cmd = `*${execQueue.length}\r\n`
+        let cmd = `*${execQueue.length-1}\r\n`
         for (let i = 1; i < execQueue.length; i++){
             if (typeof execQueue[i] === "string"){
                 cmd += `$${execQueue[i].length}\r\n${execQueue[i]}\r\n`
