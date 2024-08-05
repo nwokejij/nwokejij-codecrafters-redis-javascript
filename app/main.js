@@ -245,13 +245,17 @@ const server = net.createServer((connection) => {
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
-        
-        // for (let i = 0; i < execQueue.length; i++){
-        //     execQueue[i] = 
-        // }
-        res = "*4\r\n"
+        let cmd = `*${execQueue.length}\r\n`
+        for (let i = 0; i < execQueue.length; i++){
+            if (typeof execQueue[i] === "string"){
+                cmd += `$${execQueue[i].length}\r\n${execQueue[i]}\r\n`
+            } else {
+                cmd += `:${execQueue[i]}\r\n`
+            }
+            
+        }
         console.log("ExecQueue", execQueue);
-        connection.write(getBulkArray(execQueue));
+        connection.write(cmd);
         execQueue = null;
         isMultiCalled = false;
     }
@@ -260,7 +264,6 @@ const server = net.createServer((connection) => {
         isMultiCalled = true;
         connection.write("+OK\r\n");
     }else if (commands.includes("incr")){
-
         let key = commands[commands.indexOf("incr") + 2];
         if (!(key in dictionary)){
             dictionary[key] = 0;
@@ -278,7 +281,7 @@ const server = net.createServer((connection) => {
         val += 1;
         dictionary[key] = val.toString();
         if (isMultiCalled){
-            execQueue.push(`${val}`);
+            execQueue.push(val);
             connection.write("+QUEUED\r\n")
         } else {
             connection.write(`:${val}\r\n`);
@@ -551,7 +554,7 @@ const server = net.createServer((connection) => {
             console.log("Third block");
             if (isMultiCalled){
                 console.log(dictionary[commands[index + 2]])
-                execQueue.push(`${parseInt(dictionary[commands[index + 2]], 10)}`);
+                execQueue.push(parseInt(dictionary[commands[index + 2]], 10));
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
