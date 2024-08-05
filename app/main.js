@@ -245,10 +245,11 @@ const server = net.createServer((connection) => {
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
-    
+        
         // for (let i = 0; i < execQueue.length; i++){
         //     execQueue[i] = 
         // }
+        res = "*4\r\n"
         console.log("ExecQueue", execQueue);
         connection.write(getBulkArray(execQueue));
         execQueue = null;
@@ -519,7 +520,7 @@ const server = net.createServer((connection) => {
         }
         propagateToReplicas(command);
         if (isMultiCalled){
-            execQueue.push(getBulkString("OK"));
+            execQueue.push("OK");
             connection.write("+QUEUED\r\n")
         } else {
             connection.write("+OK\r\n");
