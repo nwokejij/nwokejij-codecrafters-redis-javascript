@@ -252,7 +252,7 @@ const server = net.createServer((connection) => {
             } else {
                 valAsString = execQueue[i].toString()
                 res = `$${valAsString.length}\r\n${valAsString}\r\n`
-                cmd += valAsString;
+                cmd += res;
             }
             
         }
