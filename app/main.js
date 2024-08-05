@@ -254,7 +254,7 @@ const server = net.createServer((connection) => {
             }
             
         }
-        console.log("ExecQueue", execQueue);
+        console.log("cmd", cmd);
         connection.write(cmd);
         execQueue = null;
         isMultiCalled = false;
