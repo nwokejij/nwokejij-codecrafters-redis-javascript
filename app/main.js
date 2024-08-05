@@ -246,18 +246,18 @@ const server = net.createServer((connection) => {
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
         msg = getBulkArray(["OK", "1", "2", "3"]);
-        let cmd = `*${execQueue.length}\r\n`
-        for (let i = 0; i < execQueue.length; i++){
-            if (typeof execQueue[i] === "string"){
-                cmd += `$${execQueue[i].length}\r\n${execQueue[i]}\r\n`
-            } else {
-                res = `:${execQueue[i]}\r\n`
-                cmd += res;
-            }
+        // let cmd = `*${execQueue.length}\r\n`
+        // for (let i = 0; i < execQueue.length; i++){
+        //     if (typeof execQueue[i] === "string"){
+        //         cmd += `$${execQueue[i].length}\r\n${execQueue[i]}\r\n`
+        //     } else {
+        //         res = `:${execQueue[i]}\r\n`
+        //         cmd += res;
+        //     }
             
-        }
-        console.log("cmd", cmd);
-        connection.write(cmd);
+        // }
+        // console.log("cmd", cmd);
+        connection.write(msg);
         execQueue = null;
         isMultiCalled = false;
     }
