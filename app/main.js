@@ -247,11 +247,10 @@ const server = net.createServer((connection) => {
         } else {
     
         // for (let i = 0; i < execQueue.length; i++){
-        //     connection.write(execQueue[i]);
+        //     execQueue[i] = 
         // }
-        console.log("ExecQueue", getBulkArray(execQueue));
+        console.log("ExecQueue", execQueue);
         connection.write(getBulkArray(execQueue));
-        connection.write(connection.write(getBulkArray(execQueue)))
         execQueue = null;
         isMultiCalled = false;
     }
