@@ -251,8 +251,8 @@ const server = net.createServer((connection) => {
             if (typeof execQueue[i] === "string"){
                 cmd += `$${execQueue[i].length}\r\n${execQueue[i]}\r\n`
             } else {
-                valAsString = execQueue[i].toString()
-                cmd += `(${execQueue[i]}\r\n`
+                valAsString = "(integer) " + execQueue[i].toString()
+                cmd += getBulkString(valAsString)
             }
             
         }
