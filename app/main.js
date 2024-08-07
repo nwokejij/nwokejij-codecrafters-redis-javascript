@@ -255,6 +255,7 @@ const server = net.createServer((connection) => {
             }
             
         }
+        cmd += '\r\n'
         // console.log("cmd", cmd);
         connection.write(cmd);
         execQueue = null;
