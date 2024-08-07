@@ -252,7 +252,7 @@ const server = net.createServer((connection) => {
                 cmd += `$${execQueue[i].length}\r\n${execQueue[i]}\r\n`
             } else {
                 valAsString = execQueue[i].toString()
-                cmd += `${execQueue[i]}\r\n`
+                cmd += `:${execQueue[i]}\r\n`
             }
             
         }
