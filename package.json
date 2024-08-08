@@ -11,5 +11,7 @@
     ],
     "author": "",
     "license": "MIT",
-    "dependencies": {}
+    "dependencies": {
+        "moment": "^2.30.1"
+    }
 }
