@@ -265,7 +265,11 @@ const server = net.createServer((connection) => {
             if (typeof execQueue[i] === "string"){
                 cmd.append(`$${execQueue[i].length}\r\n${execQueue[i]}\r\n`)
             } else {
-                cmd.append(`+${execQueue[i]}\r\n`)
+                if (i == 1){
+                    cmd.append(`+${execQueue[i]}\r\n`)
+                } else {
+                    cmd.append(`:${execQueue[i]}\r\n`)
+                }
             }
         }
         connection.write(cmd.toString());
