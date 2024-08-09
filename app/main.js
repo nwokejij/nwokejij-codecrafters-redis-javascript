@@ -263,7 +263,8 @@ const server = net.createServer((connection) => {
         } else {
         for (let i = 0; i < execQueue.length; i++){
             if (typeof execQueue[i] === "string"){
-                cmd.append(`$${execQueue[i].length}\r\n${execQueue[i]}\r\n`)
+                // cmd.append(`$${execQueue[i].length}\r\n${execQueue[i]}\r\n`)
+                cmd.append(`+${execQueue[i]}\r\n`)
             } else {
                 if (i == 1){
                     cmd.append(`+${execQueue[i]}\r\n`)
