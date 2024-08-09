@@ -245,21 +245,21 @@ let execQueue = null;
     console.log("Commands", commands);
     
     if (commands.includes("exec")){
-        let cmd = `*${execQueue.length}\r\n`;
+        let cmd = `*${execQueue.length}\r\n`
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
         for (let i = 0; i < execQueue.length; i++){
             if (typeof execQueue[i] === "string"){
                 // cmd.append(`$${execQueue[i].length}\r\n${execQueue[i]}\r\n`)
-                cmd.append(`+${execQueue[i]}\r\n`)
+                cmd += `+${execQueue[i]}\r\n`;
             } else {
                 if (i == 1){
-                    cmd.append(`:${execQueue[i]}\r\n`)
+                    cmd += `:${execQueue[i]}\r\n`
                 } else if (i == 2){
-                    cmd.append(`:${execQueue[i]}\r\n`)
+                    cmd += `:${execQueue[i]}\r\n`
                 } else {
-                    cmd.append(`+${execQueue[i]}\r\n`)
+                    cmd += `+${execQueue[i]}\r\n`
                 }
                 }
             }
