@@ -217,6 +217,10 @@ class Stream {
         this.pairs = [];
     }
 }
+
+
+
+const server = net.createServer((connection) => {
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
@@ -229,21 +233,6 @@ let timeToVersion = {}
 let notCalled = false;
 let isMultiCalled = false;
 let execQueue = null;
-class StringBuilder {
-    constructor() {
-        this.parts = [];
-    }
-
-    append(str) {
-        this.parts.push(str);
-    }
-
-    toString() {
-        return this.parts.join('');
-    }
-}
-
-const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
     const command = data.toString();
