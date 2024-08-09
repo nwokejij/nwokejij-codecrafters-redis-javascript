@@ -268,15 +268,17 @@ const server = net.createServer((connection) => {
             } else {
                 if (i == 1){
                     cmd.append(`:${execQueue[i]}\r\n`)
+                } else if (i == 2){
+                    cmd.append(`:${execQueue[i]}\r\n`)
                 } else {
                     cmd.append(`+${execQueue[i]}\r\n`)
+                }
                 }
             }
         }
         connection.write(cmd.toString());
         execQueue = null;
         isMultiCalled = false;
-    }
     } else if (commands.includes("multi")){
         execQueue = [];
         isMultiCalled = true;
