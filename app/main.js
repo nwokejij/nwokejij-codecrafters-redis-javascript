@@ -267,9 +267,9 @@ const server = net.createServer((connection) => {
                 cmd.append(`+${execQueue[i]}\r\n`)
             } else {
                 if (i == 1){
-                    cmd.append(`+${execQueue[i]}\r\n`)
-                } else {
                     cmd.append(`:${execQueue[i]}\r\n`)
+                } else {
+                    cmd.append(`+${execQueue[i]}\r\n`)
                 }
             }
         }
