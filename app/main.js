@@ -245,7 +245,7 @@ let execQueue = null;
     console.log("Commands", commands);
     
     if (commands.includes("exec")){
-        cmd.append(`*${execQueue.length}\r\n`)
+        let cmd = `*${execQueue.length}\r\n`;
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
