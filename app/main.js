@@ -229,6 +229,20 @@ let timeToVersion = {}
 let notCalled = false;
 let isMultiCalled = false;
 let execQueue = null;
+class StringBuilder {
+    constructor() {
+        this.parts = [];
+    }
+
+    append(str) {
+        this.parts.push(str);
+    }
+
+    toString() {
+        return this.parts.join('');
+    }
+}
+
 const server = net.createServer((connection) => {
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
@@ -240,20 +254,20 @@ const server = net.createServer((connection) => {
     }
     
     console.log("Commands", commands);
-    
+    let cmd = new StringBuilder();
+    cmd.append(`*${execQueue.length}\r\n`)
     if (commands.includes("exec")){
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
-        connection.write(`*${execQueue.length}\r\n`);
         for (let i = 0; i < execQueue.length; i++){
             if (typeof execQueue[i] === "string"){
-                connection.write(`$${execQueue[i].length}\r\n${execQueue[i]}\r\n`)
+                cmd.append(`$${execQueue[i].length}\r\n${execQueue[i]}\r\n`)
             } else {
-                connection.write(`:${execQueue[i]}\r\n`)
+                cmd.append(`:${execQueue[i]}\r\n`)
             }
         }
-        // console.log("cmd", cmd);
+        connection.write(cmd.toString());
         execQueue = null;
         isMultiCalled = false;
     }
