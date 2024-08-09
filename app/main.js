@@ -529,7 +529,7 @@ let execQueue = null;
                 delete dictionary[commands[index + 2]];
             }, parseInt(commands[px + 2]));
         }
-        propagateToReplicas(command);
+        propagateToReplicas(replicas, command);
         if (isMultiCalled){
             execQueue.push("OK");
             connection.write("+QUEUED\r\n")
@@ -625,7 +625,7 @@ async function xreadStreams(keys, ids, delay = 0){
     
 
 
-const propagateToReplicas = (command) => {
+const propagateToReplicas = (replicas, command) => {
     if (replicas.length === 0) {
         return;
     }
