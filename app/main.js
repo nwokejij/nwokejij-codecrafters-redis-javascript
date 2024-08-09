@@ -254,9 +254,10 @@ const server = net.createServer((connection) => {
     }
     
     console.log("Commands", commands);
-    let cmd = new StringBuilder();
-    cmd.append(`*${execQueue.length}\r\n`)
+    
     if (commands.includes("exec")){
+        let cmd = new StringBuilder();
+        cmd.append(`*${execQueue.length}\r\n`)
         if (!isMultiCalled){
             connection.write("-ERR EXEC without MULTI\r\n");
         } else {
