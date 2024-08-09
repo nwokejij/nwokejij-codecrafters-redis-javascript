@@ -248,8 +248,12 @@ const server = net.createServer((connection) => {
         
         let cmd = `*${execQueue.length}\r\n`
         for (let i = 0; i < execQueue.length; i++){
-            valAsString = execQueue[i].toString()
-            cmd += `$${valAsString.length}\r\n${valAsString}\r\n`
+            if (typeof execQueue[i] === "string"){
+                cmd += `$${execQueue[i].length}\r\n${execQueue[i]}\r\n`
+            } else {
+                cmd += getBulkString(`:${execQueue[i]}\r\n`)
+            }
+            
         }
         
         // console.log("cmd", cmd);
@@ -464,7 +468,6 @@ const server = net.createServer((connection) => {
             
             }
     else if (commands.includes("type")){
-
         let type = commands.indexOf("type");
         let key = commands[type + 2];
         if (!(key in dictionary) && !(key in streamKey)){
