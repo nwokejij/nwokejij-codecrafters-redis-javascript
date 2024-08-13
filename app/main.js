@@ -560,8 +560,8 @@ let execQueue = null;
         } else {
             console.log("Third block");
             if (isMultiCalled){
-                console.log(dictionary[commands[index + 2]])
-                execQueue.push(parseInt(dictionary[commands[index + 2]], 10));
+                console.log(typeof dictionary[commands[index + 2]])
+                execQueue.push(dictionary[commands[index + 2]]);
                 connection.write("+QUEUED\r\n")
                 } else {
                     connection.write(getBulkString(dictionary[commands[index + 2]]));
