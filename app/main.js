@@ -231,7 +231,7 @@ const streamArray = [];
 let prevStreamID = null;
 let timeToVersion = {}
 let notCalled = false;
-let execQueue = null;
+let execQueue = [];
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
     const command = data.toString();
@@ -240,9 +240,7 @@ let execQueue = null;
     for (let i = 1; i < commands.length; i+= 2){
         commands[i] = commands[i].toLowerCase();
     }
-    
     console.log("Commands", commands);
-    
     if (commands.includes("exec")){
         let cmd = `*${execQueue.length}\r\n`
         if (!isMultiCalled){
@@ -529,9 +527,6 @@ let execQueue = null;
         }
         
     } else if (commands.includes("get")) {
-        if (isMultiCalled){
-            connection.write(getBulkString(null));
-        }
         let index = commands.indexOf("get");
         readRDBFile(config["dir"], config["dbfilename"]);
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
