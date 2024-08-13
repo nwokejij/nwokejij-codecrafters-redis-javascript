@@ -251,19 +251,12 @@ let execQueue = null;
         } else {
         for (let i = 0; i < execQueue.length; i++){
             if (typeof execQueue[i] === "string"){
-                // cmd.append(`$${execQueue[i].length}\r\n${execQueue[i]}\r\n`)
                 cmd += `+${execQueue[i]}\r\n`;
             } else {
-                if (i == 1){
                     cmd += `:${execQueue[i]}\r\n`
-                } else if (i == 2){
-                    cmd += `:${execQueue[i]}\r\n`
-                } else {
-                    cmd += `+${execQueue[i]}\r\n`
                 }
                 }
             }
-        }
         connection.write(cmd.toString());
         execQueue = null;
         isMultiCalled = false;
