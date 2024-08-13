@@ -218,13 +218,12 @@ class Stream {
     }
 }
 
-
+const dictionary = {};
 
 const server = net.createServer((connection) => {
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
-const dictionary = {};
 let handshakes = 0;
 const streamKey = {};
 const streamArray = [];
