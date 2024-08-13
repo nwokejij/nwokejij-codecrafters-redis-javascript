@@ -529,6 +529,9 @@ let execQueue = null;
         }
         
     } else if (commands.includes("get")) {
+        if (isMultiCalled){
+            connection.write(getBulkString(null));
+        }
         let index = commands.indexOf("get");
         readRDBFile(config["dir"], config["dbfilename"]);
         if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
