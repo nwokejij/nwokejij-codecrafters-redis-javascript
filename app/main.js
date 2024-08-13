@@ -219,8 +219,9 @@ class Stream {
 }
 
 const dictionary = {};
-let isMultiCalled = false;
+
 const server = net.createServer((connection) => {
+let isMultiCalled = false;
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
