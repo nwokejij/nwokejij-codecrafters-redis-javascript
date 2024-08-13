@@ -219,7 +219,7 @@ class Stream {
 }
 
 const dictionary = {};
-
+let isMultiCalled = false;
 const server = net.createServer((connection) => {
 const replicas = [];
 let propagatedCommands = 0;
@@ -230,7 +230,6 @@ const streamArray = [];
 let prevStreamID = null;
 let timeToVersion = {}
 let notCalled = false;
-let isMultiCalled = false;
 let execQueue = null;
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
