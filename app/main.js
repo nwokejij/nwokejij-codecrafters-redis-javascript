@@ -232,7 +232,7 @@ let execQueue = [];
 
 
 function execFunction(isMultiCalled){
-    if (!isMultiCalled){
+    if (!isMultiCalled || execQueue == null){
         connection.write("-ERR EXEC without MULTI\r\n");
         return
     }
