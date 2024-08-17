@@ -291,7 +291,7 @@ function incrFunction(commands){
         }
         
         }
-function xRead(commands){
+async function xRead(commands){
         queries = commands.slice(commands.indexOf("streams") + 1);
         idStart = queries.length / 2;
         collectKeys = [];
