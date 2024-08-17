@@ -232,10 +232,10 @@ let execQueue = [];
 
 
 function execFunction(isMultiCalled){
-    let cmd = `*${execQueue.length}\r\n`
     if (!isMultiCalled){
         connection.write("-ERR EXEC without MULTI\r\n");
     } else {
+    let cmd = `*${execQueue.length}\r\n`
     isMultiCalled = false;
     for (let i = 0; i < execQueue.length; i++){
         let command = execQueue[i]
