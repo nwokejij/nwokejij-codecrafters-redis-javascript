@@ -443,7 +443,15 @@ const server = net.createServer((connection) => {
         commands[i] = commands[i].toLowerCase();
     }
     console.log("Commands", commands);
-    if (commands.includes("exec")){
+    if (commands.includes("discard")){
+        if (!isMultiCalled){
+            connection.write("-ERR DISCARD without MULTI\r\n");
+        } else {
+        execQueue = []
+        isMultiCalled = false;
+        connection.write("+OK\r\n");
+        }
+    }else if (commands.includes("exec")){
         connection.write(execFunction(isMultiCalled));
     } else if (commands.includes("multi")){
         isMultiCalled = true;
