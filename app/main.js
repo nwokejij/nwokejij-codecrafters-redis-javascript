@@ -244,16 +244,13 @@ function execFunction(){
         let res = ""
         if (instruction == "incr"){
             res = incrFunction(command);
+            console.log("From Incr", res)
         } else if (instruction == "set"){
             res = setCommand(command)
         } else if (instruction == "get"){
             res = getCommand(command);
         }
-        if (typeof res === "string"){
-            cmd += `+${res}\r\n`
-        } else {
-            cmd += `:${res}\r\n`
-        }
+        cmd += res
 
 
         // if (typeof execQueue[i] === "string"){
