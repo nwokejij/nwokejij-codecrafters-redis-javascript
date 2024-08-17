@@ -434,7 +434,7 @@ function getCommand(commands){
 }
 const server = net.createServer((connection) => {
     let isMultiCalled = false;
-    let execQueue = null;
+    let execQueue = [];
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
     const command = data.toString();
