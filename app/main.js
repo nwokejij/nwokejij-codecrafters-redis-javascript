@@ -553,7 +553,7 @@ const server = net.createServer((connection) => {
             execQueue.push(commands);
             connection.write("+QUEUED\r\n")
             } else {
-        propagateToReplicas(replicas, command);
+        propagateToReplicas(command);
         connection.write(setCommand(commands))
             }
     } else if (commands.includes("get")) {
@@ -620,10 +620,11 @@ async function xreadStreams(keys, ids, delay = 0){
     
 
 
-const propagateToReplicas = (replicas, command) => {
+const propagateToReplicas = (command) => {
     if (replicas.length === 0) {
         return;
     }
+    console.log("What is the type", typeof replicas);
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
         replica.write(command);
