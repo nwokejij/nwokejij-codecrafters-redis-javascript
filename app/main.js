@@ -219,8 +219,6 @@ class Stream {
 }
 
 const dictionary = {};
-
-const server = net.createServer((connection) => {
 let isMultiCalled = false;
 const replicas = [];
 let propagatedCommands = 0;
@@ -232,63 +230,68 @@ let prevStreamID = null;
 let timeToVersion = {}
 let notCalled = false;
 let execQueue = [];
-    connection.type = 'client'; // Default type is client
-    connection.on('data', async (data) => {
-    const command = data.toString();
-    let commands = command.slice(3).split('\r\n');
-    commands.pop(); // remove last empty spot
-    for (let i = 1; i < commands.length; i+= 2){
-        commands[i] = commands[i].toLowerCase();
-    }
-    console.log("Commands", commands);
-    if (commands.includes("exec")){
-        let cmd = `*${execQueue.length}\r\n`
-        if (!isMultiCalled){
-            connection.write("-ERR EXEC without MULTI\r\n");
+
+
+function execFunction(){
+    let cmd = `*${execQueue.length}\r\n`
+    if (!isMultiCalled){
+        connection.write("-ERR EXEC without MULTI\r\n");
+    } else {
+    isMultiCalled = false;
+    for (let i = 0; i < execQueue.length; i++){
+        let command = execQueue[i]
+        let instruction = command[1];
+        let res = ""
+        if (instruction == "incr"){
+            res = incrFunction(command);
+        } else if (instruction == "set"){
+            res = setCommand(command)
+        } else if (instruction == "get"){
+            res = getCommand(command);
+        }
+        if (typeof res === "string"){
+            cmd += `+${res}\r\n`
         } else {
-        for (let i = 0; i < execQueue.length; i++){
-            if (typeof execQueue[i] === "string"){
-                cmd += `+${execQueue[i]}\r\n`;
-            } else {
-                    cmd += `:${execQueue[i]}\r\n`
-                }
-                }
+            cmd += `:${res}\r\n`
+        }
+
+
+        // if (typeof execQueue[i] === "string"){
+        //     cmd += `+${execQueue[i]}\r\n`;
+        // } else {
+        //         cmd += `:${execQueue[i]}\r\n`
+        //     }
             }
-        connection.write(cmd.toString());
+        }
         execQueue = null;
-        isMultiCalled = false;
-    } else if (commands.includes("multi")){
-        execQueue = [];
-        isMultiCalled = true;
-        connection.write("+OK\r\n");
-    }else if (commands.includes("incr")){
+    return cmd.toString();
+}
+function multiFunction(){
+    execQueue = [];
+    isMultiCalled = true;
+    return "+OK\r\n"
+}
+function incrFunction(commands){
+    if (isMultiCalled){
+        execQueue.push(commands); // should I push the command instead
+        return "+QUEUED\r\n"
+    } 
         let key = commands[commands.indexOf("incr") + 2];
         if (!(key in dictionary)){
             dictionary[key] = 0;
         }
-        val = parseInt(dictionary[key], 10);
+        let val = parseInt(dictionary[key], 10);
         
         if (isNaN(val)){
-            if (isMultiCalled){
-                execQueue.push("-ERR value is not an integer or out of range\r\n");
-                connection.write("+QUEUED\r\n");
-            } else {
-                connection.write("-ERR value is not an integer or out of range\r\n");
-            }
+                return "-ERR value is not an integer or out of range\r\n"
         } else {
         val += 1;
         dictionary[key] = val.toString();
-        if (isMultiCalled){
-            execQueue.push(val);
-            connection.write("+QUEUED\r\n")
-        } else {
-            connection.write(`:${val}\r\n`);
+        return `:${val}\r\n`
         }
         
         }
-        
-        
-    }else if (commands.includes("xread")){
+function xRead(commands){
         queries = commands.slice(commands.indexOf("streams") + 1);
         idStart = queries.length / 2;
         collectKeys = [];
@@ -315,24 +318,20 @@ let execQueue = [];
                     await awaitChange(collectKeys, collectIDs);
             }
                 res = await xreadStreams(collectKeys, collectIDs, timeIndex)
-                connection.write(getBulkArray(res));
                 notCalled = true;
+                return getBulkArray(res);
             } else {
-                connection.write(getBulkString(null));
+                return getBulkString(null);
             }
             
         } else {
             res = await xreadStreams(collectKeys, collectIDs);
-            connection.write(getBulkArray(res));
+            return getBulkArray(res);
         }
-        // if commands.includes block
-        // anytime a new xadd command happens, need to call xreadStreams
-        // limited time to add 
-        // res = xreadStreams(collectKeys, collectIDs);
-        // connection.write(getBulkArray(res));
-    } else if (commands.includes("xrange")){
-    
-        index = commands.indexOf("xrange");
+}
+
+function xRange(commands){
+    index = commands.indexOf("xrange");
         leftBound = commands[index + 4].toString();
         let fromTheStart = false;
         if (leftBound == "-"){
@@ -394,24 +393,24 @@ let execQueue = [];
             }
             console.log("WithinRange", withinRange);
             console.log("bulkArray", getBulkArray(withinRange));
-            connection.write(getBulkArray(withinRange));
-        }
-    else if (commands.includes("xadd")){
-        let cmd = commands.indexOf("xadd");
+            return getBulkArray(withinRange);
+}
+function xAdd(commands){
+    let cmd = commands.indexOf("xadd");
         console.log("First Entry point");
         
         stream_id = commands[cmd + 4];
         if (stream_id == "*"){
             date = Date.now().toString() + "-0";
-            connection.write(getBulkString(date));
+            return getBulkString(date);
         } else {
         let milliseconds = stream_id.split("-")[0];
         let version = stream_id.split("-")[1];
         let auto = false;
         if (milliseconds == "0" && version == "0"){
-            connection.write("-ERR The ID specified in XADD must be greater than 0-0\r\n");
+            return "-ERR The ID specified in XADD must be greater than 0-0\r\n";
         } else if ((prevStreamID) && ((milliseconds != "*") && (milliseconds < prevStreamID.split("-")[0]) || ((milliseconds == prevStreamID.split("-")[0]) && (version != "*" && version <= prevStreamID.split("-")[1])))){
-                connection.write("-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n");
+                return "-ERR The ID specified in XADD is equal or smaller than the target stream top item\r\n"
             } else {
                 if (version == "*"){
                     auto = true;
@@ -452,16 +451,73 @@ let execQueue = [];
                 console.log("Fourth entry point")
                 if (auto){
                     let auto_reply = `${milliseconds}-${version}`
-                    connection.write(getBulkString(auto_reply));
                     auto = false;
+                    return getBulkString(auto_reply);
                 } else {
                     console.log("Fifth Entry Point")
-                    connection.write(getBulkString(stream_id));
+                    return getBulkString(stream_id);
                 }
             } 
         }
-            
-            
+}
+function setCommand(commands){
+    if (isMultiCalled){
+        execQueue.push(commands);
+        return "+QUEUED\r\n";
+    } 
+        let index = commands.indexOf("set");
+        console.log("This is the index of SET", index);
+        dictionary[commands[index + 2]] = commands[index + 4];
+        console.log(dictionary);
+        if (commands.includes("px")) {
+            let px = commands.indexOf("px");
+            setTimeout(() => {
+                delete dictionary[commands[index + 2]];
+            }, parseInt(commands[px + 2]));
+        }
+        return "+OK\r\n"
+        }
+function getCommand(commands){
+    if (isMultiCalled){
+        console.log("We arrived")
+        execQueue.push(commands);
+        return "+QUEUED\r\n"
+        }
+    let index = commands.indexOf("get");
+    readRDBFile(config["dir"], config["dbfilename"]);
+    if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
+        return getBulkString(null);
+        } else if (commands[index + 2] in replicaDict) {
+        console.log("second block")
+        return getBulkString(replicaDict[commands[index + 2]])
+            } else {
+        return getBulkString(dictionary[commands[index + 2]])
+    }
+}
+const server = net.createServer((connection) => {
+    connection.type = 'client'; // Default type is client
+    connection.on('data', async (data) => {
+    const command = data.toString();
+    let commands = command.slice(3).split('\r\n');
+    commands.pop(); // remove last empty spot
+    for (let i = 1; i < commands.length; i+= 2){
+        commands[i] = commands[i].toLowerCase();
+    }
+    console.log("Commands", commands);
+    if (commands.includes("exec")){
+        connection.write(execFunction());
+    } else if (commands.includes("multi")){
+        connection.write(multiFunction());
+    }else if (commands.includes("incr")){
+        connection.write(incrFunction(commands));
+    
+    }else if (commands.includes("xread")){
+        connection.write(xRead(commands))
+    } else if (commands.includes("xrange")){
+        connection.write(xRange(commands));
+        }
+    else if (commands.includes("xadd")){
+        connection.write(xAdd(commands));
             }
     else if (commands.includes("type")){
         let type = commands.indexOf("type");
@@ -507,56 +563,10 @@ let execQueue = [];
     } else if (commands.includes("ping")) {
         connection.write("+PONG\r\n");
     } else if (commands.includes("set")) {
-        let index = commands.indexOf("set");
-        console.log("This is the index of SET", index);
-        dictionary[commands[index + 2]] = commands[index + 4];
-        console.log(dictionary);
-        if (commands.includes("px")) {
-            let px = commands.indexOf("px");
-            console.log("Hello", dictionary[commands[index + 2]], commands[px + 2]);
-            setTimeout(() => {
-                delete dictionary[commands[index + 2]];
-            }, parseInt(commands[px + 2]));
-        }
         propagateToReplicas(replicas, command);
-        if (isMultiCalled){
-            execQueue.push("OK");
-            connection.write("+QUEUED\r\n")
-        } else {
-            connection.write("+OK\r\n");
-        }
-        
+        connection.write(setCommand(commands))
     } else if (commands.includes("get")) {
-        let index = commands.indexOf("get");
-        readRDBFile(config["dir"], config["dbfilename"]);
-        if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
-            console.log("first block")
-            if (isMultiCalled){
-            console.log("We arrived")
-            execQueue.push(getBulkString(null));
-            connection.write("+QUEUED\r\n")
-            } else {
-                connection.write(getBulkString(null));
-            }
-           
-        } else if (commands[index + 2] in replicaDict) {
-            console.log("second block")
-            if (isMultiCalled){
-                execQueue.push(getBulkString(replicaDict[commands[index + 2]]));
-                connection.write("+QUEUED\r\n")
-                } else {
-                    connection.write(getBulkString(replicaDict[commands[index + 2]]));
-                }
-        } else {
-            console.log("Third block");
-            if (isMultiCalled){
-                console.log(typeof dictionary[commands[index + 2]])
-                execQueue.push(dictionary[commands[index + 2]]);
-                connection.write("+QUEUED\r\n")
-                } else {
-                    connection.write(getBulkString(dictionary[commands[index + 2]]));
-                }
-        }
+        connection.write(getCommand(commands))
     } else if (commands.includes("wait")) {
         let index = commands.indexOf("wait");
         let noOfReps = parseInt(commands[index + 2]);
