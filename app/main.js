@@ -250,13 +250,6 @@ function execFunction(isMultiCalled){
             res = getCommand(command);
         }
         cmd += res
-
-
-        // if (typeof execQueue[i] === "string"){
-        //     cmd += `+${execQueue[i]}\r\n`;
-        // } else {
-        //         cmd += `:${execQueue[i]}\r\n`
-        //     }
         }
         execQueue = null;
     return cmd.toString();
@@ -624,7 +617,6 @@ const propagateToReplicas = (command) => {
     if (replicas.length === 0) {
         return;
     }
-    console.log("What is the type", typeof replicas);
     replicas.forEach((replica) => {
         console.log("Command to be Propagated", command);
         replica.write(command);
