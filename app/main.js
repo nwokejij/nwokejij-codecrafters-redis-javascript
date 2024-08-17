@@ -281,44 +281,6 @@ function incrFunction(commands){
         }
         
         }
-async function xRead(commands){
-        queries = commands.slice(commands.indexOf("streams") + 1);
-        idStart = queries.length / 2;
-        collectKeys = [];
-        collectIDs = [];
-        for (let i = 1; i < idStart; i += 2){
-            collectKeys.push(queries[i]);
-        }
-        for (let j = idStart + 1; j < queries.length; j += 2){
-            if (queries[j] == '$'){
-                let lastID = streamKey[collectKeys[collectKeys.length - 1]][streamKey[collectKeys[collectKeys.length - 1]].length - 1].id // retrieving the last id of the last stream under the given key
-                console.log("lastID", lastID)
-                if (lastID){
-                    queries[j] = lastID;
-                } else{
-                    queries[j] = "0-0"
-                }
-            }
-            collectIDs.push(queries[j])
-        }
-        if (commands.includes("block")){
-            if (!notCalled){
-                timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
-                if (timeIndex == 0){
-                    await awaitChange(collectKeys, collectIDs);
-            }
-                res = await xreadStreams(collectKeys, collectIDs, timeIndex)
-                notCalled = true;
-                return getBulkArray(res);
-            } else {
-                return getBulkString(null);
-            }
-            
-        } else {
-            res = await xreadStreams(collectKeys, collectIDs);
-            return getBulkArray(res);
-        }
-}
 
 function xRange(commands){
     index = commands.indexOf("xrange");
@@ -501,7 +463,42 @@ const server = net.createServer((connection) => {
                 connection.write(incrFunction(commands));
             }
     }else if (commands.includes("xread")){
-        connection.write(xRead(commands))
+        queries = commands.slice(commands.indexOf("streams") + 1);
+        idStart = queries.length / 2;
+        collectKeys = [];
+        collectIDs = [];
+        for (let i = 1; i < idStart; i += 2){
+            collectKeys.push(queries[i]);
+        }
+        for (let j = idStart + 1; j < queries.length; j += 2){
+            if (queries[j] == '$'){
+                let lastID = streamKey[collectKeys[collectKeys.length - 1]][streamKey[collectKeys[collectKeys.length - 1]].length - 1].id // retrieving the last id of the last stream under the given key
+                console.log("lastID", lastID)
+                if (lastID){
+                    queries[j] = lastID;
+                } else{
+                    queries[j] = "0-0"
+                }
+            }
+            collectIDs.push(queries[j])
+        }
+        if (commands.includes("block")){
+            if (!notCalled){
+                timeIndex = parseInt(commands[commands.indexOf("block") + 2], 10);
+                if (timeIndex == 0){
+                    await awaitChange(collectKeys, collectIDs);
+            }
+                res = await xreadStreams(collectKeys, collectIDs, timeIndex)
+                notCalled = true;
+                connection.write(getBulkArray(res));
+            } else {
+                connection.write(getBulkString(null));
+            }
+            
+        } else {
+            res = await xreadStreams(collectKeys, collectIDs);
+            connection.write(getBulkArray(res));
+        }
     } else if (commands.includes("xrange")){
         connection.write(xRange(commands));
         }
