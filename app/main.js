@@ -234,7 +234,8 @@ let execQueue = [];
 function execFunction(isMultiCalled){
     if (!isMultiCalled){
         connection.write("-ERR EXEC without MULTI\r\n");
-    } else {
+        return
+    }
     let cmd = `*${execQueue.length}\r\n`
     isMultiCalled = false;
     for (let i = 0; i < execQueue.length; i++){
@@ -257,11 +258,10 @@ function execFunction(isMultiCalled){
         // } else {
         //         cmd += `:${execQueue[i]}\r\n`
         //     }
-            }
         }
         execQueue = null;
     return cmd.toString();
-}
+    }
 function multiFunction(){
     execQueue = [];
     return "+OK\r\n"
