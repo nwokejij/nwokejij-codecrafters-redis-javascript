@@ -228,10 +228,10 @@ const streamArray = [];
 let prevStreamID = null;
 let timeToVersion = {}
 let notCalled = false;
-let execQueue = [];
 
 
-function execFunction(isMultiCalled){
+
+function execFunction(isMultiCalled, execQueue){
     if (!isMultiCalled || execQueue == null){
         return "-ERR EXEC without MULTI\r\n"
     }
@@ -254,7 +254,7 @@ function execFunction(isMultiCalled){
         execQueue = null;
     return cmd.toString();
     }
-function multiFunction(){
+function multiFunction(execQueue){
     execQueue = [];
     return "+OK\r\n"
 }
@@ -434,6 +434,7 @@ function getCommand(commands){
 }
 const server = net.createServer((connection) => {
     let isMultiCalled = false;
+    let execQueue = null;
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
     const command = data.toString();
@@ -452,10 +453,10 @@ const server = net.createServer((connection) => {
         connection.write("+OK\r\n");
         }
     }else if (commands.includes("exec")){
-        connection.write(execFunction(isMultiCalled));
+        connection.write(execFunction(isMultiCalled, execQueue));
     } else if (commands.includes("multi")){
         isMultiCalled = true;
-        connection.write(multiFunction());
+        connection.write(multiFunction(execQueue));
     }else if (commands.includes("incr")){
         if (isMultiCalled){
             execQueue.push(commands);
