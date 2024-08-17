@@ -219,7 +219,6 @@ class Stream {
 }
 
 const dictionary = {};
-let isMultiCalled = false;
 const replicas = [];
 let propagatedCommands = 0;
 let numOfAcks = 0;
@@ -232,7 +231,7 @@ let notCalled = false;
 let execQueue = [];
 
 
-function execFunction(){
+function execFunction(isMultiCalled){
     let cmd = `*${execQueue.length}\r\n`
     if (!isMultiCalled){
         connection.write("-ERR EXEC without MULTI\r\n");
@@ -265,14 +264,9 @@ function execFunction(){
 }
 function multiFunction(){
     execQueue = [];
-    isMultiCalled = true;
     return "+OK\r\n"
 }
 function incrFunction(commands){
-    if (isMultiCalled){
-        execQueue.push(commands); // should I push the command instead
-        return "+QUEUED\r\n"
-    } 
         let key = commands[commands.indexOf("incr") + 2];
         if (!(key in dictionary)){
             dictionary[key] = 0;
@@ -458,10 +452,7 @@ function xAdd(commands){
         }
 }
 function setCommand(commands){
-    if (isMultiCalled){
-        execQueue.push(commands);
-        return "+QUEUED\r\n";
-    } 
+    
         let index = commands.indexOf("set");
         console.log("This is the index of SET", index);
         dictionary[commands[index + 2]] = commands[index + 4];
@@ -475,11 +466,7 @@ function setCommand(commands){
         return "+OK\r\n"
         }
 function getCommand(commands){
-    if (isMultiCalled){
-        console.log("We arrived")
-        execQueue.push(commands);
-        return "+QUEUED\r\n"
-        }
+    
     let index = commands.indexOf("get");
     readRDBFile(config["dir"], config["dbfilename"]);
     if (!(commands[index + 2] in dictionary) && !(commands[index + 2] in replicaDict)) {
@@ -492,6 +479,7 @@ function getCommand(commands){
     }
 }
 const server = net.createServer((connection) => {
+    let isMultiCalled = false;
     connection.type = 'client'; // Default type is client
     connection.on('data', async (data) => {
     const command = data.toString();
@@ -502,12 +490,17 @@ const server = net.createServer((connection) => {
     }
     console.log("Commands", commands);
     if (commands.includes("exec")){
-        connection.write(execFunction());
+        connection.write(execFunction(isMultiCalled));
     } else if (commands.includes("multi")){
+        isMultiCalled = true;
         connection.write(multiFunction());
     }else if (commands.includes("incr")){
-        connection.write(incrFunction(commands));
-    
+        if (isMultiCalled){
+            execQueue.push(commands);
+            connection.write("+QUEUED\r\n")
+            } else {
+                connection.write(incrFunction(commands));
+            }
     }else if (commands.includes("xread")){
         connection.write(xRead(commands))
     } else if (commands.includes("xrange")){
@@ -560,10 +553,20 @@ const server = net.createServer((connection) => {
     } else if (commands.includes("ping")) {
         connection.write("+PONG\r\n");
     } else if (commands.includes("set")) {
+        if (isMultiCalled){
+            execQueue.push(commands);
+            connection.write("+QUEUED\r\n")
+            } else {
         propagateToReplicas(replicas, command);
         connection.write(setCommand(commands))
+            }
     } else if (commands.includes("get")) {
-        connection.write(getCommand(commands))
+        if (isMultiCalled){
+            execQueue.push(commands);
+            connection.write("+QUEUED\r\n")
+        } else {
+            connection.write(getCommand(commands))
+        }
     } else if (commands.includes("wait")) {
         let index = commands.indexOf("wait");
         let noOfReps = parseInt(commands[index + 2]);
