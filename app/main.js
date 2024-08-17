@@ -233,8 +233,7 @@ let execQueue = [];
 
 function execFunction(isMultiCalled){
     if (!isMultiCalled || execQueue == null){
-        connection.write("-ERR EXEC without MULTI\r\n");
-        return
+        return "-ERR EXEC without MULTI\r\n"
     }
     let cmd = `*${execQueue.length}\r\n`
     isMultiCalled = false;
