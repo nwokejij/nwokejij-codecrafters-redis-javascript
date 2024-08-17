@@ -454,10 +454,10 @@ const server = net.createServer((connection) => {
         }
     }else if (commands.includes("exec")){
         connection.write(execFunction(isMultiCalled, execQueue));
+        isMultiCalled = false;
     } else if (commands.includes("multi")){
         isMultiCalled = true;
         connection.write(multiFunction(execQueue));
-        isMultiCalled = false;
     }else if (commands.includes("incr")){
         if (isMultiCalled){
             execQueue.push(commands);
